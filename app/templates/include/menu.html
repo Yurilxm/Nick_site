@@ -1,0 +1,17 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/menu.css' %}">
+
+<div class="topbar">
+    <div class="avatar">
+        <img src="{% static 'imagens/avatar_nick.jpg' %}" alt="Avatar">
+    </div>
+    <div class="menu">
+        <a href="{% url 'home' %}">Início</a>
+        <a href="{% url 'cadernetas' %}">Cadernetas</a>
+        <a href="{% url 'lembrancinhas' %}">Lembrancinhas</a>
+        <a href="{% url 'personalizados' %}">Personalizados</a>
+        <a href="{% url 'sobre' %}">Sobre</a>
+        <a href="{% url 'contato' %}">Contato</a>
+    </div>
+</div>
+
