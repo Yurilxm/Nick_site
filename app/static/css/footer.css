@@ -1,0 +1,143 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.footer-cadastro{
+    background-color: #ffc8dd;
+    width: 100%;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.footer-cadastro .titulo{
+    color: #ffffff;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.footer-cadastro .descricao {
+    color: #ffffff;
+    font-size: 15px;
+    margin-top: 20px;
+}
+
+.footer-cadastro .cadastro-form {
+    display: flex;
+    margin-top: 15px;
+    flex-direction: row;
+}
+
+.footer-cadastro .cadastro-form input[type="email"] {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    padding: 10px 70px 10px 30px;
+    border: 1px solid white;
+}
+
+.footer-cadastro .cadastro-form input[type="email"]::placeholder {
+    color: #ffffff;
+}
+
+.footer-cadastro .cadastro-form button[type="submit"] {
+    background-color: rgba(19, 212, 180, 0.503);
+    border-radius: 10px;
+    margin-left: 10px;
+    cursor: pointer;
+    color: rgb(66, 30, 1);
+    border: none;
+    padding: 10px 20px;
+}
+
+
+.footer-main{
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+}
+
+.footer-sobre{
+    width: 25%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer-sobre .titulo{
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffc8dd;
+    padding-left: 30px;
+}
+
+.titulo{
+    font-weight: bold;
+    margin-bottom: 10px;
+    color:#000000;
+    opacity: 0.8;
+}
+
+.footer-sobre .descricao{
+    margin-top: 15px;
+    font-size: 14px;
+    color: #000000;
+}
+
+.footer-links{
+    width: 25%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer-links a{
+    text-decoration: none;
+    color: #000000;
+    margin-bottom: 5px;
+    margin-top: 10px;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.footer-social{
+    width: 25%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer-social .social-links li{
+    text-decoration: none;
+    margin-bottom: 5px;
+    margin-top: 10px;
+    color: #000000;
+}
+
+.footer-info{
+    width: 25%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer-info span{
+    margin-bottom: 5px;
+    margin-top: 10px;
+    color: #000000;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.footer-credit{
+    width: 100%;
+    text-align: center;
+    color: #000000;
+    font-size: 14px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}

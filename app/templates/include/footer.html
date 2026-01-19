@@ -1,0 +1,64 @@
+{% load static %}
+
+<footer>
+
+    <!-- BLOCO 1 — Cadastro -->
+    <div class="footer-cadastro">
+        <span class="titulo">Fique por dentro das novidades!</span>
+        <span class="descricao">Cadastre-se para receber novidades e ofertas exclusivas!</span>
+
+        <div class="cadastro-form">
+            <input type="email" placeholder="Digite seu e-mail">
+            <button type="submit">Cadastrar</button>
+        </div>
+    </div>
+
+    <!-- BLOCO 2 — Conteúdo principal do footer -->
+    <div class="footer-main">
+
+        <!-- Sobre -->
+        <div class="footer-sobre">
+            <span class="titulo">Mimos da Nick</span>
+            <span class="descricao">
+                Criando momentos especiais com produtos artesanais únicos,
+                feitos com muito carinho para sua família.
+            </span>
+        </div>
+
+        <!-- Links -->
+        <div class="footer-links">
+            <span class="titulo">Produtos</span>
+                <a href="{% url 'cadernetas' %}">Cadernetas</a>
+                <a href="{% url 'lembrancinhas' %}">Lembrancinhas</a>
+                <a href="{% url 'personalizados' %}">Personalizados</a>
+                <a href="{% url 'sobre' %}">Sobre</a>
+                <a href="{% url 'contato' %}">Contato</a>
+        </div>
+
+        <!-- Redes sociais -->
+        <div class="footer-social">
+            <span class="titulo">Siga-nos</span>
+                <ul class="social-links">
+                    <li><a href="#">Facebook</a></li>
+                    <li><a href="#">Instagram</a></li>
+                    <li><a href="#">WhatsApp</a></li>
+                </ul>
+        </div>
+
+        <!-- Informações extras -->
+        <div class="footer-info">
+            <span class="titulo">Informações</span>
+                <span><strong>Envio para todo Brasil</strong></span>
+                <span><strong>Prazo:</strong> 7 a 15 dias úteis após a confirmação do pagamento.</span>
+                <span><strong>Parcelamento:</strong> Até 3x sem juros.</span>
+                <span><strong>Pix:</strong> 5% de desconto.</span>
+        </div>
+
+    </div>
+
+    <!-- BLOCO 3 — Créditos -->
+    <div class="footer-credit">
+        <span>Site criado por Yuri Lima</span>
+    </div>
+
+</footer>

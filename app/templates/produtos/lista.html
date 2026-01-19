@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="produtos-container">
+
+    {% for produto in produtos %}
+        {% include "include/card_produto.html" %}
+    {% endfor %}
+
+</div>
+
+{% endblock %}
+
+

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="card mx-auto" style="width: 22rem;">
+
+        {% if produto.imagem %}
+            <img src="{{ produto.imagem.url }}" class="card-img-top" alt="{{ produto.nome }}">
+        {% endif %}
+
+        <div class="card-body">
+            <h5 class="card-title">{{ produto.nome }}</h5>
+            <p class="card-text">{{ produto.descricao }}</p>
+            <p class="fw-bold">R$ {{ produto.preco }}</p>
+
+            <a href="#" class="btn btn-primary w-100">
+                Comprar
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

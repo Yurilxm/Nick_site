@@ -20,6 +20,12 @@ def sobre_view(request):
 def contato_view(request):
     return render(request, 'pages/contato.html')
 
+def login_view(request):
+    return render(request, 'pages/login.html')
+
+def carrinho_view(request):
+    return render(request, 'carrinho.html')
+
 
 
 # Create your views here.

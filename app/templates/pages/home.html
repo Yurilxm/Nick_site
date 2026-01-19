@@ -1,20 +1,37 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/home.css' %}">
-    <title>Nick Brindes - Início</title>
-</head>
-<body>
 
-    {% include "include/menu.html" %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block title %}Nick Brindes - Home{% endblock %}
+
+{% block content %}
 
     <div class="content">
-        <h1>Bem-vindo a Nick Brindes!</h1>
-        <p>Explore nossa variedade de produtos personalizados, cadernetas e lembrancinhas.</p>
-    </div>
+
+        <div class="texto-banner">
+            <span class="bemvindo">Bem-vindo aos</span>
+            <span class="nick">Mimos da Nick</span>
+            <span class="descricao">Aqui você encontra os melhores brindes personalizados para todas as ocasiões! Como por exemplo:</span>
+
+        <ul class="lista-produtos">
+            <li>Cadernetas de vacinação personalizadas</li>
+            <li>Lembrancinhas criativas</li>
+            <li>Produtos exclusivos feitos sob encomenda</li>
+        </ul>
+        </div>
     
-</body>
-</html>
+        <div class="botoes-home">
+            <button class="produtos" onclick="window.location.href='{% url 'cadernetas' %}'">Ver Produtos</button>
+            <button class="contato" onclick="window.location.href='{% url 'contato' %}'">Fale Conosco</button>
+        </div>
+        
+        <div class="imagem-banner">    
+            <img class="imagem-home" src="{% static 'imagens/imagem_home.png' %}" alt="Imagem Home">
+        </div>    
+    </div>
+
+    
+{% endblock %}
