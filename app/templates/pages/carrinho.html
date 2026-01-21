@@ -1,0 +1,11 @@
+{% load static %}
+
+<div class="carrinho-container" id="carrinho">
+    <button class="btn-fechar-carrinho" id="fechar-carrinho">
+        &times;
+    </button>
+
+    <h2>Seu Carrinho</h2>
+    <p>Seu carrinho está vazio.</p>
+    <a href="{% url 'lista_produtos' %}" class="btn btn-primary">Continuar Comprando</a>
+</div>

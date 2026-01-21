@@ -24,7 +24,7 @@ def login_view(request):
     return render(request, 'pages/login.html')
 
 def carrinho_view(request):
-    return render(request, 'carrinho.html')
+    return render(request, 'pages/carrinho.html')
 
 
 

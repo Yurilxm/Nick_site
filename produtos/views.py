@@ -7,4 +7,4 @@ def lista_produtos(request):
 
 def detalhe_produto(request, id):
     produto = get_object_or_404(Produto, id=id)
-    return render(request, 'produtos/detalhe.html', {'produto': produto})
+    return render(request, 'produtos/detalhe_produto.html', {'produto': produto})
