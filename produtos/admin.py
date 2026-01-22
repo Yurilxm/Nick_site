@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Produto
+from .models import Produto, Categoria
 from django.utils.html import format_html
 
 
@@ -7,7 +7,7 @@ from django.utils.html import format_html
 class ProdutoAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Informações do Produto', {
-            'fields': ('nome', 'descricao', 'preco', 'imagem')
+            'fields': ('nome', 'categoria', 'descricao', 'preco', 'imagem')
         }),
         ('Controle', {
             'fields': ('ativo',)
@@ -17,10 +17,9 @@ class ProdutoAdmin(admin.ModelAdmin):
         }),
     )
 
-    readonly_fields = ('criado_em', 'atualizado_em')
-
-    list_display = ('imagem_preview', 'nome', 'preco', 'ativo', 'criado_em')
-    list_filter = ('ativo', 'criado_em')
+    readonly_fields = ('criado_em', 'atualizado_em', 'imagem_preview')
+    list_display = ('imagem_preview', 'nome', 'categoria', 'preco', 'ativo', 'criado_em')
+    list_filter = ('ativo', 'categoria', 'criado_em')
     search_fields = ('nome', 'descricao')
     ordering = ('-criado_em',)
 
@@ -34,3 +33,7 @@ class ProdutoAdmin(admin.ModelAdmin):
 
     imagem_preview.short_description = 'Imagem'
 
+@admin.register(Categoria)
+class CategoriaAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'slug': ('nome',)}
+    list_display = ('nome', 'slug')

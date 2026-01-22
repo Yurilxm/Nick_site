@@ -1,63 +1,52 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block css %}
-<link rel="stylesheet" href="{% static 'produtos/css/detalhe_produto.css' %}">
-<script src="{% static 'produtos/js/detalhe_produto.js' %}" defer></script>
-{% endblock %}
-
-{% block title %}Detalhe do Produto - {{ produto.nome }}{% endblock %}
-
 {% block content %}
-
 <div class="produto-container">
 
   <div class="produto-descricao">
     <img class="produto-imagem" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
     <p class="descricao">{{ produto.descricao|linebreaks }}</p>
   </div>
-  
+
   <div class="produto-info">
     <h1>{{ produto.nome }}</h1>
     <p class="preco">R$ {{ produto.preco }}</p>
 
-    <div class="campo-nome">
-      <label>Nome para personalização:*</label>
-      <input type="text" id="personalizacao" placeholder="Digite o nome para personalização da capa">
-    </div>
-
-    <div class="campo-arame">
-      <label>COR DE ARAME:*</label>
-
-      <label>
-        <input type="radio" name="arame" value="branco">
-        Branco
-      </label>
-
-      <label>
-        <input type="radio" name="arame" value="bronze">
-        Bronze
-      </label>
-    </div>
-
-
-    <div class="campo-acabamentos">
-      <label>Selecione o acabamento para capas: ( Clique na sua escolha )</label>
-        <button type="button" data-acabamento="fosco">Fosco (SEM BRILHO)</button>
-        <button type="button" data-acabamento="holografico">Holográfico (PAPEL BRILHOSO)</button>
-    </div>
+    <!-- Aqui começam os extras específicos -->
+    {% if produto.categoria.nome == "Agendas" %}
+      <div class="campo-arame">
+        <label>Cor de Arame:*</label>
+        <label><input type="radio" name="arame" value="branco"> Branco</label>
+        <label><input type="radio" name="arame" value="bronze"> Bronze</label>
+      </div>
+    {% elif produto.categoria.nome == "Camisas" %}
+      <div class="campo-tamanho">
+        <label>Tamanho:*</label>
+        <label><input type="radio" name="tamanho" value="P"> P</label>
+        <label><input type="radio" name="tamanho" value="M"> M</label>
+        <label><input type="radio" name="tamanho" value="G"> G</label>
+      </div>
+    {% elif produto.categoria.nome == "Canecas" %}
+      <div class="campo-sublimacao">
+        <label>Tipo de Sublimação:*</label>
+        <select name="sublimacao">
+          <option value="padrao">Padrão</option>
+          <option value="premium">Premium</option>
+        </select>
+      </div>
+    {% endif %}
+    <!-- Fim dos extras -->
 
     <div class="campo-quantidade">
       <div class="controle-quantidade">
         <button type="button">-</button>
-          <span>1</span>
+        <span>1</span>
         <button type="button">+</button>
       </div>
 
       <button class="adicionar-carrinho" type="button">Adicionar ao carrinho</button>
     </div>
   </div>
-
 </div>
-
 {% endblock %}

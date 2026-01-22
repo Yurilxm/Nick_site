@@ -16,6 +16,8 @@ class Produto(models.Model):
     
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
+    
+    categoria = models.ForeignKey('Categoria', on_delete=models.SET_NULL, null=True, blank=True, related_name='produtos')
 
     class Meta:
         ordering = ['-criado_em']
@@ -34,4 +36,20 @@ class Produto(models.Model):
                 contador += 1
             self.slug = slug
 
+        super().save(*args, **kwargs)
+
+
+class Categoria(models.Model):
+    nome = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=60, unique=True, blank=True)
+
+    class Meta:
+        verbose_name_plural = "Categorias"
+
+    def __str__(self):
+        return self.nome
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self.nome.lower().replace(" ", "-")
         super().save(*args, **kwargs)
