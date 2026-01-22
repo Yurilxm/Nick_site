@@ -10,7 +10,7 @@
         <h3 class="produto-nome">{{ produto.nome }}</h3>
         <p class="produto-preco">R$ {{ produto.preco }}</p>
 
-        <a href="{% url 'detalhe_produto' produto.id %}" class="produto-botao">
+        <a href="{% url 'detalhe_produto' produto.id produto.slug %}" class="produto-botao">
             Ver detalhes
         </a>
     </div>

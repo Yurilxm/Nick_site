@@ -10,7 +10,7 @@
 }
 
 .topbar {
-    background: linear-gradient(90deg, rgb(226, 122, 4) 0%, rgba(245, 137, 184, 1) 50%, rgba(148, 187, 233, 1) 100%);
+    background: #ffc8dd;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

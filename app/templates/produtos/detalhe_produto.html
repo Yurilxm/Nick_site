@@ -14,7 +14,7 @@
 
   <div class="produto-descricao">
     <img class="produto-imagem" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
-    <p class="descricao">{{ produto.descricao }}</p>
+    <p class="descricao">{{ produto.descricao|linebreaks }}</p>
   </div>
   
   <div class="produto-info">

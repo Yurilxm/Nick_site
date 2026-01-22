@@ -32,7 +32,6 @@ class Produto(models.Model):
             while Produto.objects.filter(slug=slug).exists():
                 slug = f"{slug_base}-{contador}"
                 contador += 1
-
             self.slug = slug
 
         super().save(*args, **kwargs)
