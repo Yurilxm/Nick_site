@@ -3,10 +3,16 @@ venv/
 
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
 
 # Django
 db.sqlite3
+*.log
 
-# Sistema
+# Variáveis de ambiente
+.env
+
+# Sistema / Editor
 .DS_Store
+.vscode/
+.idea/
