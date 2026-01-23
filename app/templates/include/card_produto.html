@@ -9,12 +9,15 @@
     </div>
 
     <div class="produto-info">
-        <h3 class="produto-nome">{{ produto.nome }}</h3>
-        <p class="produto-preco">R$ {{ produto.preco }}</p>
+        <h2 class="produto-nome">{{ produto.nome }}</h2>
 
-        <a href="{% url 'detalhe_produto' produto.id produto.slug %}" class="produto-botao">
-            Ver detalhes
-        </a>
+        <div class="produto-footer">
+            <p class="produto-preco">R$ {{ produto.preco }}</p>
+
+            <a href="{% url 'detalhe_produto' produto.id produto.slug %}" class="produto-botao">
+                Ver detalhes
+            </a>
+        </div>
     </div>
 
 </div>

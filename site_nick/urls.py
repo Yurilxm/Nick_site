@@ -24,13 +24,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('produtos/', include('produtos.urls')),
     path('', views.home_view, name='home'),
-    path('cadernetas/', views.cadernetas_view, name='cadernetas'),
-    path('lembrancinhas/', views.lembrancinhas_view, name='lembrancinhas'),
-    path('personalizados/', views.personalizados_view, name='personalizados'),
     path('sobre/', views.sobre_view, name='sobre'),
     path('contato/', views.contato_view, name='contato'),
     path('login/', views.login_view, name='login'),
     path('carrinho/', views.carrinho_view, name='carrinho'),
+    path('produtos/', include('produtos.urls')),
 ]
 
 
