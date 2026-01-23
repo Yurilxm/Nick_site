@@ -14,6 +14,8 @@
     box-shadow: 0 8px 20px rgba(0,0,0,0.08);
     transition: transform 0.25s ease, box-shadow 0.25s ease;
     height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 /* HOVER */
@@ -42,19 +44,27 @@
 .produto-info {
     padding: 16px;
     text-align: center;
+
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.produto-footer {
+    margin-top: auto;
 }
 
 .produto-nome {
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 500;
     margin-bottom: 8px;
+    color: #421e01;
 }
 
 .produto-preco {
     font-size: 16px;
-    color: #444;
+    color: #421e01;
     margin-bottom: 12px;
-    font-weight: bold;
 }
 
 /* BOTÃO */
@@ -68,6 +78,7 @@
     border-radius: 10px;
     font-weight: 500;
     transition: background-color 0.2s ease, transform 0.2s ease;
+    margin-top: auto;
 }
 
 .produto-botao:hover {
