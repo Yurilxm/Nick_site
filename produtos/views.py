@@ -16,3 +16,27 @@ def produtos_por_categoria(request, slug):
         'produtos': produtos,
         'categoria': categoria
     })
+
+def home(request):
+    canecas = Produto.objects.filter(
+        ativo=True,
+        categoria__slug='canecas'
+    )[:8]
+
+    camisas = Produto.objects.filter(
+        ativo=True,
+        categoria__slug='camisas'
+    )[:8]
+
+    cadernetas = Produto.objects.filter(
+        ativo=True,
+        categoria__slug='caderneta-de-vacinacao'
+    )[:8]
+
+    context = {
+        'canecas': canecas,
+        'camisas': camisas,
+        'cadernetas': cadernetas,
+    }
+
+    return render(request, 'home.html', context)
