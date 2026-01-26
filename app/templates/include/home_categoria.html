@@ -1,0 +1,49 @@
+{% load static %}
+
+<section class="home-categoria reveal">
+    <div class="home-categoria-header">
+        <h2>{{ titulo }}</h2>
+        <a href="{% url 'produtos_por_categoria' slug %}" class="ver-mais">
+            Ver mais →
+        </a>
+    </div>
+
+    <div id="carousel-{{ slug }}" class="carousel carousel-dark slide carousel-categoria">
+        <div class="carousel-inner">
+
+            <!-- Slide 1 -->
+            <div class="carousel-item active">
+                <div class="produtos-grid">
+                    {% for produto in produtos|slice:":4" %}
+                        {% include "include/card_produto.html" with produto=produto %}
+                    {% empty %}
+                        <p>Nenhum produto disponível.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Slide 2 (somente se houver mais de 4 produtos) -->
+            {% if produtos|length > 4 %}
+            <div class="carousel-item">
+                <div class="produtos-grid">
+                    {% for produto in produtos|slice:"4:8" %}
+                        {% include "include/card_produto.html" with produto=produto %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- Botões de navegação -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ slug }}" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+        </button>
+
+        <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ slug }}" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Próximo</span>
+        </button>
+    </div>
+</section>
