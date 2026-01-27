@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Seu Carrinho</h2>
+
+{% if itens %}
+  <ul>
+    {% for item in itens %}
+      <li>
+        <strong>{{ item.produto.nome }}</strong><br>
+
+        <form action="{% url 'diminuir_quantidade' item.id %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit">−</button>
+        </form>
+
+        {{ item.quantidade }}
+
+        <form action="{% url 'aumentar_quantidade' item.id %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit">+</button>
+        </form>
+
+        <br>
+
+        Preço unitário: R$ {{ item.preco_unitario }}<br>
+        Subtotal: R$ {{ item.subtotal }}
+
+        <form action="{% url 'remover_do_carrinho' item.id %}" method="post">
+          {% csrf_token %}
+          <button type="submit">Remover</button>
+        </form>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>Seu carrinho está vazio.</p>
+{% endif %}
+
+{% endblock %}
