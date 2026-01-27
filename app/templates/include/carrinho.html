@@ -1,13 +1,20 @@
 {% load static %}
 
-<div class="carrinho-container" id="carrinho">
-    <button class="btn-fechar-carrinho" id="fechar-carrinho">
-        &times;
-    </button>
+<div class="carrinho-conteudo">
+    <h2>Seu Carrinho</h2>
 
-    <div class="carrinho-conteudo">
-        <h2>Seu Carrinho</h2>
+    {% if carrinho %}
+        <ul class="lista-carrinho">
+            {% for id, item in carrinho.items %}
+                <li class="item-carrinho">
+                    <strong>{{ item.nome }}</strong><br>
+                    Qtd: {{ item.quantidade }} <br>
+                    R$ {{ item.preco }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
         <p>Seu carrinho está vazio.</p>
         <a href="{% url 'lista_produtos' %}">Continuar Comprando</a>
-    </div>
+    {% endif %}
 </div>

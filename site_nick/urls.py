@@ -26,8 +26,8 @@ urlpatterns = [
     path('sobre/', views.sobre_view, name='sobre'),
     path('contato/', views.contato_view, name='contato'),
     path('login/', views.login_view, name='login'),
-    path('carrinho/', views.carrinho_view, name='carrinho'),
     path('produtos/', include('produtos.urls')),
+    path('carrinho/', include('carrinho.urls')),
 ]
 
 
