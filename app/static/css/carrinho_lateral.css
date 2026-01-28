@@ -11,6 +11,26 @@
     background-color: #e6f2ff;
 }
 
+.item-carrinho {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.item-carrinho-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.item-carrinho-info {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+}
+
 .carrinho-container.aberto {
     right: 0;        /* ABERTO */
 }

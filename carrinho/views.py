@@ -3,8 +3,10 @@ from produtos.models import Produto
 from .models import ItemCarrinho
 from .services import obter_carrinho
 from django.views.decorators.http import require_POST
+from django.http import JsonResponse
 
 
+@require_POST
 def adicionar_ao_carrinho(request, produto_id):
     carrinho = obter_carrinho(request)
     produto = get_object_or_404(Produto, id=produto_id)
@@ -18,6 +20,9 @@ def adicionar_ao_carrinho(request, produto_id):
     if not created:
         item.quantidade += 1
         item.save()
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'status': 'ok'})
 
     return redirect('ver_carrinho')
 
@@ -39,7 +44,7 @@ def ver_carrinho(request):
     carrinho = obter_carrinho(request)
     itens = carrinho.itens.all()
 
-    total = sum(item.subtotal() for item in itens)
+    total = sum(item.subtotal for item in itens)
 
     context = {
         'carrinho': carrinho,
@@ -62,6 +67,14 @@ def aumentar_quantidade(request, item_id):
     item.quantidade += 1
     item.save()
 
+    # 👉 Se for AJAX
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({
+            'quantidade': item.quantidade,
+            'subtotal': float(item.subtotal),
+        })
+
+    # 👉 Fallback (caso alguém acesse sem JS)
     return redirect('ver_carrinho')
 
 
@@ -77,7 +90,38 @@ def diminuir_quantidade(request, item_id):
     if item.quantidade > 1:
         item.quantidade -= 1
         item.save()
+        removido = False
     else:
         item.delete()
+        removido = True
+
+    # 👉 AJAX
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({
+            'removido': removido,
+            'quantidade': item.quantidade if not removido else 0,
+            'subtotal': float(item.subtotal) if not removido else 0,
+        })
 
     return redirect('ver_carrinho')
+
+
+
+def mini_carrinho_json(request):
+    carrinho = obter_carrinho(request)
+    itens = carrinho.itens.select_related("produto")
+
+    return JsonResponse({
+        "quantidade_total": sum(item.quantidade for item in itens),
+        "total": float(sum(item.subtotal for item in itens)),
+        "itens": [
+            {
+                "id": item.id,
+                "nome": item.produto.nome,
+                "quantidade": item.quantidade,
+                "preco": float(item.preco_unitario),
+                "imagem": item.produto.imagem.url if item.produto.imagem else ""
+            }
+            for item in itens
+        ]
+    })

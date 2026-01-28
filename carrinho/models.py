@@ -36,6 +36,7 @@ class ItemCarrinho(models.Model):
     class Meta:
         unique_together = ('carrinho', 'produto')
 
+    @property
     def subtotal(self):
         return self.quantidade * self.preco_unitario
 

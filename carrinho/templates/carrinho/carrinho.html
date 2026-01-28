@@ -8,24 +8,36 @@
   <ul>
     {% for item in itens %}
       <li>
+        
+        {% if item.produto.imagem %}
+          <img src="{{ item.produto.imagem.url }}" alt="{{ item.produto.nome }}" class="carrinho-imagem">
+        {% endif %}
+
         <strong>{{ item.produto.nome }}</strong><br>
 
-        <form action="{% url 'diminuir_quantidade' item.id %}" method="post" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit">−</button>
-        </form>
+        <button 
+          class="btn-diminuir" 
+          data-item-id="{{ item.id }}">
+          −
+        </button>
 
-        {{ item.quantidade }}
+        <span id="quantidade-{{ item.id }}">
+          {{ item.quantidade }}
+        </span>
 
-        <form action="{% url 'aumentar_quantidade' item.id %}" method="post" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit">+</button>
-        </form>
+        <button 
+          class="btn-aumentar" 
+          data-item-id="{{ item.id }}">
+          +
+        </button>
 
         <br>
 
-        Preço unitário: R$ {{ item.preco_unitario }}<br>
-        Subtotal: R$ {{ item.subtotal }}
+        Subtotal: R$ 
+        <span id="subtotal-{{ item.id }}">
+          {{ item.subtotal }}
+        </span>
+
 
         <form action="{% url 'remover_do_carrinho' item.id %}" method="post">
           {% csrf_token %}
