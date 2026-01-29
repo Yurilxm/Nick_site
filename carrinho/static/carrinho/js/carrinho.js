@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+  atualizarMiniCarrinho();
 
   const csrfToken = document
     .querySelector('meta[name="csrf-token"]')
@@ -60,3 +61,20 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 });
+
+function atualizarBadge(qtd) {
+  const badge = document.getElementById("badge-carrinho");
+  if (!badge) return;
+
+  badge.innerText = qtd;
+  badge.style.display = qtd > 0 ? "inline-block" : "none";
+}
+
+function atualizarMiniCarrinho() {
+  fetch("/carrinho/mini/")
+    .then(response => response.json())
+    .then(data => {
+      atualizarBadge(data.quantidade_total);
+    })
+    .catch(error => console.error("Erro mini carrinho:", error));
+}

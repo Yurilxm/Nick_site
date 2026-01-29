@@ -19,13 +19,16 @@ from django.urls import path, include
 from app import views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
+from app.views import LoginCustomView, home_view, logout_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home_view, name='home'),
     path('sobre/', views.sobre_view, name='sobre'),
     path('contato/', views.contato_view, name='contato'),
-    path('login/', views.login_view, name='login'),
+    path('login/', LoginCustomView.as_view(), name='login'),
+    path('logout/', logout_view, name='logout'),
     path('produtos/', include('produtos.urls')),
     path('carrinho/', include('carrinho.urls')),
 ]
