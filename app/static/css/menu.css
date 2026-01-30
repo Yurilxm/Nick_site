@@ -5,10 +5,6 @@
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
-.site-content {
-    padding-top: 180px; /* PARA NÃO FICAR POR BAIXO DA TOPBAR */
-}
-
 .topbar {
     background-image: url(../imagens/fundo_topbar.png);
     

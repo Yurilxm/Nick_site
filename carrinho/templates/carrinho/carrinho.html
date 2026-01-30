@@ -2,52 +2,80 @@
 
 {% block content %}
 
+<div class="carrinho-wrapper">
+
 <h2>Seu Carrinho</h2>
 
 {% if itens %}
-  <ul>
-    {% for item in itens %}
-      <li>
-        
-        {% if item.produto.imagem %}
-          <img src="{{ item.produto.imagem.url }}" alt="{{ item.produto.nome }}" class="carrinho-imagem">
-        {% endif %}
 
-        <strong>{{ item.produto.nome }}</strong><br>
+<div class="carrinho-layout">
 
-        <button 
-          class="btn-diminuir" 
-          data-item-id="{{ item.id }}">
-          −
-        </button>
+  <!-- ESQUERDA: LISTA -->
 
-        <span id="quantidade-{{ item.id }}">
-          {{ item.quantidade }}
-        </span>
-
-        <button 
-          class="btn-aumentar" 
-          data-item-id="{{ item.id }}">
-          +
-        </button>
-
-        <br>
-
-        Subtotal: R$ 
-        <span id="subtotal-{{ item.id }}">
-          {{ item.subtotal }}
-        </span>
+  <div class="carrinho-lista">
 
 
-        <form action="{% url 'remover_do_carrinho' item.id %}" method="post">
-          {% csrf_token %}
-          <button type="submit">Remover</button>
-        </form>
-      </li>
-    {% endfor %}
-  </ul>
+<ul>
+  {% for item in itens %}
+  <li>
+
+    {% if item.produto.imagem %}
+      <img src="{{ item.produto.imagem.url }}" alt="{{ item.produto.nome }}" class="carrinho-imagem">
+    {% endif %}
+
+    <strong>{{ item.produto.nome }}</strong>
+
+    <button class="btn-diminuir" data-item-id="{{ item.id }}">−</button>
+
+    <span id="quantidade-{{ item.id }}">
+      {{ item.quantidade }}
+    </span>
+
+    <button class="btn-aumentar" data-item-id="{{ item.id }}">+</button>
+
+    Subtotal: R$
+    <span id="subtotal-{{ item.id }}">
+      {{ item.subtotal }}
+    </span>
+
+    <form action="{% url 'remover_do_carrinho' item.id %}" method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn-remover">×</button>
+    </form>
+
+  </li>
+  {% endfor %}
+</ul>
+
+
+  </div>
+
+  <!-- DIREITA: RESUMO -->
+
+  <div class="carrinho-resumo">
+
+<h3>Resumo do pedido</h3>
+
+  <p>Subtotal: R$ {{ total }}</p>
+  <p>Frete: calcular</p>
+
+<hr>
+
+<p class="total-final">Total: R$ {{ total }}</p>
+
+<button class="btn-finalizar">
+  Finalizar compra
+</button>
+
+  </div>
+
+</div>
+
 {% else %}
+
   <p>Seu carrinho está vazio.</p>
 {% endif %}
+
+</div>
 
 {% endblock %}

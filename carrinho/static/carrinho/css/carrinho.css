@@ -1,0 +1,153 @@
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.carrinho-imagem {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+button {
+    padding: 4px 8px;
+    cursor: pointer;
+}
+
+form {
+    margin-left: auto;
+}
+
+ul li {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    flex-wrap: wrap;
+}
+
+/* nome do produto */
+ul li strong {
+    min-width: 200px;
+}
+
+/* quantidade */
+ul li span {
+    font-weight: bold;
+}
+
+/* subtotal */
+ul li br {
+    display: none;
+}
+
+/* linha do item */
+li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+/* imagem */
+.carrinho-imagem {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+}
+
+/* botões + e - menores */
+.btn-aumentar,
+.btn-diminuir {
+    background: #421e01;
+    color: white;
+    border: none;
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-aumentar:hover,
+.btn-diminuir:hover {
+    background: #ec6391;
+}
+
+/* número da quantidade */
+[id^="quantidade-"] {
+    font-size: 16px;
+    font-weight: bold;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* botão X remover */
+.btn-remover {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #c00;
+    cursor: pointer;
+    margin-left: auto; /* joga ele pra direita */
+    transition: 0.2s;
+}
+
+.btn-remover:hover {
+    transform: scale(1.2);
+}
+
+.carrinho-wrapper {
+    padding: 30px;
+}
+
+.carrinho-layout {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+.carrinho-lista {
+    flex: 2;
+}
+
+.carrinho-resumo {
+    flex: 1;
+    border: 1px solid #ddd;
+    padding: 20px;
+    background: #fafafa;
+    border-radius: 8px;
+}
+
+.total-final {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.btn-finalizar {
+    width: 100%;
+    padding: 12px;
+    background: #421e01;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-top: 15px;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.btn-finalizar:hover {
+    background: #ec6391;
+}
