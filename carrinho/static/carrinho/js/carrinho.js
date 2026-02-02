@@ -31,7 +31,12 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById(`subtotal-${itemId}`).innerText =
           data.subtotal.toFixed(2);
 
-        // 🔥 ATUALIZA O MINI CARRINHO
+        document.getElementById("subtotal-geral").innerText =
+          data.total.toFixed(2);
+
+        document.getElementById("total-geral").innerText =
+          data.total.toFixed(2);
+
         atualizarMiniCarrinho();
       });
     });
@@ -45,7 +50,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       atualizarQuantidade(url, itemId, data => {
         if (data.removido) {
-          location.reload(); // simples e seguro
+          const li = this.closest("li");
+          if (li) li.remove();
         } else {
           document.getElementById(`quantidade-${itemId}`).innerText =
             data.quantidade;
@@ -54,12 +60,47 @@ document.addEventListener("DOMContentLoaded", function () {
             data.subtotal.toFixed(2);
         }
 
-        // 🔥 ATUALIZA O MINI CARRINHO
+        document.getElementById("subtotal-geral").innerText =
+          data.total.toFixed(2);
+
+        document.getElementById("total-geral").innerText =
+          data.total.toFixed(2);
+
         atualizarMiniCarrinho();
       });
     });
   });
 
+  // ❌ REMOVER (sem reload)
+  document.querySelectorAll(".form-remover").forEach(form => {
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const url = this.action;
+
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrfToken,
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          const li = this.closest("li");
+          if (li) li.remove();
+
+          document.getElementById("subtotal-geral").innerText =
+            data.total.toFixed(2);
+
+          document.getElementById("total-geral").innerText =
+            data.total.toFixed(2);
+
+          atualizarMiniCarrinho();
+        })
+        .catch(err => console.error("Erro ao remover item:", err));
+    });
+  });
 });
 
 function atualizarBadge(qtd) {
@@ -68,13 +109,4 @@ function atualizarBadge(qtd) {
 
   badge.innerText = qtd;
   badge.style.display = qtd > 0 ? "inline-block" : "none";
-}
-
-function atualizarMiniCarrinho() {
-  fetch("/carrinho/mini/")
-    .then(response => response.json())
-    .then(data => {
-      atualizarBadge(data.quantidade_total);
-    })
-    .catch(error => console.error("Erro mini carrinho:", error));
 }

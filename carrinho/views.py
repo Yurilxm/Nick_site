@@ -37,6 +37,18 @@ def remover_do_carrinho(request, item_id):
     )
 
     item.delete()
+    
+     # 👉 Se for AJAX, responde JSON
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        itens = carrinho.itens.all()
+        total = sum(i.subtotal for i in itens)
+
+        return JsonResponse({
+            'removido': True,
+            'total': float(total),
+        })
+
+    # 👉 fallback (caso alguém acesse sem JS)
     return redirect('ver_carrinho')
 
 
@@ -69,9 +81,13 @@ def aumentar_quantidade(request, item_id):
 
     # 👉 Se for AJAX
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        itens = carrinho.itens.all()
+        total = sum(item.subtotal for item in itens)
+
         return JsonResponse({
             'quantidade': item.quantidade,
             'subtotal': float(item.subtotal),
+            'total': float(total),
         })
 
     # 👉 Fallback (caso alguém acesse sem JS)
@@ -97,10 +113,14 @@ def diminuir_quantidade(request, item_id):
 
     # 👉 AJAX
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        itens = carrinho.itens.all()
+        total = sum(item.subtotal for item in itens)
+
         return JsonResponse({
             'removido': removido,
             'quantidade': item.quantidade if not removido else 0,
             'subtotal': float(item.subtotal) if not removido else 0,
+            'total': float(total),
         })
 
     return redirect('ver_carrinho')

@@ -18,7 +18,6 @@
 
     <link rel="stylesheet" href="{% static 'css/card_produto.css' %}">
     <link rel="stylesheet" href="{% static 'css/carrinho_lateral.css' %}">
-    <link rel="stylesheet" href="{% static 'carrinho/css/carrinho.css' %}">
 
 
 
@@ -55,9 +54,10 @@
 
     <script src="{% static 'js/carrinho_lateral.js' %}"></script>
     <script src="{% static 'js/home.js' %}"></script>
-    <script src="{% static 'carrinho/js/carrinho.js' %}"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+{% block scripts %}{% endblock %}
 
 </body>
 </html>

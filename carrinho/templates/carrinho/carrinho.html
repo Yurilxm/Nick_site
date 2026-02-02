@@ -1,4 +1,10 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+  <link rel="stylesheet" href="{% static 'carrinho/css/carrinho.css' %}">
+{% endblock %}
+
 
 {% block content %}
 
@@ -38,7 +44,7 @@
       {{ item.subtotal }}
     </span>
 
-    <form action="{% url 'remover_do_carrinho' item.id %}" method="post">
+    <form action="{% url 'remover_do_carrinho' item.id %}" method="post" class="form-remover" data-item-id="{{ item.id }}">
       {% csrf_token %}
       <button type="submit" class="btn-remover">×</button>
     </form>
@@ -56,12 +62,12 @@
 
 <h3>Resumo do pedido</h3>
 
-  <p>Subtotal: R$ {{ total }}</p>
+  <p>Subtotal: R$ <span id="subtotal-geral">{{ total }}</span></p>
   <p>Frete: calcular</p>
 
 <hr>
 
-<p class="total-final">Total: R$ {{ total }}</p>
+<p class="total-final">Total: R$ <span id="total-geral">{{ total }}</span></p>
 
 <button class="btn-finalizar">
   Finalizar compra
@@ -77,5 +83,9 @@
 {% endif %}
 
 </div>
+
+{% block scripts %}
+  <script src="{% static 'carrinho/js/carrinho.js' %}"></script>
+{% endblock %}
 
 {% endblock %}
