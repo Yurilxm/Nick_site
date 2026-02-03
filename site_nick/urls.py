@@ -31,6 +31,7 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
     path('produtos/', include('produtos.urls')),
     path('carrinho/', include('carrinho.urls')),
+    path("marketing/", include("marketing.urls")),
 ]
 
 
