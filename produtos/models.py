@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+from django.urls import reverse
 
 
 
@@ -37,6 +38,9 @@ class Produto(models.Model):
             self.slug = slug
 
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('detalhe_produto', kwargs={'id': self.id, 'slug': self.slug})
 
 
 class Categoria(models.Model):

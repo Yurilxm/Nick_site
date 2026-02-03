@@ -2,16 +2,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const botaoCarrinho = document.getElementById("btn-carrinho");
   const carrinho = document.getElementById("carrinho");
   const botaoFechar = document.getElementById("fechar-carrinho");
+  const overlay = document.getElementById("overlay-carrinho");
 
-  if (botaoCarrinho && carrinho && botaoFechar) {
+  function abrirCarrinho() {
+    carrinho.classList.add("aberto");
+    overlay.classList.add("ativo");
+    document.body.classList.add("no-scroll");
+  }
+
+  function fecharCarrinho() {
+    carrinho.classList.remove("aberto");
+    overlay.classList.remove("ativo");
+    document.body.classList.remove("no-scroll");
+  }
+
+  if (botaoCarrinho && carrinho && botaoFechar && overlay) {
     botaoCarrinho.addEventListener("click", (e) => {
       e.preventDefault();
-      carrinho.classList.toggle("aberto");
+      abrirCarrinho();
     });
 
-    botaoFechar.addEventListener("click", () => {
-      carrinho.classList.remove("aberto");
-    });
+    botaoFechar.addEventListener("click", fecharCarrinho);
+    overlay.addEventListener("click", fecharCarrinho);
   }
 
   atualizarMiniCarrinho();
@@ -59,7 +71,7 @@ function atualizarMiniCarrinho() {
 
       data.itens.forEach((item) => {
         lista.innerHTML += `
-          <li class="item-carrinho" data-item-id="${item.id}">
+          <li class="item-carrinho clicavel" data-item-id="${item.id}" data-url="${item.url}">
             ${
               item.imagem
                 ? `<img src="${item.imagem}" class="item-carrinho-img" alt="${item.nome}">`
@@ -86,7 +98,7 @@ function atualizarMiniCarrinho() {
 }
 
 /* =========================
-   REMOVER ITEM (EVENT DELEGATION)
+   REMOVER ITEM (X DO MINI CARRINHO) - EVENT DELEGATION
 ========================= */
 document.addEventListener("click", function (e) {
   const btn = e.target.closest(".btn-remover-mini");
@@ -103,15 +115,41 @@ document.addEventListener("click", function (e) {
   })
     .then((res) => res.json())
     .then((data) => {
-      const li = btn.closest(".item-carrinho");
-      if (li) li.remove();
+      // Remove do minicarrinho
+      const liMini = btn.closest(".item-carrinho");
+      if (liMini) liMini.remove();
 
-      const totalEl = document.getElementById("mini-carrinho-total");
-      if (totalEl) {
-        totalEl.innerText = data.total.toFixed(2);
+      // Atualiza subtotal do minicarrinho
+      const totalMini = document.getElementById("mini-carrinho-total");
+      if (totalMini) totalMini.innerText = data.total.toFixed(2);
+
+      // Atualiza badge
+      atualizarBadge(data.quantidade_total ?? 0);
+
+      // ✅ Sincroniza com a página de carrinho, se aberta
+      const liPagina = document.querySelector(`li[data-item-id="${itemId}"]`);
+      if (liPagina) {
+        liPagina.remove();
       }
 
-      atualizarMiniCarrinho();
+      const subtotalGeral = document.getElementById("subtotal-geral");
+      const totalGeral = document.getElementById("total-geral");
+      if (subtotalGeral) subtotalGeral.innerText = data.total.toFixed(2);
+      if (totalGeral) totalGeral.innerText = data.total.toFixed(2);
     })
     .catch((err) => console.error("Erro ao remover item:", err));
+});
+
+
+document.addEventListener("click", function (e) {
+  const item = e.target.closest(".item-carrinho.clicavel");
+  if (!item) return;
+
+  // Se clicou no botão de remover, NÃO navega
+  if (e.target.closest(".btn-remover-mini")) return;
+
+  const url = item.dataset.url;
+  if (url) {
+    window.location.href = url;
+  }
 });

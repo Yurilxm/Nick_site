@@ -23,7 +23,7 @@
 
 <ul>
   {% for item in itens %}
-  <li>
+  <li data-item-id="{{ item.id }}">
 
     {% if item.produto.imagem %}
       <img src="{{ item.produto.imagem.url }}" alt="{{ item.produto.nome }}" class="carrinho-imagem">

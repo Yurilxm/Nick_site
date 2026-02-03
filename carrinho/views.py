@@ -140,7 +140,8 @@ def mini_carrinho_json(request):
                 "nome": item.produto.nome,
                 "quantidade": item.quantidade,
                 "preco": float(item.preco_unitario),
-                "imagem": item.produto.imagem.url if item.produto.imagem else ""
+                "imagem": item.produto.imagem.url if item.produto.imagem else "",
+                "url": item.produto.get_absolute_url(),
             }
             for item in itens
         ]

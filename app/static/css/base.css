@@ -35,6 +35,27 @@
   background-color: #70b5f9; /* azul bebê */
 }
 
+#overlay-carrinho {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 999;
+}
+
+#overlay-carrinho.ativo {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+body.no-scroll {
+  overflow: hidden;
+  padding-right: 15px; /* compensação da scrollbar */
+}
+
+
 /* Fade out suave */
 @keyframes fadeOut {
   0%   { opacity: 1; transform: translateY(0); }

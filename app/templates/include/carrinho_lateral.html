@@ -13,7 +13,7 @@
     {% if mini_carrinho_itens %}
       <ul id="mini-carrinho-lista">
         {% for item in mini_carrinho_itens %}
-          <li class="item-carrinho" data-item-id="{{ item.id }}">
+          <li class="item-carrinho" data-item-id="{{ item.id }}" data-url="${item.url}">
   
             {% if item.produto.imagem %}
               <img
