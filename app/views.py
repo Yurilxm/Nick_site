@@ -1,46 +1,38 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from produtos.models import Produto
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from django.shortcuts import redirect
+from carrinho.models import ItemCarrinho
 
 
 class LoginCustomView(LoginView):
     template_name = 'auth/login.html'
 
     def form_valid(self, form):
-        return super().form_valid(form)
+        response = super().form_valid(form)
 
         user = self.request.user
         carrinho_sessao = self.request.session.get('carrinho', {})
 
-        if carrinho_sessao:
-            from carrinho.models import ItemCarrinho
-            from produtos.models import Produto
 
-            for produto_id, quantidade in carrinho_sessao.items():
-                try:
-                    produto = Produto.objects.get(id=produto_id)
+        for produto_id, quantidade in carrinho_sessao.items():
+            item, created = ItemCarrinho.objects.get_or_create(
+                usuario=user,
+                produto_id=produto_id,
+                defaults={'quantidade': quantidade}
+            )
 
-                    item, criado = ItemCarrinho.objects.get_or_create(
-                        usuario=user,
-                        produto=produto,
-                        defaults={'quantidade': quantidade}
-                    )
+            if not created:
+                item.quantidade += quantidade
+                item.save()
 
-                    if not criado:
-                        item.quantidade += quantidade
-                        item.save()
-
-                except Produto.DoesNotExist:
-                    pass  # ignora produto inválido
-
-            # limpa sessão depois de migrar
-            self.request.session['carrinho'] = {}
+        # limpa sessão depois de migrar
+        self.request.session['carrinho'] = {}
 
         messages.success(self.request, 'Login realizado com sucesso!', extra_tags='login')
+        
         return response
 
 def logout_view(request):
