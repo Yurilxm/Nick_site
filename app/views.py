@@ -5,6 +5,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from carrinho.models import ItemCarrinho
+from django.contrib.auth.models import User
+from django.views.decorators.http import require_POST
+from django.contrib.auth import login, authenticate
 
 
 class LoginCustomView(LoginView):
@@ -34,6 +37,60 @@ class LoginCustomView(LoginView):
         messages.success(self.request, 'Login realizado com sucesso!', extra_tags='login')
         
         return response
+    
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            'E-mail ou senha incorretos. Tente novamente.',
+            extra_tags='error'
+        )
+        return super().form_invalid(form)
+    
+    
+@require_POST
+def register_view(request):
+    email = request.POST.get('email')
+    password1 = request.POST.get('password1')
+    password2 = request.POST.get('password2')
+
+    # Senhas diferentes
+    if password1 != password2:
+        messages.error(
+            request,
+            'As senhas não coincidem.',
+            extra_tags='error'
+        )
+        return redirect('login')
+
+    # Email já cadastrado
+    if User.objects.filter(username=email).exists():
+        messages.error(
+            request,
+            'Este e-mail já está cadastrado.',
+            extra_tags='error'
+        )
+        return redirect('login')
+
+    # Cria o usuário
+    user = User.objects.create_user(
+        username=email,
+        email=email,
+        password=password1
+    )
+
+    # 🔐 AUTOLOGIN
+    user = authenticate(username=email, password=password1)
+    if user:
+        login(request, user)
+
+    messages.success(
+        request,
+        'Conta criada com sucesso! Você já está logado 😊',
+        extra_tags='success'
+    )
+
+    return redirect('home')
+
 
 def logout_view(request):
     logout(request)

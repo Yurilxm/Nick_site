@@ -21,6 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from app.views import LoginCustomView, home_view, logout_view
+from app.views import register_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,6 +30,7 @@ urlpatterns = [
     path('contato/', views.contato_view, name='contato'),
     path('login/', LoginCustomView.as_view(), name='login'),
     path('logout/', logout_view, name='logout'),
+    path('cadastro/', register_view, name='register'),
     path('produtos/', include('produtos.urls')),
     path('carrinho/', include('carrinho.urls')),
     path("marketing/", include("marketing.urls")),
