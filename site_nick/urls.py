@@ -21,7 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from app.views import LoginCustomView, home_view, logout_view
-from app.views import register_view
+from app.views import register_view, login_code_confirm_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,6 +34,13 @@ urlpatterns = [
     path('produtos/', include('produtos.urls')),
     path('carrinho/', include('carrinho.urls')),
     path("marketing/", include("marketing.urls")),
+    path('esqueceu-senha/', auth_views.PasswordResetView.as_view(template_name='auth/password_reset.html'), name='password_reset'),
+    path('esqueceu-senha/enviado/', auth_views.PasswordResetDoneView.as_view(template_name='auth/password_reset_done.html'), name='password_reset_done'),
+    path('resetar-senha/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='auth/password_reset_confirm.html'), name='password_reset_confirm'),
+    path('resetar-senha/sucesso', auth_views.PasswordResetCompleteView.as_view(template_name='auth/password_reset_complete.html'), name='password_reset_complete'),
+    path('login/codigo/', views.login_email_code_view, name='login_email_code'),
+    path('login/codigo/enviar/', views.send_login_code_view, name='login_code_send'),
+    path('login-codigo/confirmar/', login_code_confirm_view, name='login_code_confirm'),
 ]
 
 

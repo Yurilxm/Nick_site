@@ -265,3 +265,115 @@
     color: #9f8fd3;
     text-decoration: underline;
 }
+
+
+
+
+
+/* ===== MODO SINGLE (reset, confirm, done) ===== */
+.auth-container.single {
+  width: 480px;
+  max-width: 90%;
+  min-height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Remove comportamentos do login animado */
+.auth-container.single .toggle-container {
+  display: none;
+}
+
+/* Garante centralização */
+.auth-container.single .auth-form {
+  position: static;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 3rem 2.5rem;
+}
+
+.auth-container.single .auth-form:not(:has(form)) {
+  padding: 3.5rem 3rem;
+  text-align: center;
+}
+
+/* Título */
+.auth-container.single h1 {
+  font-size: 26px;
+  line-height: 1.3;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+/* Texto explicativo */
+.auth-container.single p,
+.auth-container.single .auth-description {
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: center;
+  margin-top: 12px;
+  margin-bottom: 28px;
+  color: #666;
+}
+
+/* Input maior */
+.auth-container.single input {
+  width: 100%;
+  height: 48px;
+  font-size: 15px;
+  padding: 0 14px;
+}
+
+/* Botão maior */
+.auth-container.single button {
+  width: 100%;
+  height: 48px;
+  font-size: 15px;
+  margin-top: 10px;
+}
+
+.auth-container.single .auth-link {
+  display: block;
+  padding: 12px 28px;
+  border-radius: 10px;
+
+  color: #555;
+  font-weight: 500;
+
+  transition: all 0.2s ease;
+}
+
+
+.auth-error {
+  color: #c0392b;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+
+/* Link de login por código */
+.login-code-link {
+    width: 100%;
+    margin-top: 12px;
+    text-align: center;
+}
+
+.login-code-link a {
+    font-size: 14px;
+    color: #6b5ca5;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.login-code-link a:hover {
+    color: #9f8fd3;
+    text-decoration: underline;
+}
+
+.auth-container.single .auth-links-extra {
+    margin-top: 20px;
+}

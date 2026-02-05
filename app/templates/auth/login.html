@@ -49,8 +49,14 @@
               <input type="checkbox" id="remember" name="remember">
               <label for="remember">Lembre-me</label>
           </div>
-          
-          <a href="/esqueceu-senha">Esqueceu sua senha?</a>
+
+          <a href="{% url 'password_reset' %}">Esqueceu sua senha?</a>
+        </div>
+
+        <div class="login-code-link">
+          <a href="{% url 'login_email_code' %}">
+            🔐 Entrar com código por e-mail
+          </a>
         </div>
 
 
