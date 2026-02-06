@@ -57,3 +57,31 @@ class Categoria(models.Model):
         if not self.slug:
             self.slug = self.nome.lower().replace(" ", "-")
         super().save(*args, **kwargs)
+
+
+class GrupoOpcao(models.Model):
+    nome = models.CharField(max_length=100)
+    produto = models.ForeignKey(
+        'Produto',
+        related_name='grupos_opcoes',
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f"{self.nome} - {self.produto.nome}"
+
+
+class Opcao(models.Model):
+    grupo = models.ForeignKey(
+        GrupoOpcao,
+        related_name='opcoes',
+        on_delete=models.CASCADE
+    )
+    valor = models.CharField(max_length=100)
+    ordem = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ('grupo', 'valor')
+
+    def __str__(self):
+        return self.valor

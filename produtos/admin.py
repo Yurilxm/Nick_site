@@ -1,6 +1,16 @@
 from django.contrib import admin
-from .models import Produto, Categoria
+from .models import Produto, Categoria, GrupoOpcao, Opcao
 from django.utils.html import format_html
+
+
+
+class OpcaoInline(admin.TabularInline):
+    model = Opcao
+    extra = 1
+
+class GrupoOpcaoInline(admin.StackedInline):
+    model = GrupoOpcao
+    extra = 1
 
 
 @admin.register(Produto)
@@ -23,6 +33,8 @@ class ProdutoAdmin(admin.ModelAdmin):
     search_fields = ('nome', 'descricao')
     ordering = ('-criado_em',)
 
+    inlines = [GrupoOpcaoInline]
+
     def imagem_preview(self, obj):
         if obj.imagem:
             return format_html(
@@ -32,6 +44,7 @@ class ProdutoAdmin(admin.ModelAdmin):
         return "—"
 
     imagem_preview.short_description = 'Imagem'
+
 
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):

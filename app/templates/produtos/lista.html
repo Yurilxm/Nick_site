@@ -3,9 +3,12 @@
 
 {% block content %}
 <div class="produtos-container">
-    {% for produto in produtos %}
-        {% include "include/card_produto.html" %}
-    {% endfor %}
+    {% if produtos %}
+        {% for produto in produtos %}
+            {% include "include/card_produto.html" %}
+        {% endfor %}
+    {% else %}
+        <p>Nenhum produto encontrado.</p>
+    {% endif %}
 </div>
 {% endblock %}
-

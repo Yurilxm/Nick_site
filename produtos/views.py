@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import Categoria, Produto
 
 def lista_produtos(request):
-    produtos = Produto.objects.all()
+    produtos = Produto.objects.filter(ativo=True)
     return render(request, 'produtos/lista.html', {'produtos': produtos})
 
 def detalhe_produto(request, id, slug):

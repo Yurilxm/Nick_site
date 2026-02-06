@@ -4,58 +4,87 @@
 {% block content %}
 <div class="produto-container">
 
+  <!-- COLUNA ESQUERDA -->
   <div class="produto-descricao">
-    <img class="produto-imagem" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
-    <p class="descricao">{{ produto.descricao|linebreaks }}</p>
+    {% if produto.imagem %}
+      <img 
+        class="produto-imagem" 
+        src="{{ produto.imagem.url }}" 
+        alt="{{ produto.nome }}">
+    {% endif %}
+
+    {% if produto.descricao %}
+      <p class="descricao">
+        {{ produto.descricao|linebreaks }}
+      </p>
+    {% endif %}
   </div>
 
+  <!-- COLUNA DIREITA -->
   <div class="produto-info">
     <h1>{{ produto.nome }}</h1>
-    <p class="preco">R$ {{ produto.preco }}</p>
 
-    <!-- Aqui começam os extras específicos -->
-    {% if produto.categoria.nome == "Agendas" %}
-      <div class="campo-arame">
-        <label>Cor de Arame:*</label>
-        <label><input type="radio" name="arame" value="branco"> Branco</label>
-        <label><input type="radio" name="arame" value="bronze"> Bronze</label>
-      </div>
-    {% elif produto.categoria.nome == "Camisas" %}
-      <div class="campo-tamanho">
-        <label>Tamanho:*</label>
-        <label><input type="radio" name="tamanho" value="P"> P</label>
-        <label><input type="radio" name="tamanho" value="M"> M</label>
-        <label><input type="radio" name="tamanho" value="G"> G</label>
-      </div>
-    {% elif produto.categoria.nome == "Canecas" %}
-      <div class="campo-sublimacao">
-        <label>Tipo de Sublimação:*</label>
-        <select name="sublimacao">
-          <option value="padrao">Padrão</option>
-          <option value="premium">Premium</option>
-        </select>
+    <p class="preco">
+      R$ {{ produto.preco }}
+    </p>
+
+    <!-- =========================
+         OPÇÕES DINÂMICAS DO PRODUTO
+    ========================== -->
+    {% if produto.grupos_opcoes.exists %}
+      <div class="opcoes-produto">
+
+        {% for grupo in produto.grupos_opcoes.all %}
+          <div class="grupo-opcao">
+            <label class="titulo-grupo">
+              {{ grupo.nome }}:
+            </label>
+
+            <div class="opcoes">
+              {% for opcao in grupo.opcoes.all %}
+                <label class="opcao-item">
+                  <input
+                    type="radio"
+                    name="grupo_{{ grupo.id }}"
+                    value="{{ opcao.id }}"
+                    required
+                  >
+                  {{ opcao.valor }}
+                </label>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+
       </div>
     {% endif %}
-    <!-- Fim dos extras -->
 
+    <!-- =========================
+         QUANTIDADE + CARRINHO
+    ========================== -->
     <div class="campo-quantidade">
+
       <div class="controle-quantidade">
-        <button type="button">-</button>
-        <span>1</span>
-        <button type="button">+</button>
+        <button type="button" class="btn-menos">-</button>
+        <span class="quantidade">1</span>
+        <button type="button" class="btn-mais">+</button>
       </div>
 
-      <form action="{% url 'adicionar_ao_carrinho' produto.id %}" method="post">
+      <form 
+        action="{% url 'adicionar_ao_carrinho' produto.id %}" 
+        method="post"
+      >
         {% csrf_token %}
+
         <button 
           id="btn-add-carrinho"
           data-url="{% url 'adicionar_ao_carrinho' produto.id %}">
           Adicionar ao carrinho
         </button>
-
       </form>
 
     </div>
   </div>
+
 </div>
 {% endblock %}

@@ -26,10 +26,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
       atualizarQuantidade(url, itemId, data => {
         document.getElementById(`quantidade-${itemId}`).innerText =
-          data.quantidade;
+          data.quantidade_item;
 
         document.getElementById(`subtotal-${itemId}`).innerText =
-          data.subtotal.toFixed(2);
+          data.subtotal_item.toFixed(2);
 
         document.getElementById("subtotal-geral").innerText =
           data.total.toFixed(2);
@@ -54,10 +54,10 @@ document.addEventListener("DOMContentLoaded", function () {
           if (li) li.remove();
         } else {
           document.getElementById(`quantidade-${itemId}`).innerText =
-            data.quantidade;
+            data.quantidade_item;
 
           document.getElementById(`subtotal-${itemId}`).innerText =
-            data.subtotal.toFixed(2);
+            data.subtotal_item.toFixed(2);
         }
 
         document.getElementById("subtotal-geral").innerText =
