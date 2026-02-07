@@ -52,6 +52,37 @@
     pointer-events: none;
 }
 
+#search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 10px;
+    margin-top: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 9999;
+    display: none;
+}
+
+.search-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.search-item:hover {
+    background: #fbf7f4;
+}
+
+.search-item img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
 .topbar .topbar-linha1 .navbar input[type="text"] {
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 10px;

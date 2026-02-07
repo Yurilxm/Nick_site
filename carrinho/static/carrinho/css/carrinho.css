@@ -151,3 +151,75 @@ li {
 .btn-finalizar:hover {
     background: #ec6391;
 }
+
+
+/* ===============================
+   FRETE - RESUMO DO CARRINHO
+================================ */
+
+.frete-box {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #ddd;
+  font-size: 14px;
+}
+
+/* Título "Entrega / Frete" */
+.frete-box p {
+  margin-bottom: 6px;
+  color: #421e01;
+  font-size: 15px;
+}
+
+/* Texto auxiliar */
+.frete-info {
+  font-size: 10px;
+  color: #555;
+  font-weight: normal;
+  margin-bottom: 10px;
+}
+
+/* Form CEP */
+.frete-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.frete-form input {
+  flex: 1;
+  padding: 9px 12px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.frete-form input:focus {
+  outline: none;
+  border-color: #ec6391;
+}
+
+/* Botão calcular frete (mesmo padrão do site) */
+.frete-form button {
+  padding: 9px 16px;
+  background-color: #421e01;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.frete-form button:hover {
+  background-color: #ec6391;
+}
+
+/* Resultado do frete */
+.frete-resultado {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed #ddd;
+  font-size: 14px;
+  color: #333;
+}
