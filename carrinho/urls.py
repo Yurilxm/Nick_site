@@ -7,5 +7,7 @@ urlpatterns = [
     path('remover/<int:item_id>/', views.remover_do_carrinho, name='remover_do_carrinho'),
     path('aumentar/<int:item_id>/', views.aumentar_quantidade, name='aumentar_quantidade'),
     path('diminuir/<int:item_id>/', views.diminuir_quantidade, name='diminuir_quantidade'),
-    path('mini/', views.mini_carrinho_json, name='mini_carrinho_json')
+    path('mini/', views.mini_carrinho_json, name='mini_carrinho_json'),
+    path("frete/calcular/", views.calcular_frete, name="calcular_frete"),
+    path('finalizar/', views.finalizar_compra, name='finalizar_compra'),
 ]

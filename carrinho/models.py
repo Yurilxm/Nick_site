@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from produtos.models import Produto
+from decimal import Decimal
 
 
 class Carrinho(models.Model):
@@ -25,7 +26,7 @@ class ItemCarrinho(models.Model):
 
     @property
     def subtotal(self):
-        return self.quantidade * self.preco_unitario
+        return Decimal(self.quantidade) * self.preco_unitario
 
     def __str__(self):
         return f"{self.quantidade}x {self.produto.nome}"

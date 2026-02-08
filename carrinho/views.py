@@ -1,11 +1,32 @@
+from decimal import Decimal
 from django.shortcuts import get_object_or_404, redirect, render
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 from produtos.models import Produto
 from .models import ItemCarrinho
 from .services import obter_carrinho
-from django.views.decorators.http import require_POST
-from django.http import JsonResponse
-from django.db.models import Sum
 
+
+# ==========================
+# HELPERS
+# ==========================
+
+def limpar_frete_se_carrinho_vazio(request, carrinho):
+    if not carrinho.itens.exists():
+        request.session.pop("frete", None)
+
+
+def calcular_total_produtos(carrinho):
+    return sum(
+        (item.subtotal for item in carrinho.itens.all()),
+        Decimal("0.00")
+    )
+
+
+# ==========================
+# CARRINHO
+# ==========================
 
 @require_POST
 def adicionar_ao_carrinho(request, produto_id):
@@ -13,62 +34,65 @@ def adicionar_ao_carrinho(request, produto_id):
     produto = get_object_or_404(Produto, id=produto_id)
 
     item, created = ItemCarrinho.objects.get_or_create(
-        carrinho=carrinho, produto=produto, defaults={'preco_unitario': produto.preco}
+        carrinho=carrinho,
+        produto=produto,
+        defaults={"preco_unitario": produto.preco}
     )
 
     if not created:
         item.quantidade += 1
         item.save()
 
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return JsonResponse({'status': 'ok'})
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return JsonResponse({"status": "ok"})
 
-    return redirect('ver_carrinho')
+    return redirect("ver_carrinho")
+
 
 @require_POST
 def remover_do_carrinho(request, item_id):
     carrinho = obter_carrinho(request)
-
     item = get_object_or_404(ItemCarrinho, id=item_id, carrinho=carrinho)
 
     item.delete()
-    
-     # 👉 Se for AJAX, responde JSON
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        itens = carrinho.itens.select_related("produto")
+    limpar_frete_se_carrinho_vazio(request, carrinho)
 
+    carrinho_vazio = not carrinho.itens.exists()
+    total = calcular_total_produtos(carrinho)
+
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
         return JsonResponse({
-            "quantidade_total": sum(i.quantidade for i in itens),
-            "total": float(sum(i.subtotal for i in itens)),
-            "itens": [
-                {
-                    "id": i.id,
-                    "nome": i.produto.nome,
-                    "quantidade": i.quantidade,
-                    "subtotal": float(i.subtotal),
-                }
-                for i in itens
-            ],
-            "removido_id": item_id,
+            "quantidade_total": sum(i.quantidade for i in carrinho.itens.all()),
+            "total": float(total),
+            "carrinho_vazio": carrinho_vazio,
         })
 
-    # 👉 fallback (caso alguém acesse sem JS)
-    return redirect('ver_carrinho')
+    return redirect("ver_carrinho")
 
 
 def ver_carrinho(request):
     carrinho = obter_carrinho(request)
     itens = carrinho.itens.select_related("produto")
 
-    total = sum(item.subtotal for item in itens)
+    if not itens.exists():
+        request.session.pop("frete", None)
+
+    total_produtos = calcular_total_produtos(carrinho)
+
+    frete = request.session.get("frete")
+    valor_frete = Decimal(frete["valor"]) if frete else Decimal("0.00")
+
+    total_geral = total_produtos + valor_frete
 
     context = {
-        'carrinho': carrinho,
-        'itens': itens,
-        'total': total,
+        "carrinho": carrinho,
+        "itens": itens,
+        "total_produtos": total_produtos,
+        "frete": frete,
+        "total_geral": total_geral,
     }
 
-    return render(request, 'carrinho/carrinho.html', context)
+    return render(request, "carrinho/carrinho.html", context)
 
 
 @require_POST
@@ -79,28 +103,17 @@ def aumentar_quantidade(request, item_id):
     item.quantidade += 1
     item.save()
 
-    # 👉 Se for AJAX
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        itens = carrinho.itens.select_related("produto")
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        total = calcular_total_produtos(carrinho)
 
         return JsonResponse({
             "quantidade_item": item.quantidade,
             "subtotal_item": float(item.subtotal),
-            "quantidade_total": sum(i.quantidade for i in itens),
-            "total": float(sum(i.subtotal for i in itens)),
-            "itens": [
-                {
-                    "id": i.id,
-                    "nome": i.produto.nome,
-                    "quantidade": i.quantidade,
-                    "subtotal": float(i.subtotal),
-                }
-                for i in itens
-            ],
+            "quantidade_total": sum(i.quantidade for i in carrinho.itens.all()),
+            "total": float(total),
         })
 
-    # 👉 Fallback (caso alguém acesse sem JS)
-    return redirect('ver_carrinho')
+    return redirect("ver_carrinho")
 
 
 @require_POST
@@ -116,29 +129,21 @@ def diminuir_quantidade(request, item_id):
         item.delete()
         removido = True
 
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        itens = carrinho.itens.select_related("produto")
+    limpar_frete_se_carrinho_vazio(request, carrinho)
+
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        total = calcular_total_produtos(carrinho)
 
         return JsonResponse({
             "removido": removido,
             "item_id": item_id,
             "quantidade_item": item.quantidade if not removido else 0,
             "subtotal_item": float(item.subtotal) if not removido else 0,
-            "quantidade_total": sum(i.quantidade for i in itens),
-            "total": float(sum(i.subtotal for i in itens)),
-            "itens": [
-                {
-                    "id": i.id,
-                    "nome": i.produto.nome,
-                    "quantidade": i.quantidade,
-                    "subtotal": float(i.subtotal),
-                }
-                for i in itens
-            ],
+            "quantidade_total": sum(i.quantidade for i in carrinho.itens.all()),
+            "total": float(total),
         })
 
-    return redirect('ver_carrinho')
-
+    return redirect("ver_carrinho")
 
 
 def mini_carrinho_json(request):
@@ -147,7 +152,7 @@ def mini_carrinho_json(request):
 
     return JsonResponse({
         "quantidade_total": sum(item.quantidade for item in itens),
-        "total": float(sum(item.subtotal for item in itens)),
+        "total": float(calcular_total_produtos(carrinho)),
         "itens": [
             {
                 "id": item.id,
@@ -160,3 +165,44 @@ def mini_carrinho_json(request):
             for item in itens
         ]
     })
+
+
+# ==========================
+# FRETE (FAKE)
+# ==========================
+
+@require_POST
+def calcular_frete(request):
+    cep = request.POST.get("cep")
+
+    frete_valor = Decimal("29.90")
+    frete_tipo = "PAC"
+
+    request.session["frete"] = {
+        "cep": cep,
+        "valor": str(frete_valor),
+        "tipo": frete_tipo,
+    }
+
+    return JsonResponse({
+        "status": "ok",
+        "frete": {
+            "cep": cep,
+            "valor": str(frete_valor),
+            "tipo": frete_tipo,
+        }
+    })
+
+
+# ==========================
+# FINALIZAR
+# ==========================
+
+@login_required(login_url="login")
+def finalizar_compra(request):
+    carrinho = obter_carrinho(request)
+
+    if not carrinho.itens.exists():
+        return redirect("ver_carrinho")
+
+    return render(request, "carrinho/checkout_placeholder.html")

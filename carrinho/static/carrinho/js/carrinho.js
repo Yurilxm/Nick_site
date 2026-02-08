@@ -1,112 +1,130 @@
 document.addEventListener("DOMContentLoaded", function () {
-  atualizarMiniCarrinho();
 
-  const csrfToken = document
-    .querySelector('meta[name="csrf-token"]')
-    ?.getAttribute('content');
+  // ==========================
+  // ELEMENTOS PRINCIPAIS
+  // ==========================
+  const subtotalGeralEl = document.getElementById("subtotal-geral");
+  const totalGeralEl = document.getElementById("total-geral");
+  const freteValorEl = document.getElementById("frete-valor");
+  const freteResultadoEl = document.getElementById("frete-resultado");
 
-  function atualizarQuantidade(url, itemId, callback) {
+  const cepInput = document.getElementById("cep-input");
+  const btnCalcularFrete = document.getElementById("btn-calcular-frete");
+
+  // ==========================
+  // VALORES INICIAIS SEGUROS
+  // ==========================
+  let subtotalProdutos = parseFloat(subtotalGeralEl?.innerText.replace(",", ".")) || 0;
+  let valorFrete = parseFloat(freteValorEl?.innerText.replace(",", ".")) || 0;
+
+  // Sempre recalcula o total ao carregar a página
+  atualizarTotal();
+
+  // ==========================
+  // FUNÇÕES
+  // ==========================
+  function atualizarTotal() {
+    const total = subtotalProdutos + valorFrete;
+
+    if (subtotalGeralEl) {
+      subtotalGeralEl.innerText = subtotalProdutos.toFixed(2);
+    }
+
+    if (totalGeralEl) {
+      totalGeralEl.innerText = total.toFixed(2);
+    }
+  }
+
+  function getCSRFToken() {
+    const csrfInput = document.querySelector("[name=csrfmiddlewaretoken]");
+    return csrfInput ? csrfInput.value : "";
+  }
+
+  function postJSON(url, callback) {
     fetch(url, {
       method: "POST",
       headers: {
-        "X-CSRFToken": csrfToken,
+        "X-CSRFToken": getCSRFToken(),
         "X-Requested-With": "XMLHttpRequest",
-      },
+      }
     })
       .then(response => response.json())
-      .then(data => callback(data))
-      .catch(error => console.error("Erro:", error));
+      .then(data => {
+        if (callback) callback(data);
+      });
   }
 
-  // ➕ AUMENTAR
+  // ==========================
+  // BOTÕES + / -
+  // ==========================
   document.querySelectorAll(".btn-aumentar").forEach(btn => {
     btn.addEventListener("click", function () {
       const itemId = this.dataset.itemId;
-      const url = `/carrinho/aumentar/${itemId}/`;
-
-      atualizarQuantidade(url, itemId, data => {
-        document.getElementById(`quantidade-${itemId}`).innerText =
-          data.quantidade_item;
-
-        document.getElementById(`subtotal-${itemId}`).innerText =
-          data.subtotal_item.toFixed(2);
-
-        document.getElementById("subtotal-geral").innerText =
-          data.total.toFixed(2);
-
-        document.getElementById("total-geral").innerText =
-          data.total.toFixed(2);
-
-        atualizarMiniCarrinho();
+      postJSON(`/carrinho/aumentar/${itemId}/`, () => {
+        location.reload();
       });
     });
   });
 
-  // ➖ DIMINUIR
   document.querySelectorAll(".btn-diminuir").forEach(btn => {
     btn.addEventListener("click", function () {
       const itemId = this.dataset.itemId;
-      const url = `/carrinho/diminuir/${itemId}/`;
-
-      atualizarQuantidade(url, itemId, data => {
-        if (data.removido) {
-          const li = this.closest("li");
-          if (li) li.remove();
-        } else {
-          document.getElementById(`quantidade-${itemId}`).innerText =
-            data.quantidade_item;
-
-          document.getElementById(`subtotal-${itemId}`).innerText =
-            data.subtotal_item.toFixed(2);
-        }
-
-        document.getElementById("subtotal-geral").innerText =
-          data.total.toFixed(2);
-
-        document.getElementById("total-geral").innerText =
-          data.total.toFixed(2);
-
-        atualizarMiniCarrinho();
+      postJSON(`/carrinho/diminuir/${itemId}/`, () => {
+        location.reload();
       });
     });
   });
 
-  // ❌ REMOVER (sem reload)
+  // ==========================
+  // REMOVER ITEM
+  // ==========================
   document.querySelectorAll(".form-remover").forEach(form => {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
+      postJSON(form.action, () => {
+        location.reload();
+      });
+    });
+  });
 
-      const url = this.action;
+  // ==========================
+  // CALCULAR FRETE
+  // ==========================
+  if (btnCalcularFrete) {
+    btnCalcularFrete.addEventListener("click", function () {
+      const cep = cepInput.value.replace(/\D/g, "");
 
-      fetch(url, {
+      if (cep.length !== 8) {
+        alert("CEP inválido");
+        return;
+      }
+
+      fetch("/carrinho/frete/calcular/", {
         method: "POST",
         headers: {
-          "X-CSRFToken": csrfToken,
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": getCSRFToken(),
           "X-Requested-With": "XMLHttpRequest",
         },
+        body: `cep=${cep}`
       })
         .then(response => response.json())
         .then(data => {
-          const li = this.closest("li");
-          if (li) li.remove();
+          // Backend é a fonte da verdade
+          valorFrete = parseFloat(data.frete.valor) || 0;
 
-          document.getElementById("subtotal-geral").innerText =
-            data.total.toFixed(2);
+          if (freteValorEl) {
+            freteValorEl.innerText = valorFrete.toFixed(2);
+          }
 
-          document.getElementById("total-geral").innerText =
-            data.total.toFixed(2);
+          if (freteResultadoEl) {
+            freteResultadoEl.style.display = "block";
+          }
 
-          atualizarMiniCarrinho();
-        })
-        .catch(err => console.error("Erro ao remover item:", err));
+          // Atualiza total corretamente (produto + frete)
+          atualizarTotal();
+        });
     });
-  });
+  }
+
 });
-
-function atualizarBadge(qtd) {
-  const badge = document.getElementById("badge-carrinho");
-  if (!badge) return;
-
-  badge.innerText = qtd;
-  badge.style.display = qtd > 0 ? "inline-block" : "none";
-}

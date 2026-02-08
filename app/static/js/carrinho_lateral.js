@@ -37,7 +37,7 @@ const csrfToken = document
   ?.getAttribute("content");
 
 /* =========================
-   BADGE DO CARRINHO
+   BADGE
 ========================= */
 function atualizarBadge(qtd) {
   const badge = document.getElementById("badge-carrinho");
@@ -48,7 +48,7 @@ function atualizarBadge(qtd) {
 }
 
 /* =========================
-   MINI CARRINHO (AJAX)
+   MINI CARRINHO
 ========================= */
 function atualizarMiniCarrinho() {
   fetch("/carrinho/mini/")
@@ -58,6 +58,7 @@ function atualizarMiniCarrinho() {
 
       const lista = document.getElementById("mini-carrinho-lista");
       const totalEl = document.getElementById("mini-carrinho-total");
+      const finais = document.querySelector(".btn-finais");
 
       if (!lista || !totalEl) return;
 
@@ -66,8 +67,11 @@ function atualizarMiniCarrinho() {
       if (data.itens.length === 0) {
         lista.innerHTML = "<p>Seu carrinho está vazio.</p>";
         totalEl.innerText = "0,00";
+        if (finais) finais.style.display = "none";
         return;
       }
+
+      if (finais) finais.style.display = "block";
 
       data.itens.forEach((item) => {
         lista.innerHTML += `
@@ -81,13 +85,7 @@ function atualizarMiniCarrinho() {
               <strong>${item.nome}</strong>
               <span>${item.quantidade} × R$ ${item.preco.toFixed(2)}</span>
             </div>
-            <button 
-              class="btn-remover-mini" 
-              data-item-id="${item.id}" 
-              aria-label="Remover item"
-            >
-              ×
-            </button>
+            <button class="btn-remover-mini" data-item-id="${item.id}" aria-label="Remover item">×</button>
           </li>
         `;
       });
@@ -98,7 +96,7 @@ function atualizarMiniCarrinho() {
 }
 
 /* =========================
-   REMOVER ITEM (X DO MINI CARRINHO) - EVENT DELEGATION
+   REMOVER ITEM (DELEGAÇÃO)
 ========================= */
 document.addEventListener("click", function (e) {
   const btn = e.target.closest(".btn-remover-mini");
@@ -115,37 +113,30 @@ document.addEventListener("click", function (e) {
   })
     .then((res) => res.json())
     .then((data) => {
-      // Remove do minicarrinho
-      const liMini = btn.closest(".item-carrinho");
-      if (liMini) liMini.remove();
-
-      // Atualiza subtotal do minicarrinho
-      const totalMini = document.getElementById("mini-carrinho-total");
-      if (totalMini) totalMini.innerText = data.total.toFixed(2);
-
-      // Atualiza badge
       atualizarBadge(data.quantidade_total ?? 0);
 
-      // ✅ Sincroniza com a página de carrinho, se aberta
-      const liPagina = document.querySelector(`li[data-item-id="${itemId}"]`);
-      if (liPagina) {
-        liPagina.remove();
+      // 🔥 Carrinho ficou vazio → sincroniza tudo
+      if (data.carrinho_vazio) {
+        atualizarMiniCarrinho();
+
+        if (window.location.pathname.includes("/carrinho")) {
+          window.location.reload();
+        }
+        return;
       }
 
-      const subtotalGeral = document.getElementById("subtotal-geral");
-      const totalGeral = document.getElementById("total-geral");
-      if (subtotalGeral) subtotalGeral.innerText = data.total.toFixed(2);
-      if (totalGeral) totalGeral.innerText = data.total.toFixed(2);
+      atualizarMiniCarrinho();
     })
     .catch((err) => console.error("Erro ao remover item:", err));
 });
 
-
+/* =========================
+   CLICK NO ITEM → PRODUTO
+========================= */
 document.addEventListener("click", function (e) {
   const item = e.target.closest(".item-carrinho.clicavel");
   if (!item) return;
 
-  // Se clicou no botão de remover, NÃO navega
   if (e.target.closest(".btn-remover-mini")) return;
 
   const url = item.dataset.url;

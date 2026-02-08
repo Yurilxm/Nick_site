@@ -14,7 +14,15 @@ from .models import LoginCode
 from .utils import login_code
 
 class LoginCustomView(LoginView):
-    template_name = 'auth/login.html'
+    template_name = "auth/login.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.GET.get("next") == "/carrinho/finalizar/":
+            messages.info(
+                request,
+                "Faça login ou cadastre-se para finalizar sua compra."
+            )
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -39,7 +47,11 @@ class LoginCustomView(LoginView):
         return response
 
     def form_invalid(self, form):
-        messages.error(self.request, 'E-mail ou senha incorretos. Tente novamente.', extra_tags='error')
+        messages.error(
+            self.request,
+            'E-mail ou senha incorretos. Tente novamente.',
+            extra_tags='error'
+        )
         return super().form_invalid(form)
 
 

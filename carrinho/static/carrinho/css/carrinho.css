@@ -137,13 +137,14 @@ li {
 }
 
 .btn-finalizar {
+    display: block;
     width: 100%;
     padding: 12px;
+    margin-top: 15px;
     background: #421e01;
     color: white;
-    border: none;
-    cursor: pointer;
-    margin-top: 15px;
+    text-align: center;
+    text-decoration: none;
     border-radius: 6px;
     transition: 0.2s;
 }
@@ -151,6 +152,7 @@ li {
 .btn-finalizar:hover {
     background: #ec6391;
 }
+
 
 
 /* ===============================
