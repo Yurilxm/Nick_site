@@ -1,6 +1,6 @@
 .site-content {
-  padding-top: 180px;
-  min-height: calc(100vh - 180px);
+  padding-top: 0;
+  min-height: auto;
 }
 
 /* Container fixo no canto superior direito */
