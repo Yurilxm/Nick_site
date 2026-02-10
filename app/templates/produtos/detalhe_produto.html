@@ -5,48 +5,67 @@
 <div class="produto-container">
 
   <div class="produto-descricao">
-    <img class="produto-imagem" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
+
+    <div class="galeria-produto">
+
+      <!-- IMAGEM PRINCIPAL -->
+      <div class="imagem-principal">
+          <img id="imagem-principal" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
+      </div>
+
+      <!-- MINIATURAS -->
+      <div class="miniaturas">
+          {% for imagem in produto.imagens.all %}
+              <img src="{{ imagem.imagem.url }}" class="miniatura" alt="{{ produto.nome }}">
+          {% endfor %}
+
+      </div>
+  </div>
+
+
     <p class="descricao">{{ produto.descricao|linebreaks }}</p>
+
   </div>
 
   <div class="produto-info">
     <h1>{{ produto.nome }}</h1>
     <p class="preco">R$ {{ produto.preco }}</p>
 
-    <!-- Aqui começam os extras específicos -->
     {% if produto.categoria.nome == "Agendas" %}
       <div class="campo-arame">
         <label>Cor de Arame:*</label>
-        <label><input type="radio" name="arame" value="branco"> Branco</label>
-        <label><input type="radio" name="arame" value="bronze"> Bronze</label>
+        <label><input type="radio" name="arame"> Branco</label>
+        <label><input type="radio" name="arame"> Bronze</label>
       </div>
     {% elif produto.categoria.nome == "Camisas" %}
       <div class="campo-tamanho">
         <label>Tamanho:*</label>
-        <label><input type="radio" name="tamanho" value="P"> P</label>
-        <label><input type="radio" name="tamanho" value="M"> M</label>
-        <label><input type="radio" name="tamanho" value="G"> G</label>
+        <label><input type="radio" name="tamanho"> P</label>
+        <label><input type="radio" name="tamanho"> M</label>
+        <label><input type="radio" name="tamanho"> G</label>
       </div>
     {% elif produto.categoria.nome == "Canecas" %}
       <div class="campo-sublimacao">
         <label>Tipo de Sublimação:*</label>
-        <select name="sublimacao">
-          <option value="padrao">Padrão</option>
-          <option value="premium">Premium</option>
+        <select>
+          <option>Padrão</option>
+          <option>Premium</option>
         </select>
       </div>
     {% endif %}
-    <!-- Fim dos extras -->
 
     <div class="campo-quantidade">
       <div class="controle-quantidade">
-        <button type="button">-</button>
+        <button>-</button>
         <span>1</span>
-        <button type="button">+</button>
+        <button>+</button>
       </div>
 
-      <button class="adicionar-carrinho" type="button">Adicionar ao carrinho</button>
+      <button class="adicionar-carrinho">
+        Adicionar ao carrinho
+      </button>
     </div>
+
   </div>
 </div>
 {% endblock %}

@@ -1,7 +1,11 @@
 from django.contrib import admin
-from .models import Produto, Categoria
+from .models import Produto, Categoria, ProdutoImagem
 from django.utils.html import format_html
 
+class ProdutoImagemInline(admin.TabularInline):
+    model = ProdutoImagem
+    extra = 1
+    fields = ('imagem', 'ordem')
 
 @admin.register(Produto)
 class ProdutoAdmin(admin.ModelAdmin):
@@ -22,6 +26,7 @@ class ProdutoAdmin(admin.ModelAdmin):
     list_filter = ('ativo', 'categoria', 'criado_em')
     search_fields = ('nome', 'descricao')
     ordering = ('-criado_em',)
+    inlines = [ProdutoImagemInline]
 
     def imagem_preview(self, obj):
         if obj.imagem:

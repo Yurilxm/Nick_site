@@ -32,13 +32,35 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    overflow: hidden;
 }
 
 .produto-imagem img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: opacity 0.3s ease;
 }
+
+.img-hover {
+    opacity: 0;
+}
+
+.produto-card:hover .img-hover {
+    opacity: 1;
+}
+
+.produto-card.tem-hover:hover .img-principal {
+    opacity: 0;
+}
+
+.produto-card.tem-hover:hover .img-hover {
+    opacity: 1;
+}
+
 
 /* INFO */
 .produto-info {

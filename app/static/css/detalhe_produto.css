@@ -1,0 +1,45 @@
+.galeria-produto {
+    width: 420px;
+}
+
+/* imagem grande */
+.galeria-produto .imagem-principal {
+    width: 100%;
+}
+
+.galeria-produto .imagem-principal img {
+    width: 100%;
+    height: 420px;
+    object-fit: cover;
+    border-radius: 12px;
+    display: block;
+}
+
+/* miniaturas */
+.galeria-produto .miniaturas {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.galeria-produto .miniaturas img {
+    width: 70px !important;
+    height: 70px !important;
+    max-width: 70px !important;
+    flex: 0 0 70px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    opacity: 0.6;
+    display: block;
+}
+
+.galeria-produto .miniaturas img:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.galeria-produto .miniaturas img.ativa {
+    opacity: 1;
+    border: 2px solid #ec6391;
+}
