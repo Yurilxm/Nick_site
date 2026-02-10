@@ -5,10 +5,6 @@
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
-.site-content {
-    padding-top: 180px; /* PARA NÃO FICAR POR BAIXO DA TOPBAR */
-}
-
 .topbar {
     background-image: url(../imagens/fundo_topbar.png);
     
@@ -56,6 +52,37 @@
     pointer-events: none;
 }
 
+#search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 10px;
+    margin-top: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 9999;
+    display: none;
+}
+
+.search-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.search-item:hover {
+    background: #fbf7f4;
+}
+
+.search-item img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
 .topbar .topbar-linha1 .navbar input[type="text"] {
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 10px;
@@ -93,6 +120,26 @@
     transform: scale(1.12);
 }
 
+.icone-carrinho {
+    position: relative;
+    display: inline-block;
+}
+
+.badge-carrinho {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background: #70b5f9;
+    color: #000;
+    font-size: 11px;
+    font-weight: bold;
+    border-radius: 50%;
+    padding: 3px 6px;
+    min-width: 18px;
+    text-align: center;
+    display: none;
+}
+
 .topbar .topbar-linha2{
     margin-top: 8px;
     display: flex;
@@ -121,4 +168,27 @@
 .topbar .topbar-linha2 .links .menu a:hover {
     color: #ec6391;
     background-color: #fbf7f4;
+}
+
+
+.topbar .topbar-linha1 .icones form {
+    margin: 0;
+}
+
+.topbar .topbar-linha1 .icones button {
+    background: none;
+    border: none;
+    color: #421e01;
+    opacity: 0.8;
+    font-size: 28px;
+    padding: 6px 6px;
+    border-radius: 6px;
+    transition: 0.2s ease;
+    cursor: pointer;
+}
+
+.topbar .topbar-linha1 .icones button:hover {
+    background-color: #fbf7f4;
+    color: #ec6391;
+    transform: scale(1.12);
 }

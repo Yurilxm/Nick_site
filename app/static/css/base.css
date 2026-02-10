@@ -1,0 +1,89 @@
+.site-content {
+  padding-top: 0;
+  min-height: auto;
+}
+
+/* Container fixo no canto superior direito */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999; /* acima de tudo */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Mensagem de toast padrão */
+.toast-message {
+  min-width: 280px;
+  max-width: 360px;
+
+  padding: 16px 22px;
+  border-radius: 10px;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+
+  display: flex;
+  align-items: center;
+
+  animation: fadeIn 0.3s ease, fadeOut 4s forwards;
+  color: white;
+}
+
+/* Toast de sucesso (login) */
+.toast-message.success {
+  background-color: #ec6391; /* rosa bebê */
+}
+
+/* Toast de info (logout) */
+.toast-message.info {
+  background-color: #70b5f9; /* azul bebê */
+}
+
+.toast-message.error {
+  background-color: #f87171; /* vermelho suave */
+}
+
+#overlay-carrinho {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 999;
+}
+
+#overlay-carrinho.ativo {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+body.no-scroll {
+  overflow: hidden;
+  padding-right: 15px; /* compensação da scrollbar */
+}
+
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+@keyframes fadeOut {
+  0%   { opacity: 1; transform: translateY(0); }
+  70%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}

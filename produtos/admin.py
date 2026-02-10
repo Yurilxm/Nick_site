@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.core.exceptions import ValidationError
+from .models import Produto, Categoria, ProdutoImagem, GrupoOpcao, Opcao
 
-from .models import Produto, Categoria, ProdutoImagem
 
-
+# Inline para imagens do produto
 class ProdutoImagemInline(admin.StackedInline):
     model = ProdutoImagem
     extra = 1
@@ -16,7 +16,11 @@ class ProdutoImagemInline(admin.StackedInline):
         }),
         ('Tipo da imagem', {
             'fields': ('tipo',),
-            'description': 'Escolha se esta imagem é para hover ou para o detalhe do produto.'
+            'description': 'Escolha se esta imagem é para hover ou para detalhe do produto.'
+        }),
+        ('Ordem', {
+            'fields': ('ordem',),
+            'description': 'Defina a ordem da imagem (1, 2, 3...).'
         }),
     )
 
@@ -37,6 +41,19 @@ class ProdutoImagemInline(admin.StackedInline):
     preview.short_description = "Preview da imagem"
 
 
+# Inline para opções e grupos de opções
+class OpcaoInline(admin.TabularInline):
+    model = Opcao
+    extra = 1
+
+
+class GrupoOpcaoInline(admin.StackedInline):
+    model = GrupoOpcao
+    extra = 1
+    inlines = [OpcaoInline]
+
+
+# Admin do produto
 @admin.register(Produto)
 class ProdutoAdmin(admin.ModelAdmin):
     fieldsets = (
@@ -66,7 +83,7 @@ class ProdutoAdmin(admin.ModelAdmin):
     search_fields = ('nome', 'descricao')
     ordering = ('-criado_em',)
 
-    inlines = [ProdutoImagemInline]
+    inlines = [ProdutoImagemInline, GrupoOpcaoInline]
 
     def imagem_preview(self, obj):
         if obj and obj.imagem:

@@ -4,68 +4,80 @@
 {% block content %}
 <div class="produto-container">
 
+  <!-- COLUNA ESQUERDA -->
   <div class="produto-descricao">
 
+    <!-- GALERIA DE PRODUTO -->
     <div class="galeria-produto">
 
       <!-- IMAGEM PRINCIPAL -->
-      <div class="imagem-principal">
+      {% if produto.imagem %}
+        <div class="imagem-principal">
           <img id="imagem-principal" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
-      </div>
+        </div>
+      {% endif %}
 
-      <!-- MINIATURAS -->
-      <div class="miniaturas">
+      <!-- MINIATURAS DE DETALHE -->
+      {% if produto.imagens_detalhe.exists %}
+        <div class="miniaturas">
           {% for imagem in produto.imagens_detalhe %}
-              <img src="{{ imagem.imagem.url }}" class="miniatura" alt="{{ produto.nome }}">
+            <img src="{{ imagem.imagem.url }}" class="miniatura" alt="{{ produto.nome }}">
           {% endfor %}
+        </div>
+      {% endif %}
 
-      </div>
+    </div>
+
+    <!-- DESCRIÇÃO -->
+    {% if produto.descricao %}
+      <p class="descricao">{{ produto.descricao|linebreaks }}</p>
+    {% endif %}
+
   </div>
 
-
-    <p class="descricao">{{ produto.descricao|linebreaks }}</p>
-
-  </div>
-
+  <!-- COLUNA DIREITA -->
   <div class="produto-info">
     <h1>{{ produto.nome }}</h1>
+
+    <!-- PREÇO -->
     <p class="preco">R$ {{ produto.preco }}</p>
 
-    {% if produto.categoria.nome == "Agendas" %}
-      <div class="campo-arame">
-        <label>Cor de Arame:*</label>
-        <label><input type="radio" name="arame"> Branco</label>
-        <label><input type="radio" name="arame"> Bronze</label>
-      </div>
-    {% elif produto.categoria.nome == "Camisas" %}
-      <div class="campo-tamanho">
-        <label>Tamanho:*</label>
-        <label><input type="radio" name="tamanho"> P</label>
-        <label><input type="radio" name="tamanho"> M</label>
-        <label><input type="radio" name="tamanho"> G</label>
-      </div>
-    {% elif produto.categoria.nome == "Canecas" %}
-      <div class="campo-sublimacao">
-        <label>Tipo de Sublimação:*</label>
-        <select>
-          <option>Padrão</option>
-          <option>Premium</option>
-        </select>
+    <!-- OPÇÕES DINÂMICAS DO PRODUTO -->
+    {% if produto.grupos_opcoes.exists %}
+      <div class="opcoes-produto">
+        {% for grupo in produto.grupos_opcoes.all %}
+          <div class="grupo-opcao">
+            <label class="titulo-grupo">{{ grupo.nome }}:</label>
+            <div class="opcoes">
+              {% for opcao in grupo.opcoes.all %}
+                <label class="opcao-item">
+                  <input type="radio" name="grupo_{{ grupo.id }}" value="{{ opcao.id }}" required>
+                  {{ opcao.valor }}
+                </label>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
       </div>
     {% endif %}
 
+    <!-- QUANTIDADE + CARRINHO -->
     <div class="campo-quantidade">
       <div class="controle-quantidade">
-        <button>-</button>
-        <span>1</span>
-        <button>+</button>
+        <button type="button" class="btn-menos">-</button>
+        <span class="quantidade">1</span>
+        <button type="button" class="btn-mais">+</button>
       </div>
 
-      <button class="adicionar-carrinho">
-        Adicionar ao carrinho
-      </button>
+      <form action="{% url 'adicionar_ao_carrinho' produto.id %}" method="post">
+        {% csrf_token %}
+        <button id="btn-add-carrinho" data-url="{% url 'adicionar_ao_carrinho' produto.id %}">
+          Adicionar ao carrinho
+        </button>
+      </form>
     </div>
 
   </div>
+
 </div>
 {% endblock %}

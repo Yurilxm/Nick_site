@@ -1,0 +1,227 @@
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.carrinho-imagem {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+button {
+    padding: 4px 8px;
+    cursor: pointer;
+}
+
+form {
+    margin-left: auto;
+}
+
+ul li {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    flex-wrap: wrap;
+}
+
+/* nome do produto */
+ul li strong {
+    min-width: 200px;
+}
+
+/* quantidade */
+ul li span {
+    font-weight: bold;
+}
+
+/* subtotal */
+ul li br {
+    display: none;
+}
+
+/* linha do item */
+li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+/* imagem */
+.carrinho-imagem {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+}
+
+/* botões + e - menores */
+.btn-aumentar,
+.btn-diminuir {
+    background: #421e01;
+    color: white;
+    border: none;
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-aumentar:hover,
+.btn-diminuir:hover {
+    background: #ec6391;
+}
+
+/* número da quantidade */
+[id^="quantidade-"] {
+    font-size: 16px;
+    font-weight: bold;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* botão X remover */
+.btn-remover {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #c00;
+    cursor: pointer;
+    margin-left: auto; /* joga ele pra direita */
+    transition: 0.2s;
+}
+
+.btn-remover:hover {
+    transform: scale(1.2);
+}
+
+.carrinho-wrapper {
+    padding: 30px;
+}
+
+.carrinho-layout {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+.carrinho-lista {
+    flex: 2;
+}
+
+.carrinho-resumo {
+    flex: 1;
+    border: 1px solid #ddd;
+    padding: 20px;
+    background: #fafafa;
+    border-radius: 8px;
+}
+
+.total-final {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.btn-finalizar {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    background: #421e01;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.btn-finalizar:hover {
+    background: #ec6391;
+}
+
+
+
+/* ===============================
+   FRETE - RESUMO DO CARRINHO
+================================ */
+
+.frete-box {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #ddd;
+  font-size: 14px;
+}
+
+/* Título "Entrega / Frete" */
+.frete-box p {
+  margin-bottom: 6px;
+  color: #421e01;
+  font-size: 15px;
+}
+
+/* Texto auxiliar */
+.frete-info {
+  font-size: 10px;
+  color: #555;
+  font-weight: normal;
+  margin-bottom: 10px;
+}
+
+/* Form CEP */
+.frete-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.frete-form input {
+  flex: 1;
+  padding: 9px 12px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.frete-form input:focus {
+  outline: none;
+  border-color: #ec6391;
+}
+
+/* Botão calcular frete (mesmo padrão do site) */
+.frete-form button {
+  padding: 9px 16px;
+  background-color: #421e01;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.frete-form button:hover {
+  background-color: #ec6391;
+}
+
+/* Resultado do frete */
+.frete-resultado {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed #ddd;
+  font-size: 14px;
+  color: #333;
+}

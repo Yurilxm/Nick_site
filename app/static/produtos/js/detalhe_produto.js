@@ -88,3 +88,22 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 });
+
+
+document.addEventListener("DOMContentLoaded", function() {
+  const imagemPrincipal = document.getElementById("imagem-principal");
+  const miniaturas = document.querySelectorAll(".miniaturas img");
+
+  miniaturas.forEach((miniatura) => {
+    miniatura.addEventListener("click", function() {
+      // Troca a imagem principal
+      imagemPrincipal.src = this.src;
+
+      // Remove a classe 'ativa' de todas
+      miniaturas.forEach((img) => img.classList.remove("ativa"));
+
+      // Marca a miniatura clicada como ativa
+      this.classList.add("ativa");
+    });
+  });
+});

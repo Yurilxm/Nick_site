@@ -7,10 +7,11 @@
         <span class="titulo">Fique por dentro das novidades!</span>
         <span class="descricao">Cadastre-se para receber novidades e ofertas exclusivas!</span>
 
-        <div class="cadastro-form">
-            <input type="email" placeholder="Digite seu e-mail">
+        <form class="cadastro-form" method="POST" action="{% url 'cadastrar_email_marketing' %}">
+            {% csrf_token %}
+            <input type="email" name="email" placeholder="Digite seu e-mail" required>
             <button type="submit">Cadastrar</button>
-        </div>
+        </form>
     </div>
 
     <!-- BLOCO 2 — Conteúdo principal do footer -->

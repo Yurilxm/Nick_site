@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Digite o código | Nick Brindes{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-container single">
+        <div class="auth-form">
+        
+            <h1>Digite o código 🔐</h1>
+
+            <p class="auth-description">
+                Enviamos um código para seu e-mail. Ele expira em 10 minutos.
+            </p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <input type="text" name="code" placeholder="Código de 6 dígitos" required>
+
+                <button type="submit">
+                    Validar código
+                </button>
+            </form>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

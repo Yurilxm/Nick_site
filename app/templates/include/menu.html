@@ -9,12 +9,29 @@
 
         <div class="navbar">
             <i class="bi bi-search"></i>
-            <input type="text" placeholder="Buscar produtos...">
+            <input type="text" id="search-input" placeholder="Buscar produtos..." autocomplete="off">
+            <div id="search-results" class="search-results"></div>
         </div>
 
         <div class="icones">
-            <a href="{% url 'login' %}"><i class="bi bi-person-fill"></i></a>
-            <a href="#" id="btn-carrinho"><i class="bi bi-cart-fill"></i></a>
+            {% if user.is_authenticated %}
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="icon-btn">
+                    <i class="bi bi-box-arrow-right"></i>
+                    </button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}">
+                    <i class="bi bi-person-fill"></i>
+                </a>
+            {% endif %}
+
+            <a href="#" id="btn-carrinho" class="icone-carrinho">
+                <i class="bi bi-cart-fill"></i>
+                <span id="badge-carrinho" class="badge-carrinho">0</span>
+            </a>
+            
         </div>
     </div>
         

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'carrinho/css/carrinho.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="carrinho-wrapper">
+  <h2>Seu Carrinho</h2>
+
+  {% if itens %}
+  <div class="carrinho-layout">
+
+    <!-- LISTA -->
+    <div class="carrinho-lista">
+      <ul>
+        {% for item in itens %}
+        <li data-item-id="{{ item.id }}">
+          {% if item.produto.imagem %}
+          <img src="{{ item.produto.imagem.url }}" class="carrinho-imagem">
+          {% endif %}
+
+          <strong>{{ item.produto.nome }}</strong>
+
+          <button class="btn-diminuir" data-item-id="{{ item.id }}">−</button>
+          <span id="quantidade-{{ item.id }}">{{ item.quantidade }}</span>
+          <button class="btn-aumentar" data-item-id="{{ item.id }}">+</button>
+
+          Subtotal: R$
+          <span id="subtotal-{{ item.id }}">{{ item.subtotal }}</span>
+
+          <form action="{% url 'remover_do_carrinho' item.id %}"
+                method="post"
+                class="form-remover">
+            {% csrf_token %}
+            <button type="submit" class="btn-remover">×</button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- RESUMO -->
+    <div class="carrinho-resumo">
+      <h3>Resumo do pedido</h3>
+
+      <p>
+        Subtotal: R$
+        <span id="subtotal-geral">{{ total_produtos }}</span>
+      </p>
+
+      <!-- FRETE -->
+      <div class="frete-box">
+        <p><strong>Entrega</strong></p>
+        <p class="frete-info">Digite seu CEP para ver as opções de entrega</p>
+
+        <div class="frete-form">
+          <input type="text" id="cep-input" placeholder="Digite seu CEP" maxlength="9">
+          <button type="button" id="btn-calcular-frete">Calcular</button>
+        </div>
+
+        {% if frete %}
+        <div id="frete-resultado">
+          Entrega padrão:
+          <strong>R$ <span id="frete-valor">{{ frete.valor }}</span></strong>
+        </div>
+        {% else %}
+        <div id="frete-resultado" style="display:none">
+          Entrega padrão:
+          <strong>R$ <span id="frete-valor">0.00</span></strong>
+        </div>
+        {% endif %}
+      </div>
+
+      <hr>
+
+      <p class="total-final">
+        Total: R$
+        <span id="total-geral">{{ total_geral }}</span>
+      </p>
+
+      <a href="{% url 'finalizar_compra' %}" class="btn-finalizar">
+        Finalizar compra
+      </a>
+    </div>
+
+  </div>
+  {% else %}
+    <p>Seu carrinho está vazio.</p>
+  {% endif %}
+</div>
+
+<script src="{% static 'carrinho/js/carrinho.js' %}"></script>
+{% endblock %}

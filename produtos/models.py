@@ -1,7 +1,7 @@
 from django.db import models
 from django.forms import ValidationError
 from django.utils.text import slugify
-
+from django.urls import reverse
 
 
 class Produto(models.Model):
@@ -48,6 +48,9 @@ class Produto(models.Model):
 
         super().save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        return reverse('detalhe_produto', kwargs={'id': self.id, 'slug': self.slug})
+
 
 class Categoria(models.Model):
     nome = models.CharField(max_length=50, unique=True)
@@ -65,6 +68,9 @@ class Categoria(models.Model):
         super().save(*args, **kwargs)
 
 
+# ==============================
+# PRODUTO IMAGENS
+# ==============================
 class ProdutoImagem(models.Model):
 
     TIPO_CHOICES = (
@@ -105,3 +111,34 @@ class ProdutoImagem(models.Model):
 
     def __str__(self):
         return f"{self.get_tipo_display()} - {self.produto.nome}"
+
+
+# ==============================
+# OPÇÕES DE PRODUTO
+# ==============================
+class GrupoOpcao(models.Model):
+    nome = models.CharField(max_length=100)
+    produto = models.ForeignKey(
+        Produto,
+        related_name='grupos_opcoes',
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f"{self.nome} - {self.produto.nome}"
+
+
+class Opcao(models.Model):
+    grupo = models.ForeignKey(
+        GrupoOpcao,
+        related_name='opcoes',
+        on_delete=models.CASCADE
+    )
+    valor = models.CharField(max_length=100)
+    ordem = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ('grupo', 'valor')
+
+    def __str__(self):
+        return self.valor
