@@ -15,7 +15,7 @@
 
       <!-- MINIATURAS -->
       <div class="miniaturas">
-          {% for imagem in produto.imagens.all %}
+          {% for imagem in produto.imagens_detalhe %}
               <img src="{{ imagem.imagem.url }}" class="miniatura" alt="{{ produto.nome }}">
           {% endfor %}
 

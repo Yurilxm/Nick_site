@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms import ValidationError
 from django.utils.text import slugify
 
 
@@ -24,6 +25,15 @@ class Produto(models.Model):
 
     def __str__(self):
         return self.nome
+    
+    def imagens_hover(self):
+        return self.imagens.filter(tipo='hover')
+
+    def tem_hover(self):
+        return self.imagens.filter(tipo='hover').exists()
+
+    def imagens_detalhe(self):
+        return self.imagens.filter(tipo='detalhe')
     
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -56,6 +66,12 @@ class Categoria(models.Model):
 
 
 class ProdutoImagem(models.Model):
+
+    TIPO_CHOICES = (
+        ('hover', 'Imagem de hover'),
+        ('detalhe', 'Imagem de detalhe'),
+    )
+
     produto = models.ForeignKey(
         Produto,
         on_delete=models.CASCADE,
@@ -63,11 +79,29 @@ class ProdutoImagem(models.Model):
     )
 
     imagem = models.ImageField(upload_to='produtos/galeria/')
+    tipo = models.CharField(
+        max_length=10,
+        choices=TIPO_CHOICES,
+        default='detalhe'
+    )
     ordem = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ['ordem']
+        verbose_name = 'Imagem do Produto'
+        verbose_name_plural = 'Imagens do Produto'
+
+    def clean(self):
+        if self.tipo == 'hover':
+            existe_hover = ProdutoImagem.objects.filter(
+                produto=self.produto,
+                tipo='hover'
+            ).exclude(pk=self.pk).exists()
+
+            if existe_hover:
+                raise ValidationError(
+                    'Este produto já possui uma imagem de hover.'
+                )
 
     def __str__(self):
-        return f"Imagem de {self.produto.nome}"
-
+        return f"{self.get_tipo_display()} - {self.produto.nome}"

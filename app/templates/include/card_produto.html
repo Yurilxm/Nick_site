@@ -1,22 +1,14 @@
 {% load static %}
 
-<div class="produto-card" {% if produto.imagens.exists %}tem-hover{% endif %}>
+<div class="produto-card" {% if produto.tem_hover %}tem-hover{% endif %}>
   <div class="produto-imagem">
 
     <!-- imagem principal -->
-    <img
-      class="img-principal"
-      src="{{ produto.imagem.url }}"
-      alt="{{ produto.nome }}"
-    >
+    <img class="img-principal" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
 
-    {% with produto.imagens.all|first as img_hover %}
+    {% with produto.imagens_hover|first as img_hover %}
       {% if img_hover %}
-        <img
-          class="img-hover"
-          src="{{ img_hover.imagem.url }}"
-          alt="{{ produto.nome }} hover"
-        >
+        <img class="img-hover" src="{{ img_hover.imagem.url }}" alt="{{ produto.nome }} hover">
       {% endif %}
     {% endwith %}
 
@@ -31,4 +23,3 @@
     </a>
   </div>
 </div>
-
