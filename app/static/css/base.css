@@ -3,50 +3,9 @@
   min-height: auto;
 }
 
-/* Container fixo no canto superior direito */
-.toast-container {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 9999; /* acima de tudo */
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* Mensagem de toast padrão */
-.toast-message {
-  min-width: 280px;
-  max-width: 360px;
-
-  padding: 16px 22px;
-  border-radius: 10px;
-
-  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
-
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.4;
-
-  display: flex;
-  align-items: center;
-
-  animation: fadeIn 0.3s ease, fadeOut 4s forwards;
-  color: white;
-}
-
-/* Toast de sucesso (login) */
-.toast-message.success {
-  background-color: #ec6391; /* rosa bebê */
-}
-
-/* Toast de info (logout) */
-.toast-message.info {
-  background-color: #70b5f9; /* azul bebê */
-}
-
-.toast-message.error {
-  background-color: #f87171; /* vermelho suave */
+body.no-scroll {
+  overflow: hidden;
+  padding-right: 15px; /* compensação da scrollbar */
 }
 
 #overlay-carrinho {
@@ -64,26 +23,170 @@
   pointer-events: auto;
 }
 
-body.no-scroll {
-  overflow: hidden;
-  padding-right: 15px; /* compensação da scrollbar */
+
+/*TOAST (LOGIN / LOGOUT / ERRO)*/
+
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
+.toast-message {
+  min-width: 280px;
+  max-width: 360px;
+  padding: 16px 22px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  color: white;
+  animation: fadeIn 0.3s ease, fadeOut 4s forwards;
+}
+
+.toast-message.success {
+  background-color: #ec6391;
+}
+
+.toast-message.info {
+  background-color: #70b5f9;
+}
+
+.toast-message.error {
+  background-color: #f87171;
+}
+
+
+/*TOAST PRODUTO (CARRINHO)*/
+
+#toast-produto-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.toast-produto {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 320px;
+  padding: 14px 18px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: translateX(120%);
+  opacity: 0;
+  transition: 0.35s ease;
+  cursor: pointer;
+}
+
+.toast-produto.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.toast-produto:active {
+  transform: scale(0.97);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+/* Barra lateral decorativa */
+.toast-produto::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 4px;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, #ec6391, #f59fb8);
+}
+
+/* Imagem do produto */
+.toast-produto img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #f9f9f9;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Texto do toast */
+.toast-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toast-info strong {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: #333;
+}
+
+.toast-info span {
+  font-size: 13.5px;
+  color: #555;
+}
+
+.toast-info small {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ec6391;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-top: 2px;
+}
+
+/* HOVERS (DESKTOP) */
+
+@media (hover: hover) {
+  .toast-produto:hover {
+    box-shadow:
+      0 12px 35px rgba(0, 0, 0, 0.18),
+      0 0 0 1px rgba(236, 99, 145, 0.25);
+  }
+}
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
 
 @keyframes fadeOut {
   0%   { opacity: 1; transform: translateY(0); }
   70%  { opacity: 1; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(-10px); }
+}
+
+
+@media (max-width: 600px) {
+  #toast-produto-container {
+    top: auto;
+    bottom: 20px;
+    right: 50%;
+    transform: translateX(50%);
+    align-items: center;
+  }
+
+  .toast-produto {
+    min-width: unset;
+    width: calc(100vw - 32px);
+  }
 }

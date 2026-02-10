@@ -70,17 +70,16 @@
         <button type="button" class="btn-mais">+</button>
       </div>
 
-      <form 
-        action="{% url 'adicionar_ao_carrinho' produto.id %}" 
-        method="post"
-      >
+      <form action="{% url 'adicionar_ao_carrinho' produto.id %}" method="post">
         {% csrf_token %}
 
-        <button 
-          id="btn-add-carrinho"
-          data-url="{% url 'adicionar_ao_carrinho' produto.id %}">
+        <button type="button" id="btn-add-carrinho" data-url="{% url 'adicionar_ao_carrinho' produto.id %}"
+          data-nome="{{ produto.nome }}"
+          data-preco="{{ produto.preco }}"
+          data-imagem="{{ produto.imagem.url }}">
           Adicionar ao carrinho
         </button>
+
       </form>
 
     </div>

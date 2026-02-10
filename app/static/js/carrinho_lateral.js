@@ -16,6 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.classList.remove("no-scroll");
   }
 
+  // Expoe globalmente para o toast chamar
+  window.abrirCarrinho = abrirCarrinho;
+
   if (botaoCarrinho && carrinho && botaoFechar && overlay) {
     botaoCarrinho.addEventListener("click", (e) => {
       e.preventDefault();
@@ -51,7 +54,8 @@ function atualizarBadge(qtd) {
    MINI CARRINHO
 ========================= */
 function atualizarMiniCarrinho() {
-  fetch("/carrinho/mini/")
+  // RETURN obrigatorio para poder usar .then() em quem chamar
+  return fetch("/carrinho/mini/")
     .then((response) => response.json())
     .then((data) => {
       atualizarBadge(data.quantidade_total);
@@ -65,7 +69,7 @@ function atualizarMiniCarrinho() {
       lista.innerHTML = "";
 
       if (data.itens.length === 0) {
-        lista.innerHTML = "<p>Seu carrinho está vazio.</p>";
+        lista.innerHTML = "<p>Seu carrinho esta vazio.</p>";
         totalEl.innerText = "0,00";
         if (finais) finais.style.display = "none";
         return;
@@ -83,9 +87,9 @@ function atualizarMiniCarrinho() {
             }
             <div class="item-carrinho-info">
               <strong>${item.nome}</strong>
-              <span>${item.quantidade} × R$ ${item.preco.toFixed(2)}</span>
+              <span>${item.quantidade} x R$ ${item.preco.toFixed(2)}</span>
             </div>
-            <button class="btn-remover-mini" data-item-id="${item.id}" aria-label="Remover item">×</button>
+            <button class="btn-remover-mini" data-item-id="${item.id}" aria-label="Remover item">x</button>
           </li>
         `;
       });
@@ -96,7 +100,7 @@ function atualizarMiniCarrinho() {
 }
 
 /* =========================
-   REMOVER ITEM (DELEGAÇÃO)
+   REMOVER ITEM (DELEGACAO)
 ========================= */
 document.addEventListener("click", function (e) {
   const btn = e.target.closest(".btn-remover-mini");
@@ -115,7 +119,6 @@ document.addEventListener("click", function (e) {
     .then((data) => {
       atualizarBadge(data.quantidade_total ?? 0);
 
-      // 🔥 Carrinho ficou vazio → sincroniza tudo
       if (data.carrinho_vazio) {
         atualizarMiniCarrinho();
 
@@ -131,7 +134,7 @@ document.addEventListener("click", function (e) {
 });
 
 /* =========================
-   CLICK NO ITEM → PRODUTO
+   CLICK NO ITEM -> PRODUTO
 ========================= */
 document.addEventListener("click", function (e) {
   const item = e.target.closest(".item-carrinho.clicavel");
