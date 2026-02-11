@@ -8,6 +8,8 @@ __pycache__/
 # Django
 db.sqlite3
 *.log
+media/
+/staticfiles/
 
 # Variáveis de ambiente
 .env

@@ -1,27 +1,28 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("btn-add-carrinho");
-  if (!btn) return;
+  const form = document.getElementById("form-carrinho");
+  if (!form) return;
 
-  btn.addEventListener("click", () => {
-    const url = btn.dataset.url;
-    const nome = btn.dataset.nome;
-    const preco = btn.dataset.preco;
-    const imagem = btn.dataset.imagem;
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const url = form.action;
+
+    const nome = document.querySelector(".produto-titulo")?.innerText;
+    const preco = document.querySelector(".preco-valor")?.innerText.replace("R$ ", "");
+    const imagem = document.getElementById("imagem-principal")?.src;
 
     fetch(url, {
       method: "POST",
       headers: {
-        "X-CSRFToken": document.querySelector(
-          'meta[name="csrf-token"]'
-        ).content,
+        "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
         "X-Requested-With": "XMLHttpRequest",
       },
+      body: new URLSearchParams(new FormData(form))
     })
-      .then((res) => res.json())
+      .then(res => res.json())
       .then(() => {
         mostrarToast(nome, preco, imagem);
 
-        // Atualiza badge + mini carrinho em background
         if (typeof atualizarMiniCarrinho === "function") {
           atualizarMiniCarrinho();
         }
@@ -48,28 +49,8 @@ function mostrarToast(nome, preco, imagem) {
 
   requestAnimationFrame(() => toast.classList.add("show"));
 
-  // Tempo automatico
-  const timeoutId = setTimeout(() => {
+  setTimeout(() => {
     toast.classList.remove("show");
     setTimeout(() => toast.remove(), 300);
   }, 3000);
-
-  // Clique -> busca dados frescos, espera, e so entao abre o carrinho
-  toast.addEventListener("click", () => {
-    clearTimeout(timeoutId);
-
-    toast.classList.remove("show");
-    setTimeout(() => toast.remove(), 150);
-
-    // Busca dados frescos e SO DEPOIS abre o carrinho lateral
-    if (typeof atualizarMiniCarrinho === "function") {
-      atualizarMiniCarrinho().then(() => {
-        if (typeof window.abrirCarrinho === "function") {
-          window.abrirCarrinho();
-        }
-      });
-    } else if (typeof window.abrirCarrinho === "function") {
-      window.abrirCarrinho();
-    }
-  });
 }

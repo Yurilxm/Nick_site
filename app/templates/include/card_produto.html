@@ -1,23 +1,25 @@
 {% load static %}
 
-<div class="produto-card">
+<div class="produto-card" {% if produto.tem_hover %}tem-hover{% endif %}>
+  <div class="produto-imagem">
 
-    <div class="produto-imagem">
-        {% if produto.imagem %}
-            <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
-        {% endif %}
-    </div>
+    <!-- imagem principal -->
+    <img class="img-principal" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
 
-    <div class="produto-info">
-        <h2 class="produto-nome">{{ produto.nome }}</h2>
+    {% with produto.imagens_hover|first as img_hover %}
+      {% if img_hover %}
+        <img class="img-hover" src="{{ img_hover.imagem.url }}" alt="{{ produto.nome }} hover">
+      {% endif %}
+    {% endwith %}
 
-        <div class="produto-footer">
-            <p class="produto-preco">R$ {{ produto.preco }}</p>
+  </div>
 
-            <a href="{% url 'detalhe_produto' produto.id produto.slug %}" class="produto-botao">
-                Ver detalhes
-            </a>
-        </div>
-    </div>
+  <div class="produto-info">
+    <h3 class="produto-nome">{{ produto.nome }}</h3>
+    <p class="produto-preco">R$ {{ produto.preco }}</p>
 
+    <a href="{% url 'detalhe_produto' produto.id produto.slug %}" class="produto-botao">
+      Ver produto
+    </a>
+  </div>
 </div>
