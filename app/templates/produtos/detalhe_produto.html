@@ -1,105 +1,92 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 
 {% block content %}
-<div class="produto-wrapper">
+  <div class="produto-wrapper">
+    <!-- COLUNA ESQUERDA - GALERIA E DESCRIÇÃO -->
+    <div class="produto-col-esquerda">
+      <!-- GALERIA DE PRODUTO -->
+      <div class="galeria-produto">
+        <!-- IMAGEM PRINCIPAL -->
+        <div class="imagem-principal">
+          {% if produto.imagem %}
+            <img id="imagem-principal" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}" />
+          {% else %}
+            <img id="imagem-principal" src="{% static 'images/produto-sem-imagem.jpg' %}" alt="Sem imagem" />
+          {% endif %}
+        </div>
 
-  <!-- COLUNA ESQUERDA - GALERIA E DESCRIÇÃO -->
-  <div class="produto-col-esquerda">
-
-    <!-- GALERIA DE PRODUTO -->
-    <div class="galeria-produto">
-
-      <!-- IMAGEM PRINCIPAL -->
-      <div class="imagem-principal">
-        {% if produto.imagem %}
-        <img id="imagem-principal" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
-        {% else %}
-        <img id="imagem-principal" src="{% static 'images/produto-sem-imagem.jpg' %}" alt="Sem imagem">
+        <!-- MINIATURAS -->
+        {% if produto.imagens_detalhe.exists %}
+          <div class="miniaturas-container">
+            <div class="miniaturas">
+              <!-- Primeira miniatura é a imagem principal -->
+              {% if produto.imagem %}
+                <img src="{{ produto.imagem.url }}" class="miniatura ativa" alt="{{ produto.nome }}" />
+              {% endif %}
+              {% for imagem in produto.imagens_detalhe.all %}
+                <img src="{{ imagem.imagem.url }}" class="miniatura" alt="{{ produto.nome }}" />
+              {% endfor %}
+            </div>
+          </div>
         {% endif %}
       </div>
 
-      <!-- MINIATURAS -->
-      {% if produto.imagens_detalhe.exists %}
-      <div class="miniaturas-container">
-        <div class="miniaturas">
-          <!-- Primeira miniatura é a imagem principal -->
-          {% if produto.imagem %}
-          <img src="{{ produto.imagem.url }}" class="miniatura ativa" alt="{{ produto.nome }}">
-          {% endif %}
-          {% for imagem in produto.imagens_detalhe.all %}
-          <img src="{{ imagem.imagem.url }}" class="miniatura" alt="{{ produto.nome }}">
-          {% endfor %}
+      <!-- DESCRIÇÃO DO PRODUTO -->
+      {% if produto.descricao %}
+        <div class="descricao-produto">
+          <h2>Descrição do Produto</h2>
+          <div class="descricao-conteudo">{{ produto.descricao|linebreaks }}</div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- COLUNA DIREITA - INFORMAÇÕES E COMPRA -->
+    <div class="produto-col-direita">
+      <div class="produto-info-card">
+        <!-- TÍTULO -->
+        <h1 class="produto-titulo">{{ produto.nome }}</h1>
+
+        <!-- PREÇO - SIMPLES E DIRETO -->
+        <div class="produto-preco">
+          <span class="preco-valor">R$ {{ produto.preco|floatformat:2 }}</span>
+        </div>
+
+        <!-- PERSONALIZAÇÃO (se existir) -->
+        {% if produto.permite_personalizacao %}
+          <div class="personalizacao-area">
+            <label for="personalizacao">Personalização:</label>
+            <textarea id="personalizacao" name="personalizacao" rows="3" placeholder="Digite aqui sua personalização..."></textarea>
+            <span class="caracteres-restantes">0/200</span>
+          </div>
+        {% endif %}
+
+        <!-- QUANTIDADE - APENAS BOTÕES -->
+        <div class="quantidade-area">
+          <label>Quantidade:</label>
+          <div class="quantidade-controle">
+            <button type="button" class="quantidade-btn menos" aria-label="Diminuir quantidade">−</button>
+            <input type="text" id="quantidade" name="quantidade" value="1" readonly>
+            <button type="button" class="quantidade-btn mais" aria-label="Aumentar quantidade">+</button>
+          </div>
+        </div>
+
+        <!-- BOTÕES DE AÇÃO -->
+        <div class="acoes-produto">
+          <button type="button" id="btn-comprar-agora" class="btn-comprar-agora" data-finalizar-url="{% url 'finalizar_compra' %}">Comprar Agora</button>
+
+          <form id="form-carrinho" action="{% url 'adicionar_ao_carrinho' produto.id %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="quantidade" id="input-quantidade" value="1" />
+            <input type="hidden" name="personalizacao" id="input-personalizacao" value="" />
+
+            <button type="submit" id="btn-adicionar-carrinho" class="btn-adicionar-carrinho">
+              <span class="icone-carrinho">🛒</span>
+              Adicionar ao Carrinho
+            </button>
+          </form>
         </div>
       </div>
-      {% endif %}
-
-    </div>
-
-    <!-- DESCRIÇÃO DO PRODUTO -->
-    {% if produto.descricao %}
-    <div class="descricao-produto">
-      <h2>Descrição do Produto</h2>
-      <div class="descricao-conteudo">
-        {{ produto.descricao|linebreaks }}
-      </div>
-    </div>
-    {% endif %}
-
-  </div>
-
-  <!-- COLUNA DIREITA - INFORMAÇÕES E COMPRA -->
-  <div class="produto-col-direita">
-    <div class="produto-info-card">
-
-      <!-- TÍTULO -->
-      <h1 class="produto-titulo">{{ produto.nome }}</h1>
-
-      <!-- PREÇO - SIMPLES E DIRETO -->
-      <div class="produto-preco">
-        <span class="preco-valor">R$ {{ produto.preco|floatformat:2 }}</span>
-      </div>
-
-      <!-- PERSONALIZAÇÃO (se existir) -->
-      {% if produto.permite_personalizacao %}
-      <div class="personalizacao-area">
-        <label for="personalizacao">Personalização:</label>
-        <textarea id="personalizacao" name="personalizacao" rows="3"
-          placeholder="Digite aqui sua personalização..."></textarea>
-        <span class="caracteres-restantes">0/200</span>
-      </div>
-      {% endif %}
-
-      <!-- QUANTIDADE - APENAS BOTÕES -->
-      <div class="quantidade-area">
-        <label>Quantidade:</label>
-        <div class="quantidade-controle">
-          <button type="button" class="quantidade-btn menos" aria-label="Diminuir quantidade">−</button>
-          <input type="text" id="quantidade" name="quantidade" value="1" min="1" max="{{ produto.estoque|default:99 }}"
-            step="1" readonly>
-          <button type="button" class="quantidade-btn mais" aria-label="Aumentar quantidade">+</button>
-        </div>
-      </div>
-
-      <!-- BOTÕES DE AÇÃO -->
-      <div class="acoes-produto">
-        <button id="btn-comprar-agora" class="btn-comprar-agora" data-produto-id="{{ produto.id }}">
-          Comprar Agora
-        </button>
-
-        <form id="form-carrinho" action="{% url 'adicionar_ao_carrinho' produto.id %}" method="post">
-          {% csrf_token %}
-          <input type="hidden" name="quantidade" id="input-quantidade" value="1">
-          <input type="hidden" name="personalizacao" id="input-personalizacao" value="">
-          <button type="submit" id="btn-adicionar-carrinho" class="btn-adicionar-carrinho" data-produto-id="{{ produto.id }}">
-            <span class="icone-carrinho">🛒</span>
-            Adicionar ao Carrinho
-          </button>
-        </form>
-      </div>
-
     </div>
   </div>
-
-</div>
 {% endblock %}

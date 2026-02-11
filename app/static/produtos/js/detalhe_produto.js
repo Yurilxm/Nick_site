@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // FORÇA READONLY (garantia)
         inputQtd.readOnly = true;
         
-        const max = parseInt(inputQtd.max) || 99;
+        const max = 999;
         
         function atualizar(valor) {
             valor = parseInt(valor) || 1;
@@ -91,32 +91,49 @@ document.addEventListener('DOMContentLoaded', function () {
     // ====================================
     
     function initCarrinho() {
-        const form = document.getElementById('form-carrinho');
-        const btnComprar = document.getElementById('btn-comprar-agora');
-        
-        if (!form) return;
-        
-        // Atualiza quantidade antes de enviar
-        form.onsubmit = function() {
+    const form = document.getElementById('form-carrinho');
+    const btnComprar = document.getElementById('btn-comprar-agora');
+
+    if (!form) return;
+
+    // Garante que quantidade sempre esteja sincronizada
+    form.addEventListener('submit', function () {
+        const qtd = document.getElementById('quantidade');
+        const qtdHidden = document.getElementById('input-quantidade');
+        if (qtdHidden && qtd) {
+            qtdHidden.value = qtd.value;
+        }
+    });
+
+    // Comprar Agora
+    if (btnComprar) {
+        btnComprar.addEventListener('click', function () {
+            const finalizarUrl = this.dataset.finalizarUrl;
             const qtd = document.getElementById('quantidade');
             const qtdHidden = document.getElementById('input-quantidade');
-            if (qtdHidden && qtd) qtdHidden.value = qtd.value;
-        };
-        
-        // Comprar agora
-        if (btnComprar) {
-            btnComprar.onclick = function(e) {
-                e.preventDefault();
-                const qtd = document.getElementById('quantidade');
-                const qtdHidden = document.getElementById('input-quantidade');
-                if (qtdHidden && qtd) qtdHidden.value = qtd.value;
-                form.action = '/checkout/';
-                form.submit();
-            };
-        }
-        
-        console.log('✅ Carrinho OK');
+
+            if (qtdHidden && qtd) {
+                qtdHidden.value = qtd.value;
+            }
+
+            // Primeiro adiciona ao carrinho
+            fetch(form.action, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams(new FormData(form))
+            })
+            .then(() => {
+                // Depois redireciona para finalizar
+                window.location.href = finalizarUrl;
+            });
+        });
     }
+
+    console.log('✅ Carrinho OK');
+}
 
     // ====================================
     // INICIALIZAR TUDO

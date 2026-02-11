@@ -89,7 +89,7 @@ class ProdutoAdmin(admin.ModelAdmin):
             "🛍️ Informações do Produto",
             {"fields": ("nome", "categoria", "descricao", "preco", "imagem")},
         ),
-        ("⚙️ Controle", {"fields": ("ativo",)}),
+        ("⚙️ Controle", {"fields": ("ativo", "permite_personalizacao")}),
         ("📅 Datas", {"fields": ("criado_em", "atualizado_em")}),
     )
 

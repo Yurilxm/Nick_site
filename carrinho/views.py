@@ -33,18 +33,30 @@ def adicionar_ao_carrinho(request, produto_id):
     carrinho = obter_carrinho(request)
     produto = get_object_or_404(Produto, id=produto_id)
 
+    # 🔥 Pega a quantidade enviada pelo formulário
+    try:
+        quantidade = int(request.POST.get("quantidade", 1))
+        if quantidade < 1:
+            quantidade = 1
+    except (ValueError, TypeError):
+        quantidade = 1
+
     item, created = ItemCarrinho.objects.get_or_create(
         carrinho=carrinho,
         produto=produto,
-        defaults={"preco_unitario": produto.preco}
+        defaults={
+            "preco_unitario": produto.preco,
+            "quantidade": quantidade
+        }
     )
 
+    # Se já existia, soma a quantidade enviada
     if not created:
-        item.quantidade += 1
+        item.quantidade += quantidade
         item.save()
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
-        return JsonResponse({"status": "ok"})
+        return JsonResponse({"status": "ok", "quantidade": item.quantidade})
 
     return redirect("ver_carrinho")
 

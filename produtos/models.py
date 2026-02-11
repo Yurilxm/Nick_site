@@ -14,6 +14,8 @@ class Produto(models.Model):
 
     imagem = models.ImageField(upload_to="produtos/", blank=True)
 
+    permite_personalizacao = models.BooleanField(default=False)
+
     ativo = models.BooleanField(default=True)
 
     criado_em = models.DateTimeField(auto_now_add=True)
