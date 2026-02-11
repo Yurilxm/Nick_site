@@ -122,6 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 headers: {
                     "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
                     "Content-Type": "application/x-www-form-urlencoded",
+                    "X-Requested-With": "XMLHttpRequest"
                 },
                 body: new URLSearchParams(new FormData(form))
             })

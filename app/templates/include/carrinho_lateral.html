@@ -1,7 +1,6 @@
 {% load static %}
 
 <div class="carrinho-container" id="carrinho">
-
   <div class="carrinho-conteudo">
 
     <!-- HEADER DO CARRINHO -->
@@ -10,56 +9,21 @@
       <button class="btn-fechar-carrinho" id="fechar-carrinho">×</button>
     </div>
 
-    {% if mini_carrinho_itens %}
-      <ul id="mini-carrinho-lista">
-        {% for item in mini_carrinho_itens %}
-          <li class="item-carrinho" data-item-id="{{ item.id }}" data-url="${item.url}">
-  
-            {% if item.produto.imagem %}
-              <img
-                src="{{ item.produto.imagem.url }}"
-                class="item-carrinho-img"
-                alt="{{ item.produto.nome }}"
-              >
-            {% endif %}
-
-            <div class="item-carrinho-info">
-              <strong>{{ item.produto.nome }}</strong>
-
-              <span>
-                <span class="mini-qtd" id="mini-qtd-{{ item.id }}">
-                  {{ item.quantidade }}
-                </span>
-                × R$
-                <span class="mini-subtotal" id="mini-subtotal-{{ item.id }}">
-                  {{ item.subtotal }}
-                </span>
-              </span>
-            </div>
-
-            <button class="btn-remover-mini" data-item-id="{{ item.id }}" aria-label="Remover item">
-              ×
-            </button>
-
-
-          </li>
-        {% endfor %}
-      </ul>
-
-      <div class="btn-finais">
-        <hr>
-
-        <div class="mini-total-linha">
-          <span>Total:</span>
-          <span>R$ <span id="mini-carrinho-total">0</span></span>
-        </div>
-
-        <a href="{% url 'ver_carrinho' %}" class="btn-mini">Ver carrinho</a>
-        <a href="#" class="btn-mini">Finalizar compra</a>
-      </div>
-
-    {% else %}
+    <!-- LISTA DE ITENS - SEMPRE VAZIA NO HTML INICIAL -->
+    <ul id="mini-carrinho-lista">
       <p>Seu carrinho está vazio.</p>
-    {% endif %}
+    </ul>
+
+    <!-- RODAPÉ - INICIALMENTE OCULTO -->
+    <div class="btn-finais" style="display: none;">
+      <hr>
+      <div class="mini-total-linha">
+        <span>Total:</span>
+        <span>R$ <span id="mini-carrinho-total">0,00</span></span>
+      </div>
+      <a href="{% url 'ver_carrinho' %}" class="btn-mini">Ver carrinho</a>
+      <a href="{% url 'finalizar_compra' %}" class="btn-mini">Finalizar compra</a>
+    </div>
+
   </div>
 </div>

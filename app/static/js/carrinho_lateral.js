@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Expoe globalmente para o toast chamar
   window.abrirCarrinho = abrirCarrinho;
+  window.atualizarMiniCarrinho = atualizarMiniCarrinho;
 
   if (botaoCarrinho && carrinho && botaoFechar && overlay) {
     botaoCarrinho.addEventListener("click", (e) => {
@@ -54,7 +55,6 @@ function atualizarBadge(qtd) {
    MINI CARRINHO
 ========================= */
 function atualizarMiniCarrinho() {
-  // RETURN obrigatorio para poder usar .then() em quem chamar
   return fetch("/carrinho/mini/")
     .then((response) => response.json())
     .then((data) => {
@@ -66,32 +66,37 @@ function atualizarMiniCarrinho() {
 
       if (!lista || !totalEl) return;
 
+      // 🔥 LIMPA A LISTA COMPLETAMENTE
       lista.innerHTML = "";
 
       if (data.itens.length === 0) {
-        lista.innerHTML = "<p>Seu carrinho esta vazio.</p>";
+        // CARRINHO VAZIO
+        lista.innerHTML = "<p>Seu carrinho está vazio.</p>";
         totalEl.innerText = "0,00";
         if (finais) finais.style.display = "none";
         return;
       }
 
+      // 🔥 CARRINHO COM ITENS - MOSTRA RODAPÉ
       if (finais) finais.style.display = "block";
 
+      // 🔥 ADICIONA OS ITENS
       data.itens.forEach((item) => {
-        lista.innerHTML += `
-          <li class="item-carrinho clicavel" data-item-id="${item.id}" data-url="${item.url}">
-            ${
-              item.imagem
-                ? `<img src="${item.imagem}" class="item-carrinho-img" alt="${item.nome}">`
-                : ""
-            }
-            <div class="item-carrinho-info">
-              <strong>${item.nome}</strong>
-              <span>${item.quantidade} x R$ ${item.preco.toFixed(2)}</span>
-            </div>
-            <button class="btn-remover-mini" data-item-id="${item.id}" aria-label="Remover item">x</button>
-          </li>
+        const li = document.createElement("li");
+        li.className = "item-carrinho clicavel";
+        li.dataset.itemId = item.id;
+        li.dataset.url = item.url;
+        
+        li.innerHTML = `
+          ${item.imagem ? `<img src="${item.imagem}" class="item-carrinho-img" alt="${item.nome}">` : ''}
+          <div class="item-carrinho-info">
+            <strong>${item.nome}</strong>
+            <span>${item.quantidade} x R$ ${item.preco.toFixed(2)}</span>
+          </div>
+          <button class="btn-remover-mini" data-item-id="${item.id}" aria-label="Remover item">×</button>
         `;
+        
+        lista.appendChild(li);
       });
 
       totalEl.innerText = data.total.toFixed(2);
