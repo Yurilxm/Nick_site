@@ -1,40 +1,47 @@
 from django.db import models
-from django.forms import ValidationError
 from django.utils.text import slugify
 from django.urls import reverse
 
 
 class Produto(models.Model):
     nome = models.CharField(max_length=150)
-    slug = models.SlugField(unique=True, blank=True, max_length=160, editable=False, db_index=True)
+    slug = models.SlugField(
+        unique=True, blank=True, max_length=160, editable=False, db_index=True
+    )
 
     descricao = models.TextField(blank=True)
     preco = models.DecimalField(max_digits=10, decimal_places=2)
 
-    imagem = models.ImageField(upload_to='produtos/', blank=True)
+    imagem = models.ImageField(upload_to="produtos/", blank=True)
 
     ativo = models.BooleanField(default=True)
-    
+
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
-    
-    categoria = models.ForeignKey('Categoria', on_delete=models.SET_NULL, null=True, blank=True, related_name='produtos')
+
+    categoria = models.ForeignKey(
+        "Categoria",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="produtos",
+    )
 
     class Meta:
-        ordering = ['-criado_em']
+        ordering = ["-criado_em"]
 
     def __str__(self):
         return self.nome
-    
+
     def imagens_hover(self):
-        return self.imagens.filter(tipo='hover')
+        return self.imagens.filter(tipo="hover")
 
     def tem_hover(self):
-        return self.imagens.filter(tipo='hover').exists()
+        return self.imagens.filter(tipo="hover").exists()
 
     def imagens_detalhe(self):
-        return self.imagens.filter(tipo='detalhe')
-    
+        return self.imagens.filter(tipo="detalhe")
+
     def save(self, *args, **kwargs):
         if not self.slug:
             slug_base = slugify(self.nome)
@@ -49,7 +56,7 @@ class Produto(models.Model):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('detalhe_produto', kwargs={'id': self.id, 'slug': self.slug})
+        return reverse("detalhe_produto", kwargs={"id": self.id, "slug": self.slug})
 
 
 class Categoria(models.Model):
@@ -68,77 +75,32 @@ class Categoria(models.Model):
         super().save(*args, **kwargs)
 
 
-# ==============================
-# PRODUTO IMAGENS
-# ==============================
 class ProdutoImagem(models.Model):
 
     TIPO_CHOICES = (
-        ('hover', 'Imagem de hover'),
-        ('detalhe', 'Imagem de detalhe'),
+        ("hover", "Imagem de hover"),
+        ("detalhe", "Imagem de detalhe"),
     )
 
     produto = models.ForeignKey(
-        Produto,
-        on_delete=models.CASCADE,
-        related_name='imagens'
+        Produto, on_delete=models.CASCADE, related_name="imagens"
     )
 
-    imagem = models.ImageField(upload_to='produtos/galeria/')
-    tipo = models.CharField(
-        max_length=10,
-        choices=TIPO_CHOICES,
-        default='detalhe'
-    )
+    imagem = models.ImageField(upload_to="produtos/galeria/")
+    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, default="detalhe")
     ordem = models.PositiveIntegerField(default=0)
 
     class Meta:
-        ordering = ['ordem']
-        verbose_name = 'Imagem do Produto'
-        verbose_name_plural = 'Imagens do Produto'
-
-    def clean(self):
-        if self.tipo == 'hover':
-            existe_hover = ProdutoImagem.objects.filter(
-                produto=self.produto,
-                tipo='hover'
-            ).exclude(pk=self.pk).exists()
-
-            if existe_hover:
-                raise ValidationError(
-                    'Este produto já possui uma imagem de hover.'
-                )
+        ordering = ["ordem"]
+        verbose_name = "Imagem do Produto"
+        verbose_name_plural = "Imagens do Produto"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["produto"],
+                condition=models.Q(tipo="hover"),
+                name="unique_hover_image_por_produto",
+            )
+        ]
 
     def __str__(self):
         return f"{self.get_tipo_display()} - {self.produto.nome}"
-
-
-# ==============================
-# OPÇÕES DE PRODUTO
-# ==============================
-class GrupoOpcao(models.Model):
-    nome = models.CharField(max_length=100)
-    produto = models.ForeignKey(
-        Produto,
-        related_name='grupos_opcoes',
-        on_delete=models.CASCADE
-    )
-
-    def __str__(self):
-        return f"{self.nome} - {self.produto.nome}"
-
-
-class Opcao(models.Model):
-    grupo = models.ForeignKey(
-        GrupoOpcao,
-        related_name='opcoes',
-        on_delete=models.CASCADE
-    )
-    valor = models.CharField(max_length=100)
-    ordem = models.PositiveIntegerField(default=0)
-
-    class Meta:
-        unique_together = ('grupo', 'valor')
-
-    def __str__(self):
-        return self.valor
