@@ -2,13 +2,38 @@
 {% load static %}
 
 {% block content %}
-<div class="produtos-container">
+
+<section class="produtos-section">
+
+    <div class="categoria-header">
+        {% if categoria %}
+            <h1>{{ categoria.nome }}</h1>
+            <p class="categoria-info">
+                {{ produtos|length }} produto{{ produtos|length|pluralize }}
+                disponível{{ produtos|length|pluralize }}
+            </p>
+        {% else %}
+            <h1>Todos os Produtos</h1>
+            <p class="categoria-info">
+                {{ produtos|length }} produto{{ produtos|length|pluralize }}
+                disponível{{ produtos|length|pluralize }}
+            </p>
+        {% endif %}
+    </div>
+
     {% if produtos %}
-        {% for produto in produtos %}
-            {% include "include/card_produto.html" %}
-        {% endfor %}
+        <div class="produtos-grid">
+            {% for produto in produtos %}
+                {% include "include/card_produto.html" %}
+            {% endfor %}
+        </div>
     {% else %}
-        <p>Nenhum produto encontrado.</p>
+        <div class="empty-state">
+            <h3>Em breve novidades por aqui 👀</h3>
+            <p>Estamos preparando novos produtos para você.</p>
+        </div>
     {% endif %}
-</div>
+
+</section>
+
 {% endblock %}

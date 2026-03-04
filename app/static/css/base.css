@@ -1,6 +1,6 @@
 .site-content {
   padding-top: 0;
-  min-height: auto;
+  min-height: calc(100vh - 60px); /* Ajuste para altura total da tela menos a altura do header */
 }
 
 body.no-scroll {
@@ -86,7 +86,6 @@ body.no-scroll {
   background: #ffffff;
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.06);
-  backdrop-filter: blur(4px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   transform: translateX(120%);
   opacity: 0;

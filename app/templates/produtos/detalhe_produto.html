@@ -10,22 +10,20 @@
     <div class="galeria-produto">
       <div class="imagem-principal">
         {% if produto.imagem %}
-          <img id="imagem-principal" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
+        <img id="imagem-principal" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
         {% else %}
-          <img id="imagem-principal" src="{% static 'images/produto-sem-imagem.jpg' %}" alt="Sem imagem">
+        <img id="imagem-principal" src="{% static 'images/produto-sem-imagem.jpg' %}" alt="Sem imagem">
         {% endif %}
       </div>
 
       {% if produto.imagens_detalhe.exists %}
-      <div class="miniaturas-container">
-        <div class="miniaturas">
-          {% if produto.imagem %}
-            <img src="{{ produto.imagem.url }}" class="miniatura ativa" alt="{{ produto.nome }}">
-          {% endif %}
-          {% for imagem in produto.imagens_detalhe.all %}
-            <img src="{{ imagem.imagem.url }}" class="miniatura" alt="{{ produto.nome }}">
-          {% endfor %}
-        </div>
+      <div class="miniaturas">
+        {% if produto.imagem %}
+        <img src="{{ produto.imagem.url }}" class="miniatura ativa" alt="{{ produto.nome }}">
+        {% endif %}
+        {% for imagem in produto.imagens_detalhe.all %}
+        <img src="{{ imagem.imagem.url }}" class="miniatura" alt="{{ produto.nome }}">
+        {% endfor %}
       </div>
       {% endif %}
     </div>
@@ -48,20 +46,92 @@
       <h1 class="produto-titulo">{{ produto.nome }}</h1>
 
       <div class="produto-preco">
-        <span class="preco-valor">R$ {{ produto.preco|floatformat:2 }}</span>
+        R$ {{ produto.preco|floatformat:2 }}
       </div>
 
       {% if produto.permite_personalizacao %}
       <div class="personalizacao-area">
-        <label for="personalizacao">Personalização:</label>
-        <textarea id="personalizacao" name="personalizacao" rows="3"
-          placeholder="Digite aqui sua personalização..."></textarea>
+        <label for="personalizacao">Personalização</label>
+
+        <div class="input-linha">
+          <textarea id="personalizacao" name="personalizacao" rows="3"
+            placeholder="Digite aqui sua personalização..."></textarea>
+          <span></span>
+        </div>
+
         <span class="caracteres-restantes">0/200</span>
       </div>
       {% endif %}
 
+      {% if produto.grupos_opcoes.all %}
+      <div class="opcoes-produto">
+
+        {% for grupo in produto.grupos_opcoes.all %}
+        <div class="grupo-opcao">
+
+          <label class="grupo-titulo">
+            {{ grupo.nome }}
+            {% if grupo.obrigatorio %}
+            <span class="obrigatorio">*</span>
+            {% endif %}
+          </label>
+
+          <div class="grupo-campos">
+
+            {% if grupo.tipo == "radio" %}
+            {% for opcao in grupo.opcoes.all %}
+            <label class="opcao-item">
+              <input type="radio"
+                name="grupo_{{ grupo.id }}"
+                value="{{ opcao.id }}"
+                {% if grupo.obrigatorio %}required{% endif %}>
+              {{ opcao.nome }}
+            </label>
+            {% endfor %}
+            {% endif %}
+
+            {% if grupo.tipo == "checkbox" %}
+            {% for opcao in grupo.opcoes.all %}
+            <label class="opcao-item">
+              <input type="checkbox"
+                name="grupo_{{ grupo.id }}"
+                value="{{ opcao.id }}">
+              {{ opcao.nome }}
+            </label>
+            {% endfor %}
+            {% endif %}
+
+            {% if grupo.tipo == "select" %}
+            <div class="input-linha">
+              <select name="grupo_{{ grupo.id }}" {% if grupo.obrigatorio %}required{% endif %}>
+                <option value="">Selecione...</option>
+                {% for opcao in grupo.opcoes.all %}
+                <option value="{{ opcao.id }}">{{ opcao.nome }}</option>
+                {% endfor %}
+              </select>
+              <span></span>
+            </div>
+            {% endif %}
+
+            {% if grupo.tipo == "texto" %}
+            <div class="input-linha">
+              <input type="text"
+                name="grupo_{{ grupo.id }}"
+                placeholder="Digite aqui..."
+                {% if grupo.obrigatorio %}required{% endif %}>
+              <span></span>
+            </div>
+            {% endif %}
+
+          </div>
+        </div>
+        {% endfor %}
+
+      </div>
+      {% endif %}
+
       <div class="quantidade-area">
-        <label>Quantidade:</label>
+        <label>Quantidade</label>
         <div class="quantidade-controle">
           <button type="button" class="quantidade-btn menos">−</button>
           <input type="text" id="quantidade" value="1" readonly>
@@ -85,8 +155,7 @@
           <input type="hidden" name="quantidade" id="input-quantidade" value="1">
           <input type="hidden" name="personalizacao" id="input-personalizacao" value="">
 
-          <button type="submit" id="btn-adicionar-carrinho"
-            class="btn-adicionar-carrinho">
+          <button type="submit" class="btn-adicionar-carrinho">
             🛒 Adicionar ao Carrinho
           </button>
         </form>

@@ -59,6 +59,50 @@ class Produto(models.Model):
 
     def get_absolute_url(self):
         return reverse("detalhe_produto", kwargs={"id": self.id, "slug": self.slug})
+    
+
+class GrupoOpcao(models.Model):
+
+    TIPO_CHOICES = (
+        ("radio", "Radio"),
+        ("select", "Select"),
+        ("checkbox", "Checkbox"),
+        ("texto", "Campo de Texto"),
+    )
+
+    produto = models.ForeignKey(
+        Produto,
+        on_delete=models.CASCADE,
+        related_name="grupos_opcoes"
+    )
+
+    nome = models.CharField(max_length=100)
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    obrigatorio = models.BooleanField(default=True)
+    ordem = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["ordem"]
+
+    def __str__(self):
+        return f"{self.nome} - {self.produto.nome}"
+
+
+class Opcao(models.Model):
+    grupo = models.ForeignKey(
+        GrupoOpcao,
+        on_delete=models.CASCADE,
+        related_name="opcoes"
+    )
+
+    nome = models.CharField(max_length=100)
+    ordem = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["ordem"]
+
+    def __str__(self):
+        return f"{self.nome} ({self.grupo.nome})"
 
 
 class Categoria(models.Model):

@@ -6,12 +6,20 @@ def lista_produtos(request):
     return render(request, 'produtos/lista.html', {'produtos': produtos})
 
 def detalhe_produto(request, id, slug):
-    produto = get_object_or_404(Produto, id=id, slug=slug)
+    produto = get_object_or_404(Produto.objects.prefetch_related('grupos_opcoes__opcoes'), id=id, slug=slug)
     return render(request, 'produtos/detalhe_produto.html', {'produto': produto})
 
 def produtos_por_categoria(request, slug):
-    categoria = get_object_or_404(Categoria, slug=slug)
-    produtos = Produto.objects.filter(categoria=categoria)
+    categoria = Categoria.objects.filter(slug=slug).first()
+
+    if categoria:
+        produtos = Produto.objects.filter(
+            categoria=categoria,
+            ativo=True
+        )
+    else:
+        produtos = Produto.objects.none()  # QuerySet vazio
+
     return render(request, 'produtos/lista.html', {
         'produtos': produtos,
         'categoria': categoria

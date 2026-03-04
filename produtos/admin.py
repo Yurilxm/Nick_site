@@ -3,7 +3,7 @@ from django.utils.html import format_html
 from django.forms.models import BaseInlineFormSet
 from django.core.exceptions import ValidationError
 from django.urls import reverse
-from .models import Produto, Categoria, ProdutoImagem
+from .models import Produto, Categoria, ProdutoImagem, GrupoOpcao, Opcao
 
 
 # 🔒 Formset para garantir apenas 1 hover
@@ -78,6 +78,16 @@ class ProdutoImagemInline(admin.StackedInline):
     preview.short_description = "Preview da imagem"
 
 
+class GrupoOpcaoInline(admin.TabularInline):
+    model = GrupoOpcao
+    extra = 1
+    ordering = ("ordem",)
+
+class OpcaoInline(admin.TabularInline):
+    model = Opcao
+    extra = 1
+
+
 # =========================
 # PRODUTO ADMIN
 # =========================
@@ -110,7 +120,7 @@ class ProdutoAdmin(admin.ModelAdmin):
     search_fields = ("nome", "descricao")
     ordering = ("-criado_em",)
 
-    inlines = [ProdutoImagemInline]
+    inlines = [ProdutoImagemInline, GrupoOpcaoInline]
 
     def imagem_preview(self, obj):
         if obj and obj.imagem:
@@ -145,6 +155,19 @@ class ProdutoAdmin(admin.ModelAdmin):
         )
 
     delete_button.short_description = "Excluir"
+
+
+@admin.register(GrupoOpcao)
+class GrupoOpcaoAdmin(admin.ModelAdmin):
+    inlines = [OpcaoInline]
+
+    list_display = (
+        "nome",
+        "produto",
+        "tipo",
+        "obrigatorio",
+        "ordem",
+    )
 
 
 # =========================

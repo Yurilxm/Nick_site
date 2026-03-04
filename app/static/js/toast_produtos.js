@@ -8,8 +8,38 @@ document.addEventListener("DOMContentLoaded", () => {
     const url = form.action;
 
     const nome = document.querySelector(".produto-titulo")?.innerText;
-    const preco = document.querySelector(".preco-valor")?.innerText.replace("R$ ", "");
     const imagem = document.getElementById("imagem-principal")?.src;
+
+    // Preço unitário
+    const precoElemento = document.querySelector(".produto-preco");
+    let precoUnitario = 0;
+
+    if (precoElemento) {
+      precoUnitario = parseFloat(
+        precoElemento.innerText
+          .replace("R$", "")
+          .replace(",", ".")
+          .trim()
+      );
+    }
+
+    // Quantidade
+    const quantidade = parseInt(document.getElementById("quantidade")?.value || 1);
+
+    // Total
+    const total = precoUnitario * quantidade;
+
+    // Formatação BR
+    const precoFormatado = precoUnitario.toFixed(2).replace(".", ",");
+    const totalFormatado = total.toFixed(2).replace(".", ",");
+
+    // Texto final
+    let precoTexto = `R$ ${precoFormatado}`;
+
+    if (quantidade > 1) {
+      precoTexto = `${quantidade}x R$ ${precoFormatado} = R$ ${totalFormatado}`;
+    }
+
 
     fetch(url, {
       method: "POST",
@@ -22,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(res => res.json())
       .then(() => {
         // 1. MOSTRA O TOAST
-        mostrarToast(nome, preco, imagem);
+        mostrarToast(nome, precoTexto, imagem);
         
         // 2. ATUALIZA O MINI CARRINHO IMEDIATAMENTE
         if (typeof window.atualizarMiniCarrinho === "function") {
@@ -34,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-function mostrarToast(nome, preco, imagem) {
+function mostrarToast(nome, precoTexto, imagem) {
   const container = document.getElementById("toast-produto-container");
 
   // Remove toasts anteriores
@@ -52,7 +82,7 @@ function mostrarToast(nome, preco, imagem) {
     <img src="${imagem}" alt="${nome}">
     <div class="toast-info">
       <strong>${nome}</strong>
-      <span>R$ ${preco}</span>
+      <span>${precoTexto}</span>
       <small>Adicionado ao carrinho</small>
     </div>
   `;
