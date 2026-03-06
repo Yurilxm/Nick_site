@@ -6,11 +6,33 @@ from django.urls import reverse
 from .models import Produto, Categoria, ProdutoImagem, GrupoOpcao, Opcao
 
 
-# 🔒 Formset para garantir apenas 1 hover
+# =====================================================
+# BOTÕES REUTILIZÁVEIS
+# =====================================================
+
+def action_buttons(obj, app_label, model_name):
+    edit_url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.pk])
+    delete_url = reverse(f"admin:{app_label}_{model_name}_delete", args=[obj.pk])
+
+    return format_html(
+        '''
+        <div class="action-buttons">
+            <a class="btn-edit" href="{}">✏️</a>
+            <a class="btn-delete" href="{}">🗑️</a>
+        </div>
+        ''',
+        edit_url,
+        delete_url
+    )
+
+
+# =====================================================
+# VALIDAÇÃO IMAGEM
+# =====================================================
+
 class ProdutoImagemInlineFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
-
         total_hover = 0
 
         for form in self.forms:
@@ -20,87 +42,75 @@ class ProdutoImagemInlineFormSet(BaseInlineFormSet):
             if form.cleaned_data.get("DELETE", False):
                 continue
 
-            tipo = form.cleaned_data.get("tipo")
-
-            if tipo == "hover":
+            if form.cleaned_data.get("tipo") == "hover":
                 total_hover += 1
 
         if total_hover > 1:
-            raise ValidationError(
-                "Só é permitida uma imagem de hover por produto."
-            )
+            raise ValidationError("Só é permitida uma imagem de hover por produto.")
 
 
 class ProdutoImagemInline(admin.StackedInline):
     model = ProdutoImagem
     formset = ProdutoImagemInlineFormSet
-    extra = 1
-
-    class Media:
-        js = ("admin/js/produto_imagem_inline.js",)
-
-    fieldsets = (
-        ("Imagem do Produto", {"fields": ("preview", "imagem")}),
-        ("Tipo da imagem", {"fields": ("tipo",)}),
-        ("Ordem", {"fields": ("ordem",)}),
-    )
-
+    extra = 0
     readonly_fields = ("preview",)
+    can_delete = True
+    show_change_link = True
 
-    # 🔒 Remove opção hover se já existir
-    def formfield_for_choice_field(self, db_field, request, **kwargs):
-        if db_field.name == "tipo":
-            obj_id = request.resolver_match.kwargs.get("object_id")
-
-            if obj_id:
-                produto = Produto.objects.filter(pk=obj_id).first()
-
-                if produto and produto.tem_hover():
-                    kwargs["choices"] = [
-                        choice for choice in db_field.choices
-                        if choice[0] != "hover"
-                    ]
-
-        return super().formfield_for_choice_field(db_field, request, **kwargs)
 
     def preview(self, obj):
         if obj and obj.imagem:
             return format_html(
-                '<div style="margin: 10px 0;">'
-                '<img src="{}" style="width: 140px; height: 140px; '
-                'object-fit: cover; border-radius: 10px; '
-                'border: 2px solid #e5e7eb;" />'
-                "</div>",
-                obj.imagem.url,
+                '<img src="{}" class="admin-preview-img" />',
+                obj.imagem.url
             )
-        return "Nenhuma imagem selecionada"
+        return "Sem imagem"
 
-    preview.short_description = "Preview da imagem"
+    preview.short_description = "Preview"
 
 
-class GrupoOpcaoInline(admin.TabularInline):
+class GrupoOpcaoInline(admin.StackedInline):
     model = GrupoOpcao
-    extra = 1
+    extra = 0
     ordering = ("ordem",)
+    show_change_link = True
+    can_delete = True
 
-class OpcaoInline(admin.TabularInline):
+    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        field = super().formfield_for_foreignkey(db_field, request, **kwargs)
+        if db_field.name == "produto":
+            field.widget.can_add_related = False
+            field.widget.can_change_related = False
+            field.widget.can_view_related = False
+        return field
+
+
+class OpcaoInline(admin.StackedInline):
     model = Opcao
-    extra = 1
+    extra = 0
+    ordering = ("ordem",)
+    can_delete = True
 
 
-# =========================
+# =====================================================
 # PRODUTO ADMIN
-# =========================
+# =====================================================
 
 @admin.register(Produto)
 class ProdutoAdmin(admin.ModelAdmin):
+
+    actions = None
+
     fieldsets = (
-        (
-            "🛍️ Informações do Produto",
-            {"fields": ("nome", "categoria", "descricao", "preco", "imagem")},
-        ),
-        ("⚙️ Controle", {"fields": ("ativo", "permite_personalizacao")}),
-        ("📅 Datas", {"fields": ("criado_em", "atualizado_em")}),
+        ("🛍️ Informações do Produto", {
+            "fields": ("nome", "categoria", "descricao", "preco", "imagem")
+        }),
+        ("⚙️ Controle", {
+            "fields": ("ativo", "permite_personalizacao")
+        }),
+        ("📅 Datas", {
+            "fields": ("criado_em", "atualizado_em")
+        }),
     )
 
     readonly_fields = ("criado_em", "atualizado_em", "imagem_preview")
@@ -111,54 +121,58 @@ class ProdutoAdmin(admin.ModelAdmin):
         "categoria",
         "preco",
         "ativo",
-        "criado_em",
-        "edit_button",
-        "delete_button",
+        "acoes",
     )
 
-    list_filter = ("ativo", "categoria", "criado_em")
-    search_fields = ("nome", "descricao")
+    list_display_links = ("nome",)
+
+    list_filter = ("ativo", "categoria")
+    search_fields = ("nome",)
     ordering = ("-criado_em",)
 
     inlines = [ProdutoImagemInline, GrupoOpcaoInline]
 
     def imagem_preview(self, obj):
-        if obj and obj.imagem:
+        if obj.imagem:
             return format_html(
-                '<img src="{}" style="width: 70px; height: 70px; '
-                'object-fit: cover; border-radius: 8px; '
-                'border: 1px solid #ddd;" />',
-                obj.imagem.url,
+                '<img src="{}" class="admin-list-img" />',
+                obj.imagem.url
             )
-        return "Sem imagem"
+        return "—"
 
     imagem_preview.short_description = "Capa"
 
-    # ✏️ BOTÃO EDITAR
-    def edit_button(self, obj):
-        return format_html(
-            '<a style="background-color:#2563eb; color:white; '
-            'padding:6px 10px; border-radius:6px; text-decoration:none;" '
-            'href="{}">✏️</a>',
-            reverse("admin:produtos_produto_change", args=[obj.pk])
-        )
+    def acoes(self, obj):
+        return action_buttons(obj, "produtos", "produto")
 
-    edit_button.short_description = "Editar"
+    acoes.short_description = "Ações"
 
-    # 🗑 BOTÃO EXCLUIR
-    def delete_button(self, obj):
-        return format_html(
-            '<a style="background-color:#dc2626; color:white; '
-            'padding:6px 10px; border-radius:6px; text-decoration:none;" '
-            'href="{}">🗑</a>',
-            reverse("admin:produtos_produto_delete", args=[obj.pk])
-        )
+    class Media:
+        css = {
+            "all": ("admin/css/custom_admin.css",)
+        }
+        js = ("admin/js/produto_admin.js",)
 
-    delete_button.short_description = "Excluir"
+
+@admin.register(Categoria)
+class CategoriaAdmin(admin.ModelAdmin):
+
+    actions = None
+
+    prepopulated_fields = {"slug": ("nome",)}
+    list_display = ("nome", "slug", "acoes")
+    ordering = ("nome",)
+
+    def acoes(self, obj):
+        return action_buttons(obj, "produtos", "categoria")
+
+    acoes.short_description = "Ações"
 
 
 @admin.register(GrupoOpcao)
 class GrupoOpcaoAdmin(admin.ModelAdmin):
+
+    actions = None
     inlines = [OpcaoInline]
 
     list_display = (
@@ -167,45 +181,16 @@ class GrupoOpcaoAdmin(admin.ModelAdmin):
         "tipo",
         "obrigatorio",
         "ordem",
+        "acoes",
     )
 
+    def acoes(self, obj):
+        return action_buttons(obj, "produtos", "grupoopcao")
 
-# =========================
-# CATEGORIA ADMIN
-# =========================
+    acoes.short_description = "Ações"
 
-@admin.register(Categoria)
-class CategoriaAdmin(admin.ModelAdmin):
-    prepopulated_fields = {"slug": ("nome",)}
-
-    list_display = (
-        "nome",
-        "slug",
-        "edit_button",
-        "delete_button",
-    )
-
-    search_fields = ("nome",)
-    ordering = ("nome",)
-
-    # ✏️ EDITAR
-    def edit_button(self, obj):
-        return format_html(
-            '<a style="background-color:#2563eb; color:white; '
-            'padding:6px 10px; border-radius:6px; text-decoration:none;" '
-            'href="{}">✏️</a>',
-            reverse("admin:produtos_categoria_change", args=[obj.pk])
-        )
-
-    edit_button.short_description = "Editar"
-
-    # 🗑 EXCLUIR
-    def delete_button(self, obj):
-        return format_html(
-            '<a style="background-color:#dc2626; color:white; '
-            'padding:6px 10px; border-radius:6px; text-decoration:none;" '
-            'href="{}">🗑</a>',
-            reverse("admin:produtos_categoria_delete", args=[obj.pk])
-        )
-
-    delete_button.short_description = "Excluir"
+    class Media:
+        css = {
+            "all": ("admin/css/custom_admin.css",)
+        }
+        js = ("admin/js/produto_admin.js",)

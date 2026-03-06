@@ -21,14 +21,35 @@
           <img src="{{ item.produto.imagem.url }}" class="carrinho-imagem">
           {% endif %}
 
-          <strong>{{ item.produto.nome }}</strong>
+          <div class="item-info">
+            <strong>{{ item.produto.nome }}</strong>
 
-          <button class="btn-diminuir" data-item-id="{{ item.id }}">−</button>
-          <span id="quantidade-{{ item.id }}">{{ item.quantidade }}</span>
-          <button class="btn-aumentar" data-item-id="{{ item.id }}">+</button>
+            {% if item.opcoes_formatadas %}
+              <div class="item-opcoes">
+                <ul>
+                  {% for opcao in item.opcoes_formatadas %}
+                    <li>
+                      <small>
+                        <strong>{{ opcao.grupo }}:</strong>
+                        {{ opcao.valores|join:", " }}
+                      </small>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
 
-          Subtotal: R$
-          <span id="subtotal-{{ item.id }}">{{ item.subtotal }}</span>
+            <div class="quantidade-box">
+              <button class="btn-diminuir" data-item-id="{{ item.id }}">−</button>
+              <span id="quantidade-{{ item.id }}">{{ item.quantidade }}</span>
+              <button class="btn-aumentar" data-item-id="{{ item.id }}">+</button>
+            </div>
+
+            <div class="subtotal-box">
+              Subtotal: R$
+              <span id="subtotal-{{ item.id }}">{{ item.subtotal }}</span>
+            </div>
+          </div>
 
           <form action="{% url 'remover_do_carrinho' item.id %}"
                 method="post"

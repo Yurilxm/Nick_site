@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-from produtos.models import Produto
+from produtos.models import Produto, GrupoOpcao, Opcao
 from .models import ItemCarrinho
 from .services import obter_carrinho
 
@@ -33,7 +33,9 @@ def adicionar_ao_carrinho(request, produto_id):
     carrinho = obter_carrinho(request)
     produto = get_object_or_404(Produto, id=produto_id)
 
-    # 🔥 Pega a quantidade enviada pelo formulário
+    # ==========================
+    # QUANTIDADE
+    # ==========================
     try:
         quantidade = int(request.POST.get("quantidade", 1))
         if quantidade < 1:
@@ -41,22 +43,51 @@ def adicionar_ao_carrinho(request, produto_id):
     except (ValueError, TypeError):
         quantidade = 1
 
-    item, created = ItemCarrinho.objects.get_or_create(
+    # ==========================
+    # PERSONALIZAÇÃO
+    # ==========================
+    personalizacao = request.POST.get("personalizacao", "").strip()
+
+    # ==========================
+    # CAPTURAR OPÇÕES
+    # ==========================
+    opcoes_escolhidas = {}
+
+    for key in request.POST:
+        if key.startswith("grupo_"):
+            grupo_id = key.replace("grupo_", "")
+            valores = request.POST.getlist(key)
+
+            if valores:
+                opcoes_escolhidas[grupo_id] = valores
+
+    # adiciona personalização dentro das opções
+    if personalizacao:
+        opcoes_escolhidas["personalizacao"] = personalizacao
+
+    # ==========================
+    # VERIFICA SE JÁ EXISTE ITEM IGUAL
+    # ==========================
+    item = ItemCarrinho.objects.filter(
         carrinho=carrinho,
         produto=produto,
-        defaults={
-            "preco_unitario": produto.preco,
-            "quantidade": quantidade
-        }
-    )
+        opcoes=opcoes_escolhidas
+    ).first()
 
-    # Se já existia, soma a quantidade enviada
-    if not created:
+    if item:
         item.quantidade += quantidade
         item.save()
+    else:
+        ItemCarrinho.objects.create(
+            carrinho=carrinho,
+            produto=produto,
+            preco_unitario=produto.preco,
+            quantidade=quantidade,
+            opcoes=opcoes_escolhidas
+        )
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
-        return JsonResponse({"status": "ok", "quantidade": item.quantidade})
+        return JsonResponse({"status": "ok"})
 
     return redirect("ver_carrinho")
 
@@ -88,6 +119,33 @@ def ver_carrinho(request):
 
     if not itens.exists():
         request.session.pop("frete", None)
+
+    # 🔥 TRADUZINDO OPÇÕES
+    for item in itens:
+        opcoes_traduzidas = []
+
+        for chave, valor in item.opcoes.items():
+
+            if chave == "personalizacao":
+                opcoes_traduzidas.append({
+                    "grupo": "Personalização",
+                    "valores": [valor]
+                })
+                continue
+
+            try:
+                grupo = GrupoOpcao.objects.get(id=int(chave))
+                opcoes = Opcao.objects.filter(id__in=valor)
+
+                opcoes_traduzidas.append({
+                    "grupo": grupo.nome,
+                    "valores": [op.nome for op in opcoes]
+                })
+
+            except (GrupoOpcao.DoesNotExist, ValueError):
+                continue
+
+        item.opcoes_formatadas = opcoes_traduzidas
 
     total_produtos = calcular_total_produtos(carrinho)
 

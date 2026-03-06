@@ -21,8 +21,7 @@ class ItemCarrinho(models.Model):
     quantidade = models.PositiveIntegerField(default=1)
     preco_unitario = models.DecimalField(max_digits=10, decimal_places=2)
 
-    class Meta:
-        unique_together = ('carrinho', 'produto')
+    opcoes = models.JSONField(default=dict, blank=True)
 
     @property
     def subtotal(self):
