@@ -10,7 +10,9 @@
     <div class="galeria-produto">
       <div class="imagem-principal">
         {% if produto.imagem %}
-        <img id="imagem-principal" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
+        <div class="zoom-container">
+          <img id="imagem-principal" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
+        </div>  
         {% else %}
         <img id="imagem-principal" src="{% static 'images/produto-sem-imagem.jpg' %}" alt="Sem imagem">
         {% endif %}
@@ -163,6 +165,18 @@
 
     </div>
   </div>
+
+</div>
+
+<div id="modal-galeria" class="modal-galeria">
+
+  <span class="modal-fechar">&times;</span>
+
+  <button class="modal-seta esquerda">&#10094;</button>
+
+  <img id="modal-imagem" class="modal-imagem">
+
+  <button class="modal-seta direita">&#10095;</button>
 
 </div>
 {% endblock %}

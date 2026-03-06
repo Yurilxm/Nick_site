@@ -30,6 +30,211 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ====================================
+    // MODAL GALERIA (ZOOM DAS IMAGENS)
+    // ====================================
+
+    function initModalGaleria(){
+
+        const modal = document.getElementById("modal-galeria");
+        const imagemPrincipal = document.getElementById("imagem-principal");
+        const modalImg = document.getElementById("modal-imagem");
+        const fechar = document.querySelector(".modal-fechar");
+
+        const setaEsq = document.querySelector(".modal-seta.esquerda");
+        const setaDir = document.querySelector(".modal-seta.direita");
+
+        const miniaturas = document.querySelectorAll(".miniaturas img");
+
+        if(!modal || miniaturas.length === 0 || !imagemPrincipal) return;
+
+        const imagens = Array.from(miniaturas).map(img => img.src);
+
+        let indiceAtual = 0;
+
+        let startX = 0;
+
+        imagemPrincipal.addEventListener("touchstart", (e)=>{
+
+            startX = e.touches[0].clientX;
+
+        });
+
+        imagemPrincipal.addEventListener("touchend", (e)=>{
+
+            let endX = e.changedTouches[0].clientX;
+
+            let diff = startX - endX;
+
+            if(Math.abs(diff) > 50){
+
+                if(diff > 0){
+                    proximaImagem();
+                }else{
+                    imagemAnterior();
+                }
+
+            }
+
+        });
+
+    // =============================
+    // TROCAR IMAGEM PRINCIPAL
+    // =============================
+
+    function trocarImagem(index){
+
+        indiceAtual = index;
+
+        imagemPrincipal.src = imagens[indiceAtual];
+
+        atualizarMiniatura();
+
+    }
+
+    function atualizarMiniatura(){
+
+        miniaturas.forEach(m => m.classList.remove("ativa"));
+
+        miniaturas[indiceAtual].classList.add("ativa");
+
+    }
+
+    // =============================
+    // MINIATURAS
+    // =============================
+
+    miniaturas.forEach((miniatura, index)=>{
+
+        miniatura.addEventListener("click", ()=>{
+
+            trocarImagem(index);
+
+        });
+
+        miniatura.addEventListener("mouseenter", ()=>{
+
+            trocarImagem(index);
+
+        });
+
+    });
+
+    // =============================
+    // ABRIR MODAL
+    // =============================
+
+    imagemPrincipal.addEventListener("click", ()=>{
+
+        modal.style.display = "flex";
+
+        modalImg.src = imagens[indiceAtual];
+
+    });
+
+    // =============================
+    // FECHAR MODAL
+    // =============================
+
+    fechar.onclick = ()=> modal.style.display = "none";
+
+    modal.onclick = (e)=>{
+
+        if(e.target === modal){
+            modal.style.display = "none";
+        }
+
+    };
+
+    // =============================
+    // NAVEGAÇÃO
+    // =============================
+
+    function proximaImagem(){
+
+        indiceAtual++;
+
+        if(indiceAtual >= imagens.length){
+            indiceAtual = 0;
+        }
+
+        modalImg.src = imagens[indiceAtual];
+        trocarImagem(indiceAtual);
+
+    }
+
+    function imagemAnterior(){
+
+        indiceAtual--;
+
+        if(indiceAtual < 0){
+            indiceAtual = imagens.length - 1;
+        }
+
+        modalImg.src = imagens[indiceAtual];
+        trocarImagem(indiceAtual);
+
+    }
+
+    setaDir.onclick = proximaImagem;
+    setaEsq.onclick = imagemAnterior;
+
+    // =============================
+    // TECLADO
+    // =============================
+
+    document.addEventListener("keydown", (e)=>{
+
+        if(modal.style.display === "flex"){
+
+            if(e.key === "ArrowRight"){
+                proximaImagem();
+            }
+
+            if(e.key === "ArrowLeft"){
+                imagemAnterior();
+            }
+
+            if(e.key === "Escape"){
+                modal.style.display = "none";
+            }
+
+        }
+
+    });
+
+    // =============================
+    // ZOOM PROFISSIONAL
+    // =============================
+
+    const zoomContainer = document.querySelector(".zoom-container");
+
+    if(zoomContainer){
+
+        zoomContainer.addEventListener("mousemove",(e)=>{
+
+            const rect = zoomContainer.getBoundingClientRect();
+
+            const x = (e.clientX - rect.left) / rect.width * 100;
+            const y = (e.clientY - rect.top) / rect.height * 100;
+
+            imagemPrincipal.style.transformOrigin = `${x}% ${y}%`;
+            imagemPrincipal.style.transform = "scale(1.5)";
+
+        });
+
+        zoomContainer.addEventListener("mouseleave",()=>{
+
+            imagemPrincipal.style.transform = "scale(1)";
+
+        });
+
+    }
+
+    console.log("✅ Modal Galeria OK");
+
+}
+
+    // ====================================
     // CONTROLE DE QUANTIDADE - SÓ BOTÕES
     // ====================================
     
@@ -142,6 +347,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     console.log('🚀 Iniciando produto detalhe...');
     initGaleria();
+    initModalGaleria();
     initQuantidade();
     initPersonalizacao();
     initCarrinho();
