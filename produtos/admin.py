@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin
 from django.utils.html import format_html
 from django.forms.models import BaseInlineFormSet
@@ -24,6 +25,43 @@ def action_buttons(obj, app_label, model_name):
         edit_url,
         delete_url
     )
+
+
+
+# SELOS SUGESTÕES
+
+selo_SUGESTOES = [
+    "Novo",
+    "Promoção",
+    "Lançamento",
+    "Últimas unidades",
+    "Mais vendido",
+    "Exclusivo",
+    "Oferta especial",
+    "Esgotando",
+    "Destaque",
+]
+
+
+class SeloWidget(forms.TextInput):
+    template_name = "admin/widgets/selo_produto.html"
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context["selo_sugestoes"] = selo_SUGESTOES
+        return context
+
+
+class ProdutoAdminForm(forms.ModelForm):
+
+    selo = forms.CharField(
+        required=False,
+        widget=SeloWidget()
+    )
+
+    class Meta:
+        model = Produto
+        fields = "__all__"
 
 
 # =====================================================
@@ -99,11 +137,12 @@ class OpcaoInline(admin.StackedInline):
 @admin.register(Produto)
 class ProdutoAdmin(admin.ModelAdmin):
 
+    form = ProdutoAdminForm
     actions = None
 
     fieldsets = (
         ("🛍️ Informações do Produto", {
-            "fields": ("nome", "categoria", "descricao", "preco", "imagem")
+            "fields": ("nome", "categoria", "selo", "descricao", "preco", "imagem")
         }),
         ("⚙️ Controle", {
             "fields": ("ativo", "permite_personalizacao")
@@ -118,6 +157,7 @@ class ProdutoAdmin(admin.ModelAdmin):
     list_display = (
         "imagem_preview",
         "nome",
+        "selo",
         "categoria",
         "preco",
         "ativo",

@@ -1,9 +1,17 @@
 {% load static %}
 
-<div class="produto-card" {% if produto.tem_hover %}tem-hover{% endif %}>
+<div class="produto-card {% if produto.tem_hover %}tem-hover{% endif %}">
+
   <div class="produto-imagem">
 
-    <!-- imagem principal -->
+    {% if produto.selo %}
+    <span class="selo-produto {{ produto.selo|slugify }}">{{ produto.selo }}</span>
+    {% endif %}
+
+    {% if produto.desconto %}
+    <span class="badge-desconto">-{{ produto.desconto }}%</span>
+    {% endif %}
+
     <img class="img-principal" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
 
     {% with produto.imagens_hover|first as img_hover %}
@@ -12,14 +20,39 @@
       {% endif %}
     {% endwith %}
 
+    <div class="card-overlay">
+      <a href="{% url 'detalhe_produto' produto.id produto.slug %}" class="btn-ver-rapido">
+        🔍 Ver produto
+      </a>
+    </div>
+
   </div>
 
   <div class="produto-info">
-    <h3 class="card-nome">{{ produto.nome }}</h3>
-    <p class="card-preco">R$ {{ produto.preco }}</p>
 
-    <a href="{% url 'detalhe_produto' produto.id produto.slug %}" class="card-botao">
-      Ver produto
-    </a>
+    {% if produto.categoria %}
+    <span class="card-categoria">{{ produto.categoria }}</span>
+    {% endif %}
+
+    <h3 class="card-nome">{{ produto.nome }}</h3>
+
+    <div class="card-footer">
+
+      <!-- Estrelas acima do preço/botão -->
+      <div class="card-estrelas">
+        <span class="estrelas">★★★★★</span>
+      </div>
+
+      <!-- Preço e botão na mesma linha -->
+      <div class="card-preco-botao">
+        <p class="card-preco">R$ {{ produto.preco }}</p>
+        <a href="{% url 'detalhe_produto' produto.id produto.slug %}" class="card-botao">
+          Ver produto
+        </a>
+      </div>
+
+    </div>
+
   </div>
+
 </div>

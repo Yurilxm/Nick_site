@@ -1,41 +1,117 @@
-/* GRID DE PRODUTOS */
-.produtos-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 30px;
-    padding: 40px 80px;
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+:root {
+    --baby-blue:    #bde0fe;
+    --baby-pink:    #ffafcc;
+    --baby-lilac:   #cdb4db;
+    --pink-mid:     #ff85a1;
+    --lilac-mid:    #b695c0;
+    --text-dark:    #4a3f5c;
+    --text-mid:     #7a6a8a;
+    --bg-card:      #fff9fc;
+    --border:       rgba(205, 180, 219, 0.35);
+    --shadow-soft:  0 6px 20px rgba(182, 149, 192, 0.13);
+    --shadow-hover: 0 14px 36px rgba(182, 149, 192, 0.24);
+    --radius-card:  18px;
 }
 
-/* CARD */
+/* =============================================
+   SEÇÃO
+   ============================================= */
+
+.produtos-section {
+    font-family: 'Nunito', sans-serif;
+    padding: 0 0 60px;
+}
+
+/* =============================================
+   HEADER DE CATEGORIA
+   ============================================= */
+
+.categoria-header {
+    padding: 36px 48px 20px;
+}
+
+.categoria-header h1 {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+}
+
+.categoria-info {
+    font-size: 13px;
+    color: var(--text-mid);
+    font-weight: 600;
+}
+
+/* =============================================
+   GRID
+   ============================================= */
+
+.produtos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+    padding: 10px 48px 0;
+}
+
+/* =============================================
+   CARD BASE
+   ============================================= */
+
 .produto-card {
-    background: #fff;
-    border-radius: 16px;
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
     overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    height: 100%;
+    border: 1.5px solid var(--border);
+    box-shadow: var(--shadow-soft);
+    transition:
+        transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        box-shadow 0.3s ease,
+        border-color 0.3s ease;
     display: flex;
     flex-direction: column;
-    height: 400px;
+    position: relative;
+    cursor: pointer;
 }
 
-/* HOVER */
 .produto-card:hover {
-    transform: scale(1.04);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow:
+        0 18px 40px rgba(0,0,0,0.12),
+        0 6px 16px rgba(0,0,0,0.08);
+    border-color: rgba(255, 175, 204, 0.65);
 }
 
-/* IMAGEM */
+.produto-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 8%;
+    right: 8%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--baby-pink), var(--baby-lilac), var(--baby-blue));
+    border-radius: 0 0 var(--radius-card) var(--radius-card);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.produto-card:hover::after {
+    opacity: 1;
+}
+
+/* =============================================
+   IMAGEM
+   ============================================= */
+
 .produto-imagem {
     width: 100%;
-    aspect-ratio: 1 / 1;  /* <- força a imagem a ser quadrada */
-    height: 240px;
-    background: #f5f5f5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    height: 220px;
+    background: linear-gradient(145deg, #fce4f3, #e8d5f5, #d0eeff);
     position: relative;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .produto-imagem img {
@@ -44,67 +120,292 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.4s ease, transform 0.5s ease;
+    z-index: 1;
 }
 
 .img-hover {
     opacity: 0;
 }
 
-.produto-card:hover .img-hover {
-    opacity: 1;
-}
-
 .produto-card.tem-hover:hover .img-principal {
     opacity: 0;
+    transform: scale(1.04);
 }
 
 .produto-card.tem-hover:hover .img-hover {
     opacity: 1;
+    transform: scale(1.04);
 }
 
+.produto-card:not(.tem-hover):hover .img-principal {
+    transform: scale(1.04);
+}
 
-/* INFO */
+/* =============================================
+   OVERLAY
+   ============================================= */
+
+.card-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(74, 63, 92, 0.35);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 5;
+}
+
+.produto-card:hover .card-overlay {
+    opacity: 1;
+}
+
+.btn-ver-rapido {
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--lilac-mid);
+    font-size: 13px;
+    font-weight: 800;
+    padding: 9px 18px;
+    border-radius: 40px;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    transition: transform 0.2s, background 0.2s;
+    transform: translateY(5px);
+}
+
+.produto-card:hover .btn-ver-rapido {
+    transform: translateY(0);
+}
+
+.btn-ver-rapido:hover {
+    background: var(--baby-pink);
+    color: white;
+}
+
+/* =============================================
+   SELOS
+   ============================================= */
+
+.selo-produto {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    color: white;
+    z-index: 6;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+.selo-produto.novo             { background: linear-gradient(135deg, #a8edca, #2ecc71); color: #0a4a2a; }
+.selo-produto.promocao         { background: linear-gradient(135deg, #ffb3c6, #ff4d79); }
+.selo-produto.mais-vendido     { background: linear-gradient(135deg, var(--baby-lilac), var(--lilac-mid)); }
+.selo-produto.ultimas-unidades { background: linear-gradient(135deg, #ffe0a0, #f5a623); color: #5a3a00; }
+.selo-produto.lancamento       { background: linear-gradient(135deg, var(--baby-blue), #5ba4d4); }
+
+.badge-desconto {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #ff85a1, #ff4d79);
+    color: white;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 9px;
+    border-radius: 20px;
+    z-index: 6;
+    box-shadow: 0 2px 8px rgba(255, 77, 121, 0.25);
+}
+
+/* =============================================
+   INFO
+   ============================================= */
+
 .produto-info {
-    padding: 16px;
-    text-align: center;
+    padding: 14px 16px 16px;
     display: flex;
     flex-direction: column;
     flex: 1;
 }
 
-.produto-footer {
-    margin-top: auto;
+.card-categoria {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--lilac-mid);
+    margin-bottom: 4px;
+    display: block;
 }
 
 .card-nome {
-    font-size: 18px;
-    font-weight: 500;
-    margin-bottom: 8px;
-    color: #421e01;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 0 10px;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* =============================================
+   FOOTER
+   ============================================= */
+
+.card-footer {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.estrelas {
+    font-size: 14px;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--baby-pink), var(--lilac-mid));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.card-preco-botao {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
 }
 
 .card-preco {
     font-size: 16px;
-    color: #421e01;
-    margin-bottom: 12px;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(135deg, var(--pink-mid), var(--lilac-mid));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
-/* BOTÃO */
+/* =============================================
+   BOTÃO
+   ============================================= */
+
 .card-botao {
-    display: inline-block;
-    width: 100%;
-    padding: 10px;
-    background-color: #ec6391;
-    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    background: linear-gradient(135deg, var(--baby-pink), var(--baby-lilac));
+    color: white;
     text-decoration: none;
     border-radius: 10px;
-    font-weight: 500;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-    margin-top: auto;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+    box-shadow: 0 3px 12px rgba(255, 133, 161, 0.28);
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-botao::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.5s ease;
+}
+
+.card-botao:hover::before {
+    left: 130%;
 }
 
 .card-botao:hover {
-    background-color: #ff85b3;
     transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(255, 133, 161, 0.38);
+    filter: brightness(1.05);
+    color: white;
+}
+
+/* =============================================
+   EMPTY STATE
+   ============================================= */
+
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-mid);
+}
+
+.empty-state h3 {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: var(--text-dark);
+}
+
+.empty-state p {
+    font-size: 14px;
+}
+
+/* =============================================
+   RESPONSIVO
+   ============================================= */
+
+@media (max-width: 900px) {
+
+    .produtos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+        padding: 10px 24px 0;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .produtos-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        padding: 10px 16px 0;
+    }
+
+    .categoria-header {
+        padding: 24px 16px 16px;
+    }
+
+    .produto-imagem {
+        height: 180px;
+    }
+
+    .card-nome {
+        font-size: 13px;
+    }
+
+    .card-preco {
+        font-size: 14px;
+    }
+
+    .card-botao {
+        font-size: 11px;
+        padding: 7px 10px;
+    }
+
+    .card-overlay {
+        display: none;
+    }
+
 }

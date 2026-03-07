@@ -5,6 +5,13 @@ from django.urls import reverse
 
 class Produto(models.Model):
     nome = models.CharField(max_length=150)
+
+    selo = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="Ex: Novo, Promoção, Lançamento, Últimas unidades"
+    )
+
     slug = models.SlugField(
         unique=True, blank=True, max_length=160, editable=False, db_index=True
     )

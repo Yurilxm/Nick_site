@@ -1,0 +1,37 @@
+<div class="selo-widget-wrapper" id="selo-wrapper-{{ widget.attrs.id }}">
+
+  <div class="selo-top-row">
+    <select class="selo-select" id="selo-select-{{ widget.attrs.id }}">
+      <option value="">— Selecione um selo —</option>
+      {% for selo in selo_sugestoes %}
+        <option value="{{ selo }}"
+          {% if widget.value|stringformat:"s" == selo %}selected{% endif %}
+        >{{ selo }}</option>
+      {% endfor %}
+    </select>
+
+    <input
+      type="text"
+      class="vTextField selo-direct-input"
+      id="selo-direct-{{ widget.attrs.id }}"
+      placeholder="Ou digite diretamente..."
+      value="{% if widget.value and widget.value|stringformat:'s' not in selo_sugestoes %}{{ widget.value }}{% endif %}"
+    >
+
+    {# Botão adicionar à lista #}
+    <button type="button" class="selo-add-btn" id="selo-add-btn-{{ widget.attrs.id }}" title="Adicionar à lista">➕</button>
+
+    {# Botão limpar #}
+    <button type="button" class="selo-clear-btn" id="selo-clear-btn-{{ widget.attrs.id }}" title="Limpar selo">✖</button>
+  </div>
+
+  <div class="selo-saved-list" id="selo-saved-list-{{ widget.attrs.id }}"></div>
+
+  <input
+    type="hidden"
+    name="{{ widget.name }}"
+    id="{{ widget.attrs.id }}"
+    value="{{ widget.value|stringformat:'s' }}"
+  >
+
+</div>

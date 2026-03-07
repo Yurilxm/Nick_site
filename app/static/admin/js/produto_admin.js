@@ -143,3 +143,152 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  const STORAGE_KEY = "selo_custom_options";
+
+  function getCustomSelosStored() {
+    try {
+      return JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "[]");
+    } catch { return []; }
+  }
+
+  function saveCustomSelo(value) {
+    const list = getCustomSelosStored();
+    if (!list.includes(value)) {
+      list.push(value);
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+  }
+
+  function removeCustomSelo(value) {
+    const list = getCustomSelosStored().filter(s => s !== value);
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  }
+
+  document.querySelectorAll(".selo-widget-wrapper").forEach(function (wrapper) {
+
+    const id          = wrapper.id.replace("selo-wrapper-", "");
+    const hiddenInput = document.getElementById(id);
+    const select      = wrapper.querySelector(".selo-select");
+    const directInput = document.getElementById(`selo-direct-${id}`);
+    const clearBtn    = document.getElementById(`selo-clear-btn-${id}`);
+    const addBtn      = document.getElementById(`selo-add-btn-${id}`);
+    const savedList   = document.getElementById(`selo-saved-list-${id}`);
+
+    if (!hiddenInput || !select) return;
+
+    function renderSavedList() {
+      const stored = getCustomSelosStored();
+      savedList.innerHTML = "";
+
+      if (stored.length === 0) return;
+
+      const label = document.createElement("span");
+      label.className = "selo-saved-label";
+      label.textContent = "Salvos:";
+      savedList.appendChild(label);
+
+      stored.forEach(function (val) {
+        const tag = document.createElement("span");
+        tag.className = "selo-saved-tag";
+        tag.dataset.value = val;
+
+        const text = document.createElement("span");
+        text.className = "selo-saved-tag-text";
+        text.textContent = val;
+
+        const del = document.createElement("button");
+        del.type = "button";
+        del.className = "selo-saved-tag-del";
+        del.title = "Remover";
+        del.textContent = "✖";
+
+        text.addEventListener("click", function () {
+          setValue(val);
+          addOptionToSelect(val);
+          select.value = val;
+          directInput.value = "";
+        });
+
+        del.addEventListener("click", function () {
+          removeCustomSelo(val);
+          const opt = select.querySelector(`option[value="${val}"]`);
+          if (opt) opt.remove();
+          if (hiddenInput.value === val) {
+            setValue("");
+            select.value = "";
+          }
+          renderSavedList();
+        });
+
+        tag.appendChild(text);
+        tag.appendChild(del);
+        savedList.appendChild(tag);
+      });
+    }
+
+    function setValue(val) {
+      hiddenInput.value = val;
+      savedList.querySelectorAll(".selo-saved-tag").forEach(t => {
+        t.classList.toggle("active", t.dataset.value === val);
+      });
+    }
+
+    function addOptionToSelect(value) {
+      const exists = Array.from(select.options).some(o => o.value === value);
+      if (!exists) {
+        const opt = new Option(value, value, true, true);
+        select.appendChild(opt);
+      }
+      select.value = value;
+    }
+
+    // Carrega salvos
+    getCustomSelosStored().forEach(val => addOptionToSelect(val));
+    renderSavedList();
+
+    // Select onChange
+    select.addEventListener("change", function () {
+      if (select.value) {
+        setValue(select.value);
+        directInput.value = "";
+      }
+    });
+
+    // Input direto — só atualiza o valor, SEM salvar
+    directInput.addEventListener("input", function () {
+      const val = directInput.value.trim();
+      setValue(val);
+      if (val) select.value = "";
+    });
+
+    // Botão ✏️ — salva na lista
+    addBtn.addEventListener("click", function () {
+      const val = directInput.value.trim();
+      if (!val) {
+        directInput.focus();
+        return;
+      }
+      saveCustomSelo(val);
+      addOptionToSelect(val);
+      setValue(val);
+      renderSavedList();
+    });
+
+    // Botão limpar
+    clearBtn.addEventListener("click", function () {
+      setValue("");
+      select.value = "";
+      directInput.value = "";
+    });
+
+    // Estado inicial
+    const initialValue = hiddenInput.value;
+    if (initialValue) setValue(initialValue);
+
+  });
+
+});
