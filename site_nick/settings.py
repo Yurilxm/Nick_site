@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'produtos',
     'carrinho',
     'marketing',
+    'pedidos',
 ]
 
 MIDDLEWARE = [
@@ -140,9 +141,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
+LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
-
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

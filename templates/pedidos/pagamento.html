@@ -1,0 +1,35 @@
+{% include "components/checkout_etapas.html" with etapa=3 %}
+
+    <h2 class="checkout-titulo">💳 Escolha a forma de pagamento</h2>
+
+    <div class="checkout-layout">
+
+        <!-- ============================
+             FORMAS DE PAGAMENTO
+        ============================= -->
+        <div class="checkout-pagamento">
+            <div class="checkout-card">
+                <h3 class="checkout-card-titulo">Formas de pagamento</h3>
+
+                <form method="post" action="{% url 'pedidos:finalizar' %}">
+                    {% csrf_token %}
+
+                    {% for forma in formas_pagamento %}
+                    <label class="pagamento-opcao">
+                        <input type="radio" name="forma_pagamento" value="{{ forma.id }}" required>
+                        {{ forma.nome }}
+                    </label>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-primary btn-block">Finalizar Pedido</button>
+                </form>
+
+            </div>
+        </div>
+
+        <!-- ============================
+             RESUMO FINANCEIRO
+        ============================= -->
+        <div class="checkout-resumo">
+            <div class="checkout-card">
+                <h3 class="checkout-card-titulo">Resumo do pedido</h3>

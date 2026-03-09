@@ -34,6 +34,7 @@ urlpatterns = [
     path('login/codigo/enviar/', views.send_login_code_view, name='login_code_send'),
     path('login-codigo/confirmar/', login_code_confirm_view, name='login_code_confirm'),
     path('buscar-produtos/', views.search_products_view, name='search_products'),
+    path('pedidos/', include('pedidos.urls')),
 ]
 
 if settings.DEBUG:

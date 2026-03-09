@@ -1,61 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+:root {
+    --baby-blue:   #bde0fe;
+    --baby-pink:   #ffafcc;
+    --baby-lilac:  #cdb4db;
+    --pink-mid:    #ff85a1;
+    --lilac-mid:   #b695c0;
+    --text-dark:   #4a3f5c;
+    --text-mid:    #7a6a8a;
+    --text-light:  #c4b5d0;
+    --bg-card:     #fff9fc;
+    --border:      rgba(205, 180, 219, 0.35);
+}
+
+/* =============================================
+   CONTAINER LATERAL
+   ============================================= */
 .carrinho-container {
     position: fixed;
     top: 0;
     right: 0;
     width: 360px;
     height: 100vh;
-
-    padding: 20px;
     box-sizing: border-box;
-
-    background-color: #e6f2ff;
-    box-shadow: -4px 0 5px rgba(0, 0, 0, 0.1);
+    background: var(--bg-card);
+    border-left: 1.5px solid var(--border);
+    box-shadow: -8px 0 40px rgba(182, 149, 192, 0.2);
     z-index: 1000;
-
     transform: translateX(100%);
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Nunito', sans-serif;
 }
 
 .carrinho-container.aberto {
     transform: translateX(0);
 }
 
-/* =========================
-   CONTEÚDO GERAL
-========================= */
+/* =============================================
+   CONTEÚDO
+   ============================================= */
 .carrinho-conteudo {
     display: flex;
     flex-direction: column;
     height: 100%;
-    min-height: 0; /* 🔑 evita estouro */
+    min-height: 0;
 }
 
-/* =========================
+/* =============================================
    HEADER
-========================= */
+   ============================================= */
 .carrinho-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    padding: 20px 20px 16px;
+    border-bottom: 1.5px solid var(--border);
+    flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(255,175,204,0.12), rgba(205,180,219,0.12));
 }
 
 .carrinho-header h2 {
     margin: 0;
-    font-size: 20px;
-    color: #333;
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text-dark);
 }
 
 .btn-fechar-carrinho {
-    background: none;
+    background: rgba(205, 180, 219, 0.2);
     border: none;
-    font-size: 24px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 20px;
+    color: var(--text-mid);
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: background 0.2s, color 0.2s;
+    padding: 0;
 }
 
-/* =========================
-   LISTA
-========================= */
+.btn-fechar-carrinho:hover {
+    background: rgba(255, 133, 161, 0.15);
+    color: var(--pink-mid);
+}
+
+/* =============================================
+   LISTA DE ITENS
+   ============================================= */
 #mini-carrinho-lista {
     flex: 1;
     min-height: 0;
@@ -63,111 +98,229 @@
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 0 4px 0 2px;
+    gap: 0;
+    padding: 8px 16px;
+    list-style: none;
+    margin: 0;
 }
 
+/* Estado vazio */
+#mini-carrinho-lista > p {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-light);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Scrollbar customizada */
+#mini-carrinho-lista::-webkit-scrollbar { width: 4px; }
+#mini-carrinho-lista::-webkit-scrollbar-track { background: transparent; }
+#mini-carrinho-lista::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--baby-pink), var(--baby-lilac));
+    border-radius: 10px;
+}
+
+/* =============================================
+   ITEM DO CARRINHO
+   ============================================= */
 .item-carrinho {
     position: relative;
     display: flex;
     gap: 12px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #cfe9ff;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
 }
 
-/* Remove a linha do último item */
 .item-carrinho:last-child {
     border-bottom: none;
 }
 
-.item-carrinho-img {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 8px;
+.item-carrinho.clicavel {
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 12px 8px;
+    margin: 0 -8px;
+    transition: background 0.2s;
 }
 
+.item-carrinho.clicavel:hover {
+    background: rgba(255, 175, 204, 0.18);
+}
+
+/* =============================================
+   IMAGEM DO ITEM
+   ============================================= */
+.item-carrinho-img {
+    width: 58px;
+    height: 58px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+}
+
+/* =============================================
+   INFO DO ITEM
+   ============================================= */
 .item-carrinho-info {
     flex: 1;
     display: flex;
     flex-direction: column;
-    font-size: 14px;
-    color: #444;
+    gap: 3px;
+    font-size: 13px;
+    color: var(--text-mid);
+    min-width: 0;
 }
 
+.item-carrinho-info strong {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.item-carrinho-info span {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--pink-mid);
+}
+
+/* =============================================
+   BOTÃO REMOVER MINI
+   ============================================= */
 .btn-remover-mini {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 12px;
+    right: 16px;
     background: none;
     border: none;
-    font-size: 18px;
-    color: #ff85b3;
+    font-size: 17px;
+    color: var(--text-light);
     cursor: pointer;
     padding: 4px;
+    line-height: 1;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s, transform 0.15s;
 }
 
-.btn-remover-mini:hover { 
-    color: #ff4f9a; 
+.btn-remover-mini:hover {
+    color: var(--pink-mid);
+    background: rgba(255, 133, 161, 0.1);
+    transform: scale(1.15);
 }
 
-/* =========================
-   RODAPÉ
-========================= */
+/* =============================================
+   RODAPÉ: total + botões
+   ============================================= */
 .btn-finais {
     flex-shrink: 0;
+    padding: 14px 20px 20px;
+    border-top: 1.5px solid var(--border);
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding-top: 12px;
+    background: linear-gradient(135deg, rgba(255,175,204,0.07), rgba(205,180,219,0.07));
 }
 
 .btn-finais hr {
-    border: none;
-    border-top: 2px solid #34b1ff;
+    display: none; /* substituído pelo border-top do container */
 }
 
 .mini-total-linha {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 18px;
-    color: #34b1ff;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-dark);
+    padding-bottom: 4px;
 }
 
+.mini-total-linha span:last-child {
+    font-size: 17px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--pink-mid), var(--lilac-mid));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* =============================================
+   BOTÕES DO RODAPÉ
+   ============================================= */
 .btn-mini {
     display: block;
     width: 100%;
-    max-width: 100%;
     padding: 12px;
     box-sizing: border-box;
     text-align: center;
     text-decoration: none;
-    background-color: #ffadcc;
-    color: #fff;
-    border-radius: 10px;
-    transform-origin: center;
-    margin-top: 10px;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+    position: relative;
+    overflow: hidden;
 }
 
-/* Espaçamento garantido entre os botões do mini carrinho */
+/* Primeiro botão: "Ver carrinho" — outline suave */
+.btn-finais .btn-mini:first-of-type {
+    background: rgba(205, 180, 219, 0.15);
+    color: var(--lilac-mid);
+    border: 1.5px solid rgba(205, 180, 219, 0.5);
+}
+
+.btn-finais .btn-mini:first-of-type:hover {
+    background: rgba(205, 180, 219, 0.25);
+    transform: translateY(-1px);
+    color: var(--lilac-mid);
+}
+
+/* Garante espaço entre os dois botões */
 .btn-finais .btn-mini + .btn-mini {
     margin-top: 10px;
 }
 
-.btn-mini:hover { 
-    background-color: #ff85b3; 
-    transform: scale(1.03); 
-} 
+/* Segundo botão: "Finalizar" — gradiente cheio */
+.btn-finais .btn-mini:last-of-type {
+    background: linear-gradient(135deg, var(--baby-pink), var(--baby-lilac));
+    color: white;
+    border: none;
+    box-shadow: 0 4px 14px rgba(255, 133, 161, 0.28);
+}
 
-.item-carrinho.clicavel { 
-    width: 100%; 
-    cursor: pointer; 
-    transition: 0.2s ease, box-shadow 0.2s ease; 
-    transform-origin: left center; 
-} 
+/* Brilho deslizante */
+.btn-finais .btn-mini:last-of-type::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -75%;
+    width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.5s ease;
+}
 
-.item-carrinho.clicavel:hover { 
-    transform: scale(1.03); 
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
+.btn-finais .btn-mini:last-of-type:hover::before { left: 130%; }
+
+.btn-finais .btn-mini:last-of-type:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba(255, 133, 161, 0.38);
+    filter: brightness(1.05);
+    color: white;
+}
+
+/* =============================================
+   RESPONSIVO
+   ============================================= */
+@media (max-width: 400px) {
+    .carrinho-container {
+        width: 100vw;
+    }
 }

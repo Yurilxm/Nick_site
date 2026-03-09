@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'carrinho/css/checkout.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="checkout-wrapper">
+
+    {% include "components/checkout_etapas.html" with etapa=2 %}
+
+    <h2 class="checkout-titulo">🎀 Confirmar Pedido</h2>
+
+    <div class="checkout-layout">
+
+        <!-- ============================
+             RESUMO DOS ITENS
+        ============================= -->
+        <div class="checkout-itens">
+            <div class="checkout-card">
+                <h3 class="checkout-card-titulo">Itens do pedido</h3>
+
+                <ul class="checkout-lista">
+                    {% for item in carrinho.itens.select_related %}
+                    <li class="checkout-item">
+
+                        {% if item.produto.imagem %}
+                        <img src="{{ item.produto.imagem.url }}"
+                             class="checkout-img"
+                             alt="{{ item.produto.nome }}">
+                        {% endif %}
+
+                        <div class="checkout-item-info">
+                            <strong class="checkout-item-nome">{{ item.produto.nome }}</strong>
+
+                            {% if item.opcoes_formatadas %}
+                            <div class="checkout-opcoes">
+                                {% for opcao in item.opcoes_formatadas %}
+                                <span class="checkout-opcao-tag">
+                                    <strong>{{ opcao.grupo }}:</strong> {{ opcao.valores|join:", " }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <div class="checkout-item-qty">
+                                Qtd: <strong>{{ item.quantidade }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="checkout-item-preco">
+                            R$ {{ item.subtotal }}
+                        </div>
+
+                    </li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+
+        <!-- ============================
+             RESUMO FINANCEIRO
+        ============================= -->
+        <div class="checkout-resumo">
+            <div class="checkout-card">
+                <h3 class="checkout-card-titulo">Resumo do pedido</h3>
+
+                <div class="checkout-linha">
+                    <span>Subtotal</span>
+                    <span>R$ {{ total_produtos }}</span>
+                </div>
+
+                {% if frete %}
+                <div class="checkout-linha">
+                    <span>Frete ({{ frete.tipo }})</span>
+                    <span>R$ {{ frete.valor }}</span>
+                </div>
+                {% else %}
+                <div class="checkout-linha frete-pendente">
+                    <span>Frete</span>
+                    <span>A calcular</span>
+                </div>
+                {% endif %}
+
+                <div class="checkout-divider"></div>
+
+                <div class="checkout-linha total">
+                    <span>Total</span>
+                    <span>R$ {{ total_geral }}</span>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-confirmar">
+                        Confirmar pedido
+                    </button>
+                </form>
+
+                <a href="{% url 'ver_carrinho' %}" class="btn-voltar-carrinho">
+                    ← Voltar ao carrinho
+                </a>
+
+            </div>
+
+            <!-- Info segurança -->
+            <div class="checkout-seguranca">
+                <span>🔒</span>
+                <p>Seus dados estão protegidos. Compra 100% segura.</p>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}
