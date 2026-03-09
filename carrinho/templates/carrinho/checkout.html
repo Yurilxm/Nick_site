@@ -14,15 +14,13 @@
 
     <div class="checkout-layout">
 
-        <!-- ============================
-             RESUMO DOS ITENS
-        ============================= -->
+        <!-- ITENS DO PEDIDO -->
         <div class="checkout-itens">
             <div class="checkout-card">
                 <h3 class="checkout-card-titulo">Itens do pedido</h3>
 
                 <ul class="checkout-lista">
-                    {% for item in carrinho.itens.select_related %}
+                    {% for item in itens %}
                     <li class="checkout-item">
 
                         {% if item.produto.imagem %}
@@ -56,13 +54,10 @@
                     </li>
                     {% endfor %}
                 </ul>
-
             </div>
         </div>
 
-        <!-- ============================
-             RESUMO FINANCEIRO
-        ============================= -->
+        <!-- RESUMO FINANCEIRO -->
         <div class="checkout-resumo">
             <div class="checkout-card">
                 <h3 class="checkout-card-titulo">Resumo do pedido</h3>
@@ -91,25 +86,20 @@
                     <span>R$ {{ total_geral }}</span>
                 </div>
 
-                <form method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="btn-confirmar">
-                        Confirmar pedido
-                    </button>
+                <a href="{% url 'pedidos:pagamento' %}" class="btn-confirmar">
+                    Confirmar pedido
+                </a>
                 </form>
 
                 <a href="{% url 'ver_carrinho' %}" class="btn-voltar-carrinho">
                     ← Voltar ao carrinho
                 </a>
-
             </div>
 
-            <!-- Info segurança -->
             <div class="checkout-seguranca">
                 <span>🔒</span>
                 <p>Seus dados estão protegidos. Compra 100% segura.</p>
             </div>
-
         </div>
 
     </div>

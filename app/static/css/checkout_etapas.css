@@ -1,7 +1,10 @@
+.checkout-etapas {
+    margin-bottom: 36px;
+}
+
 .etapas {
     display: flex;
     align-items: center;
-    margin-bottom: 32px;
     gap: 0;
 }
 
@@ -9,35 +12,60 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
     flex-shrink: 0;
+    opacity: 0;
+    transform: translateY(8px);
+    animation: etapaFade 0.4s ease forwards;
 }
 
-.etapa span {
+.etapa:nth-child(1) { animation-delay: 0.05s; }
+.etapa:nth-child(3) { animation-delay: 0.12s; }
+.etapa:nth-child(5) { animation-delay: 0.19s; }
+.etapa:nth-child(7) { animation-delay: 0.26s; }
+
+@keyframes etapaFade {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ====================================
+   LABEL
+==================================== */
+.etapa-label {
+    font-family: 'Nunito', sans-serif;
     font-size: 11px;
     font-weight: 700;
     color: var(--text-light);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
     white-space: nowrap;
+    transition: color 0.3s;
 }
 
+/* ====================================
+   CÍRCULO
+==================================== */
 .etapa-circulo {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     border: 2px solid var(--border);
     background: white;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-family: 'Nunito', sans-serif;
     font-size: 13px;
     font-weight: 800;
     color: var(--text-light);
-    transition: all 0.3s;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    position: relative;
+    z-index: 1;
 }
 
-/* Etapa concluída */
+/* ====================================
+   ESTADO: CONCLUÍDA
+==================================== */
 .etapa.concluida .etapa-circulo {
     background: linear-gradient(135deg, var(--baby-pink), var(--baby-lilac));
     border-color: transparent;
@@ -45,103 +73,120 @@
     box-shadow: 0 3px 10px rgba(255, 133, 161, 0.3);
 }
 
-.etapa.concluida span { color: var(--lilac-mid); }
-
-.etapa.concluida:hover .etapa-circulo{
-    box-shadow:
-        0 0 0 4px rgba(255,175,204,0.15),
-        0 4px 14px rgba(255,133,161,0.35);
+.etapa.concluida .etapa-label {
+    color: var(--lilac-mid);
 }
 
-/* Etapa ativa */
+/* Hover nas concluídas (clicáveis) */
+.etapa.concluida:hover .etapa-circulo {
+    transform: scale(1.1);
+    box-shadow:
+        0 0 0 5px rgba(255,175,204,0.15),
+        0 4px 16px rgba(255,133,161,0.35);
+}
+
+.etapa.concluida:hover .etapa-label {
+    color: var(--pink-mid);
+}
+
+/* ====================================
+   ESTADO: ATIVA
+==================================== */
 .etapa.ativa .etapa-circulo {
     background: linear-gradient(135deg, var(--baby-pink), var(--baby-lilac));
     border-color: transparent;
     color: white;
-    box-shadow: 0 3px 14px rgba(255, 133, 161, 0.35);
-    transform: scale(1.1);
+    box-shadow:
+        0 0 0 5px rgba(255,175,204,0.18),
+        0 4px 16px rgba(255,133,161,0.35);
+    transform: scale(1.14);
 }
 
-.etapa.ativa span {
+.etapa.ativa .etapa-label {
     color: var(--pink-mid);
     font-weight: 800;
 }
 
-/* Linha entre etapas */
+/* Pulso suave na etapa ativa */
+@keyframes pulsoAtivo {
+    0%, 100% { box-shadow: 0 0 0 5px rgba(255,175,204,0.18), 0 4px 16px rgba(255,133,161,0.35); }
+    50%       { box-shadow: 0 0 0 8px rgba(255,175,204,0.1),  0 6px 20px rgba(255,133,161,0.3);  }
+}
+
+.etapa.ativa .etapa-circulo {
+    animation: pulsoAtivo 2.5s ease-in-out infinite;
+}
+
+/* ====================================
+   CHECKMARK
+==================================== */
+.etapa-check {
+    font-size: 14px;
+    line-height: 1;
+}
+
+/* ====================================
+   LINK (etapas clicáveis)
+==================================== */
+.etapa-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.etapa-link:hover .etapa-label {
+    color: var(--pink-mid);
+}
+
+/* ====================================
+   LINHA ENTRE ETAPAS
+==================================== */
 .etapa-linha {
     flex: 1;
     height: 2px;
     background: var(--border);
-    margin-bottom: 20px; /* alinha com os círculos */
+    margin-bottom: 22px; /* alinha verticalmente com os círculos */
     position: relative;
-    min-width: 20px;
-}
-
-.etapa-linha-preenchida {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, var(--baby-pink), var(--baby-lilac));
+    min-width: 24px;
+    overflow: hidden;
     border-radius: 2px;
 }
 
-@media (max-width: 480px) {
-    .etapa span { display: none; }
-    .etapa-circulo { width: 28px; height: 28px; font-size: 11px; }
-    .etapas { margin-bottom: 24px; }
+/* Linha preenchida — animação de carregamento */
+.etapa-linha-preenchida {
+    position: absolute;
+    top: 0; left: 0;
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--baby-pink), var(--baby-lilac));
+    border-radius: 2px;
+    transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* animação da linha preenchendo */
-
-.etapa-linha-preenchida{
-    width:0%;
-    height:100%;
-    background:linear-gradient(90deg,var(--baby-pink),var(--baby-lilac));
-    border-radius:2px;
-    transition:width 0.6s ease;
+.etapa-linha-preenchida.preencher {
+    width: 100%;
 }
 
-.etapa-linha-preenchida.preencher{
-    width:100%;
-}
+/* ====================================
+   RESPONSIVO
+==================================== */
+@media (max-width: 600px) {
+    .etapa-label { display: none; }
 
-/* animação de entrada das etapas */
-
-.etapa{
-    opacity:0;
-    transform:translateY(6px);
-    animation:etapaFade 0.45s ease forwards;
-}
-
-.etapa:nth-child(1){animation-delay:.05s;}
-.etapa:nth-child(3){animation-delay:.1s;}
-.etapa:nth-child(5){animation-delay:.15s;}
-.etapa:nth-child(7){animation-delay:.2s;}
-
-@keyframes etapaFade{
-    to{
-        opacity:1;
-        transform:translateY(0);
+    .etapa-circulo {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
     }
-}
 
-/* transição suave do círculo */
+    .etapa.ativa .etapa-circulo {
+        transform: scale(1.1);
+    }
 
-.etapa-circulo{
-    transition:transform .25s ease, box-shadow .25s ease;
-}
-
-.etapa.ativa .etapa-circulo{
-    transform:scale(1.12);
-}
-
-.etapa-link{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    text-decoration:none;
-    color:inherit;
-}
-
-.etapa-link:hover .etapa-circulo{
-    transform:scale(1.08);
+    .etapa-linha { margin-bottom: 14px; min-width: 16px; }
+    .checkout-etapas { margin-bottom: 24px; }
 }

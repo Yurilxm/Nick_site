@@ -1,35 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+
 {% include "components/checkout_etapas.html" with etapa=3 %}
 
-    <h2 class="checkout-titulo">💳 Escolha a forma de pagamento</h2>
+<h2 class="checkout-titulo">💳 Escolha a forma de pagamento</h2>
 
-    <div class="checkout-layout">
+<div class="checkout-layout">
 
-        <!-- ============================
-             FORMAS DE PAGAMENTO
-        ============================= -->
-        <div class="checkout-pagamento">
-            <div class="checkout-card">
-                <h3 class="checkout-card-titulo">Formas de pagamento</h3>
+    <!-- PAGAMENTO -->
+    <div class="checkout-pagamento">
+        <div class="checkout-card">
+            <h3 class="checkout-card-titulo">Formas de pagamento</h3>
 
-                <form method="post" action="{% url 'pedidos:finalizar' %}">
-                    {% csrf_token %}
+            <form method="post">
+                {% csrf_token %}
 
-                    {% for forma in formas_pagamento %}
-                    <label class="pagamento-opcao">
-                        <input type="radio" name="forma_pagamento" value="{{ forma.id }}" required>
-                        {{ forma.nome }}
-                    </label>
-                    {% endfor %}
+                <label class="pagamento-opcao">
+                    <input type="radio" name="forma_pagamento" value="pix" required>
+                    PIX
+                </label>
 
-                    <button type="submit" class="btn btn-primary btn-block">Finalizar Pedido</button>
-                </form>
+                <label class="pagamento-opcao">
+                    <input type="radio" name="forma_pagamento" value="cartao">
+                    Cartão de crédito
+                </label>
 
-            </div>
+                <label class="pagamento-opcao">
+                    <input type="radio" name="forma_pagamento" value="boleto">
+                    Boleto
+                </label>
+
+                <button type="submit" class="btn-confirmar">
+                    Finalizar Pedido
+                </button>
+
+            </form>
+
         </div>
+    </div>
 
-        <!-- ============================
-             RESUMO FINANCEIRO
-        ============================= -->
-        <div class="checkout-resumo">
-            <div class="checkout-card">
-                <h3 class="checkout-card-titulo">Resumo do pedido</h3>
+</div>
+
+{% endblock %}

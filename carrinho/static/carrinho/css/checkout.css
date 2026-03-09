@@ -45,7 +45,7 @@
 }
 
 /* ====================================
-   LAYOUT: itens + resumo
+   LAYOUT
 ==================================== */
 .checkout-layout {
     display: flex;
@@ -57,7 +57,7 @@
 .checkout-resumo { flex: 1; min-width: 280px; position: sticky; top: 24px; }
 
 /* ====================================
-   CARD GENÉRICO
+   CARD
 ==================================== */
 .checkout-card {
     background: var(--bg-card);
@@ -98,10 +98,7 @@
 }
 
 .checkout-item:last-child { border-bottom: none; }
-
-.checkout-item:hover {
-    background: rgba(255, 175, 204, 0.04);
-}
+.checkout-item:hover { background: rgba(255, 175, 204, 0.04); }
 
 .checkout-img {
     width: 68px;
@@ -129,7 +126,6 @@
     text-overflow: ellipsis;
 }
 
-/* Opções como pílulas */
 .checkout-opcoes {
     display: flex;
     flex-wrap: wrap;
@@ -143,14 +139,13 @@
     background: linear-gradient(135deg, rgba(255,175,204,0.18), rgba(205,180,219,0.18));
     border: 1px solid rgba(205,180,219,0.4);
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--lilac-mid);
 }
 
-.checkout-opcao-tag.personalizacao {
-    background: linear-gradient(135deg, rgba(255,175,204,0.18), rgba(205,180,219,0.18));
-    border-color: rgba(205,180,219,0.4);
-    color: var(--lilac-mid);
+.checkout-opcao-tag strong {
+    color: var(--text-mid);
+    font-weight: 800;
 }
 
 .checkout-item-qty {
@@ -159,9 +154,7 @@
     color: var(--text-light);
 }
 
-.checkout-item-qty strong {
-    color: var(--text-mid);
-}
+.checkout-item-qty strong { color: var(--text-mid); }
 
 .checkout-item-preco {
     font-size: 15px;
@@ -234,6 +227,8 @@
     margin: 4px 20px 12px;
     padding: 14px;
     border: none;
+    text-decoration: none;
+    text-align: center;
     border-radius: 12px;
     font-family: 'Nunito', sans-serif;
     font-size: 14px;
@@ -259,7 +254,6 @@
 }
 
 .btn-confirmar:hover::before { left: 130%; }
-
 .btn-confirmar:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(255, 133, 161, 0.4);
@@ -277,9 +271,7 @@
     transition: color 0.2s;
 }
 
-.btn-voltar-carrinho:hover {
-    color: var(--lilac-mid);
-}
+.btn-voltar-carrinho:hover { color: var(--lilac-mid); }
 
 /* ====================================
    SEGURANÇA
@@ -305,29 +297,12 @@
    RESPONSIVO
 ==================================== */
 @media (max-width: 768px) {
-    .checkout-layout {
-        flex-direction: column;
-    }
-
-    .checkout-resumo {
-        position: static;
-        width: 100%;
-        min-width: unset;
-    }
-
-    .checkout-wrapper {
-        padding: 24px 16px 40px;
-    }
+    .checkout-layout { flex-direction: column; }
+    .checkout-resumo { position: static; width: 100%; min-width: unset; }
+    .checkout-wrapper { padding: 24px 16px 40px; }
 }
 
 @media (max-width: 480px) {
-    .checkout-item {
-        flex-wrap: wrap;
-        gap: 12px;
-    }
-
-    .checkout-img {
-        width: 56px;
-        height: 56px;
-    }
+    .checkout-item { flex-wrap: wrap; gap: 12px; }
+    .checkout-img { width: 56px; height: 56px; }
 }

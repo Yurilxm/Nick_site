@@ -1,78 +1,64 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/components/checkout_etapas.css' %}">
+
 <div class="checkout-etapas">
     <div class="etapas">
 
-    <!-- Carrinho -->
-    <div class="etapa {% if etapa > 1 %}concluida{% elif etapa == 1 %}ativa{% endif %}">
-        {% if etapa > 1 %}
-            <a href="{% url 'ver_carrinho' %}" class="etapa-link">
-        {% endif %}
-
-        <div class="etapa-circulo">
-            {% if etapa > 1 %}✓{% else %}1{% endif %}
-        </div>
-        <span>Carrinho</span>
-
-        {% if etapa > 1 %}
+        <!-- ETAPA 1: Carrinho -->
+        <div class="etapa {% if etapa > 1 %}concluida{% elif etapa == 1 %}ativa{% endif %}">
+            {% if etapa > 1 %}
+            <a href="{% url 'ver_carrinho' %}" class="etapa-link" title="Voltar ao carrinho">
+            {% endif %}
+                <div class="etapa-circulo">
+                    {% if etapa > 1 %}<span class="etapa-check">✓</span>{% else %}1{% endif %}
+                </div>
+                <span class="etapa-label">Carrinho</span>
+            {% if etapa > 1 %}
             </a>
-        {% endif %}
-    </div>
-
-
-    <div class="etapa-linha">
-        {% if etapa > 1 %}
-        <div class="etapa-linha-preenchida"></div>
-        {% endif %}
-    </div>
-
-
-    <!-- Confirmar -->
-    <div class="etapa {% if etapa > 2 %}concluida{% elif etapa == 2 %}ativa{% endif %}">
-        {% if etapa > 2 %}
-            <a href="{% url 'checkout' %}" class="etapa-link">
-        {% endif %}
-
-        <div class="etapa-circulo">
-            {% if etapa > 2 %}✓{% else %}2{% endif %}
+            {% endif %}
         </div>
-        <span>Confirmar</span>
 
-        {% if etapa > 2 %}
+        <div class="etapa-linha">
+            <div class="etapa-linha-preenchida {% if etapa > 1 %}preencher{% endif %}"></div>
+        </div>
+
+        <!-- ETAPA 2: Confirmar -->
+        <div class="etapa {% if etapa > 2 %}concluida{% elif etapa == 2 %}ativa{% endif %}">
+            {% if etapa > 2 %}
+            <a href="{% url 'finalizar_compra' %}" class="etapa-link" title="Voltar ao checkout">
+            {% endif %}
+                <div class="etapa-circulo">
+                    {% if etapa > 2 %}<span class="etapa-check">✓</span>{% else %}2{% endif %}
+                </div>
+                <span class="etapa-label">Confirmar</span>
+            {% if etapa > 2 %}
             </a>
-        {% endif %}
-    </div>
-
-
-    <div class="etapa-linha">
-        {% if etapa > 2 %}
-        <div class="etapa-linha-preenchida"></div>
-        {% endif %}
-    </div>
-
-
-    <!-- Pagamento -->
-    <div class="etapa {% if etapa > 3 %}concluida{% elif etapa == 3 %}ativa{% endif %}">
-
-        <div class="etapa-circulo">
-            {% if etapa > 3 %}✓{% else %}3{% endif %}
+            {% endif %}
         </div>
 
-        <span>Pagamento</span>
+        <div class="etapa-linha">
+            <div class="etapa-linha-preenchida {% if etapa > 2 %}preencher{% endif %}"></div>
+        </div>
+
+        <!-- ETAPA 3: Pagamento -->
+        <div class="etapa {% if etapa > 3 %}concluida{% elif etapa == 3 %}ativa{% endif %}">
+            <div class="etapa-circulo">
+                {% if etapa > 3 %}<span class="etapa-check">✓</span>{% else %}3{% endif %}
+            </div>
+            <span class="etapa-label">Pagamento</span>
+        </div>
+
+        <div class="etapa-linha">
+            <div class="etapa-linha-preenchida {% if etapa > 3 %}preencher{% endif %}"></div>
+        </div>
+
+        <!-- ETAPA 4: Confirmação -->
+        <div class="etapa {% if etapa == 4 %}ativa{% endif %}">
+            <div class="etapa-circulo">
+                {% if etapa > 4 %}<span class="etapa-check">✓</span>{% else %}4{% endif %}
+            </div>
+            <span class="etapa-label">Confirmação</span>
+        </div>
+
     </div>
-
-
-    <div class="etapa-linha">
-        {% if etapa > 3 %}
-        <div class="etapa-linha-preenchida"></div>
-        {% endif %}
-    </div>
-
-
-    <!-- Confirmação -->
-    <div class="etapa {% if etapa == 4 %}ativa{% endif %}">
-        <div class="etapa-circulo">4</div>
-        <span>Confirmação</span>
-    </div>
-
-</div>
-
 </div>

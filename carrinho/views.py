@@ -271,53 +271,47 @@ def calcular_frete(request):
 
 @login_required
 def finalizar_compra(request):
+
     carrinho = obter_carrinho(request)
 
     if not carrinho.itens.exists():
         return redirect("ver_carrinho")
 
-    # Traduz opções para exibir no checkout (igual ao ver_carrinho)
     itens = carrinho.itens.select_related("produto")
+
+    # traduz opções (igual ao carrinho)
     for item in itens:
         opcoes_traduzidas = []
+
         for chave, valor in item.opcoes.items():
+
             if chave == "personalizacao":
-                opcoes_traduzidas.append({"grupo": "Personalização", "valores": [valor]})
+                opcoes_traduzidas.append({
+                    "grupo": "Personalização",
+                    "valores": [valor]
+                })
                 continue
+
             try:
                 grupo = GrupoOpcao.objects.get(id=int(chave))
                 opcoes = Opcao.objects.filter(id__in=valor)
+
                 opcoes_traduzidas.append({
                     "grupo": grupo.nome,
                     "valores": [op.nome for op in opcoes]
                 })
+
             except (GrupoOpcao.DoesNotExist, ValueError):
                 continue
+
         item.opcoes_formatadas = opcoes_traduzidas
 
     total_produtos = calcular_total_produtos(carrinho)
+
     frete = request.session.get("frete")
     valor_frete = Decimal(frete["valor"]) if frete else Decimal("0.00")
-    total_geral = total_produtos + valor_frete
 
-    if request.method == "POST":
-        pedido = Pedido.objects.create(
-            usuario=request.user,
-            total_produtos=total_produtos,
-            valor_frete=valor_frete,
-            total_geral=total_geral,
-            cep_entrega=frete.get("cep", "") if frete else ""
-        )
-        for item in carrinho.itens.all():
-            PedidoItem.objects.create(
-                pedido=pedido,
-                produto=item.produto,
-                preco_unitario=item.preco_unitario,
-                quantidade=item.quantidade,
-                opcoes=item.opcoes
-            )
-        carrinho.itens.all().delete()
-        return redirect("pedido_confirmado", pedido_id=pedido.id)
+    total_geral = total_produtos + valor_frete
 
     return render(request, "carrinho/checkout.html", {
         "carrinho": carrinho,
