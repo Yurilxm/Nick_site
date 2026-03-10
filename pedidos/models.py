@@ -11,6 +11,7 @@ class Pedido(models.Model):
         ("criado", "Criado"),
         ("aguardando_pagamento", "Aguardando pagamento"),
         ("pago", "Pago"),
+        ("em_producao", "Em produção"),
         ("cancelado", "Cancelado"),
         ("expirado", "Expirado"),
         ("enviado", "Enviado"),
@@ -30,7 +31,38 @@ class Pedido(models.Model):
     )
 
     cep_entrega = models.CharField(
-        max_length=9
+        max_length=9,
+        blank=True
+    )
+
+    rua = models.CharField(
+        max_length=200,
+        blank=True
+    )
+
+    numero = models.CharField(
+        max_length=20,
+        blank=True
+    )
+
+    bairro = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    cidade = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    estado = models.CharField(
+        max_length=2,
+        blank=True
+    )
+
+    complemento = models.CharField(
+        max_length=200,
+        blank=True
     )
 
     status = models.CharField(
@@ -39,17 +71,12 @@ class Pedido(models.Model):
         default="criado"
     )
 
-    reservado_ate = models.DateTimeField(
-        null=True,
-        blank=True
-    )
-
     criado_em = models.DateTimeField(
         auto_now_add=True
     )
 
     def __str__(self):
-        return f"Pedido {self.id}"
+        return f"Pedido {self.id} - {self.status}"
 
 
 class PedidoItem(models.Model):
@@ -72,8 +99,17 @@ class PedidoItem(models.Model):
         decimal_places=2
     )
 
+    opcoes = models.JSONField(
+        blank=True,
+        null=True
+    )
+
+    @property
     def subtotal(self):
         return self.preco_unitario * self.quantidade
+
+    def __str__(self):
+        return f"{self.quantidade}x {self.produto.nome}"
 
 
 class Pagamento(models.Model):
@@ -109,7 +145,9 @@ class Pagamento(models.Model):
 
     transaction_id = models.CharField(
         max_length=200,
-        unique=True
+        unique=True,
+        blank=True,
+        null=True
     )
 
     idempotency_key = models.UUIDField(
@@ -117,21 +155,13 @@ class Pagamento(models.Model):
         unique=True
     )
 
-    qr_code = models.TextField(
-        blank=True
-    )
+    qr_code = models.TextField(blank=True)
 
-    qr_code_base64 = models.TextField(
-        blank=True
-    )
+    qr_code_base64 = models.TextField(blank=True)
 
-    boleto_url = models.URLField(
-        blank=True
-    )
+    boleto_url = models.URLField(blank=True)
 
-    criado_em = models.DateTimeField(
-        auto_now_add=True
-    )
+    criado_em = models.DateTimeField(auto_now_add=True)
 
     pix_expira_em = models.DateTimeField(
         null=True,
@@ -139,4 +169,4 @@ class Pagamento(models.Model):
     )
 
     def __str__(self):
-        return f"Pagamento {self.id}"
+        return f"Pagamento {self.id} - Pedido {self.pedido.id}"

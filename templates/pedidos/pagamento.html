@@ -1,47 +1,170 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'pedidos/css/pagamento.css' %}">
+{% endblock %}
 
 {% block content %}
+<div class="pagamento-wrapper">
 
-{% include "components/checkout_etapas.html" with etapa=3 %}
+    {% include "components/checkout_etapas.html" with etapa=3 %}
 
-<h2 class="checkout-titulo">💳 Escolha a forma de pagamento</h2>
+    <h2 class="pagamento-titulo">💳 Pagamento</h2>
 
-<div class="checkout-layout">
+    <div class="pagamento-layout">
 
-    <!-- PAGAMENTO -->
-    <div class="checkout-pagamento">
-        <div class="checkout-card">
-            <h3 class="checkout-card-titulo">Formas de pagamento</h3>
+        <!-- MÉTODOS DE PAGAMENTO -->
+        <div class="pagamento-metodos">
 
-            <form method="post">
-                {% csrf_token %}
-
-                <label class="pagamento-opcao">
-                    <input type="radio" name="forma_pagamento" value="pix" required>
-                    PIX
-                </label>
-
-                <label class="pagamento-opcao">
-                    <input type="radio" name="forma_pagamento" value="cartao">
-                    Cartão de crédito
-                </label>
-
-                <label class="pagamento-opcao">
-                    <input type="radio" name="forma_pagamento" value="boleto">
-                    Boleto
-                </label>
-
-                <button type="submit" class="btn-confirmar">
-                    Finalizar Pedido
+            <!-- ABAS -->
+            <div class="metodo-abas">
+                <button class="metodo-aba ativa" data-metodo="pix">
+                    <span class="aba-icone">⚡</span>
+                    <span>Pix</span>
                 </button>
+                <button class="metodo-aba" data-metodo="cartao">
+                    <span class="aba-icone">💳</span>
+                    <span>Cartão</span>
+                </button>
+                <button class="metodo-aba" data-metodo="boleto">
+                    <span class="aba-icone">🧾</span>
+                    <span>Boleto</span>
+                </button>
+            </div>
 
-                {% include "components/resumo_pedido.html" %}
+            <!-- PIX -->
+            <div class="metodo-painel ativo" id="painel-pix">
+                <div class="pagamento-card">
+                    <div class="pix-destaque">
+                        <div class="pix-badge">⚡ Aprovação imediata</div>
+                        <p class="pix-desc">Pague com Pix e tenha seu pedido confirmado na hora. Válido por <strong>30 minutos</strong>.</p>
+                    </div>
 
-            </form>
+                    <form method="post" class="pagamento-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="metodo" value="pix">
+                        <button type="submit" class="btn-pagar btn-pix">
+                            Gerar QR Code Pix
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- CARTÃO -->
+            <div class="metodo-painel" id="painel-cartao">
+                <div class="pagamento-card">
+                    <form method="post" class="pagamento-form" id="form-cartao">
+                        {% csrf_token %}
+                        <input type="hidden" name="metodo" value="cartao">
+
+                        <div class="campo-grupo">
+                            <label class="campo-label">Número do cartão</label>
+                            <input type="text" name="numero_cartao" class="campo-input"
+                                   placeholder="0000 0000 0000 0000" maxlength="19"
+                                   id="numero-cartao">
+                        </div>
+
+                        <div class="campo-grupo">
+                            <label class="campo-label">Nome no cartão</label>
+                            <input type="text" name="nome_cartao" class="campo-input"
+                                   placeholder="Como está impresso no cartão">
+                        </div>
+
+                        <div class="campo-linha">
+                            <div class="campo-grupo">
+                                <label class="campo-label">Validade</label>
+                                <input type="text" name="validade" class="campo-input"
+                                       placeholder="MM/AA" maxlength="5" id="validade-cartao">
+                            </div>
+                            <div class="campo-grupo">
+                                <label class="campo-label">CVV</label>
+                                <input type="text" name="cvv" class="campo-input"
+                                       placeholder="123" maxlength="4">
+                            </div>
+                        </div>
+
+                        <div class="campo-grupo">
+                            <label class="campo-label">Parcelamento</label>
+                            <select name="parcelas" class="campo-input campo-select">
+                                <option value="1">1x sem juros</option>
+                                <option value="2">2x sem juros</option>
+                                <option value="3">3x sem juros</option>
+                                <option value="6">6x sem juros</option>
+                                <option value="12">12x com juros</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn-pagar btn-cartao">
+                            Pagar com cartão
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- BOLETO -->
+            <div class="metodo-painel" id="painel-boleto">
+                <div class="pagamento-card">
+                    <div class="boleto-info">
+                        <div class="boleto-icone">🧾</div>
+                        <div>
+                            <strong>Boleto bancário</strong>
+                            <p>Prazo de compensação: <strong>1 a 3 dias úteis</strong>. Válido por <strong>3 dias</strong>.</p>
+                        </div>
+                    </div>
+
+                    <form method="post" class="pagamento-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="metodo" value="boleto">
+                        <button type="submit" class="btn-pagar btn-boleto">
+                            Gerar boleto
+                        </button>
+                    </form>
+                </div>
+            </div>
 
         </div>
-    </div>
 
+        <!-- RESUMO -->
+        <div class="pagamento-resumo">
+            {% include "components/resumo_pedido.html" %}
+
+            <a href="{% url 'finalizar_compra' %}" class="btn-voltar-pagamento">
+                ← Voltar ao pedido
+            </a>
+        </div>
+
+    </div>
 </div>
 
+<script>
+document.querySelectorAll('.metodo-aba').forEach(aba => {
+    aba.addEventListener('click', () => {
+        document.querySelectorAll('.metodo-aba').forEach(a => a.classList.remove('ativa'));
+        document.querySelectorAll('.metodo-painel').forEach(p => p.classList.remove('ativo'));
+
+        aba.classList.add('ativa');
+        document.getElementById('painel-' + aba.dataset.metodo).classList.add('ativo');
+    });
+});
+
+// Máscara cartão
+const campoCartao = document.getElementById('numero-cartao');
+if (campoCartao) {
+    campoCartao.addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '').substring(0, 16);
+        e.target.value = v.replace(/(.{4})/g, '$1 ').trim();
+    });
+}
+
+// Máscara validade
+const campoValidade = document.getElementById('validade-cartao');
+if (campoValidade) {
+    campoValidade.addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '').substring(0, 4);
+        if (v.length > 2) v = v.slice(0, 2) + '/' + v.slice(2);
+        e.target.value = v;
+    });
+}
+</script>
 {% endblock %}

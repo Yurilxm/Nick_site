@@ -1,28 +1,107 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'pedidos/css/pedido_confirmado.css' %}">
+{% endblock %}
 
 {% block content %}
+<div class="confirmado-wrapper">
 
-{% include "components/checkout_etapas.html" with etapa=4 %}
+    {% include "components/checkout_etapas.html" with etapa=4 %}
 
-<div style="max-width:800px;margin:40px auto;text-align:center;">
+    <!-- HERO DE SUCESSO -->
+    <div class="confirmado-hero">
+        <div class="confirmado-icone">
+            <div class="confirmado-circulo">
+                <span class="confirmado-check">✓</span>
+            </div>
+            <div class="confirmado-sparkles" aria-hidden="true">
+                <span>✨</span><span>🎀</span><span>✨</span>
+            </div>
+        </div>
+        <h1 class="confirmado-titulo">Pedido confirmado!</h1>
+        <p class="confirmado-subtitulo">
+            Obrigada pela sua compra 🌸 Você receberá um e-mail com os detalhes em breve.
+        </p>
+        <div class="confirmado-numero">
+            Pedido <strong>#{{ pedido.id }}</strong>
+        </div>
+    </div>
 
-    <h2>Pedido realizado com sucesso! 🎉</h2>
+    <div class="confirmado-layout">
 
-    <p>Seu pedido foi registrado no sistema.</p>
+        <!-- ITENS DO PEDIDO -->
+        <div class="confirmado-itens">
+            <div class="confirmado-card">
+                <h3 class="confirmado-card-titulo">Itens do pedido</h3>
+                <ul class="confirmado-lista">
+                    {% for item in pedido.itens.all %}
+                    <li class="confirmado-item">
+                        {% if item.produto.imagem %}
+                        <img src="{{ item.produto.imagem.url }}"
+                             class="confirmado-img"
+                             alt="{{ item.produto.nome }}">
+                        {% endif %}
+                        <div class="confirmado-item-info">
+                            <strong class="confirmado-item-nome">{{ item.produto.nome }}</strong>
+                            {% if item.opcoes %}
+                            <div class="confirmado-opcoes">
+                                {% for chave, valor in item.opcoes.items %}
+                                {% if chave != "personalizacao" %}
+                                <span class="confirmado-opcao-tag">{{ valor|join:", " }}</span>
+                                {% else %}
+                                <span class="confirmado-opcao-tag">✏️ {{ valor }}</span>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="confirmado-item-qty">Qtd: <strong>{{ item.quantidade }}</strong></div>
+                        </div>
+                        <div class="confirmado-item-preco">
+                            R$ {{ item.subtotal }}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
 
-    <p><strong>Número do pedido:</strong> #{{ pedido.id }}</p>
+        <!-- RESUMO -->
+        <div class="confirmado-resumo">
+            <div class="confirmado-card">
+                <h3 class="confirmado-card-titulo">Resumo do pedido</h3>
 
-    <a href="{% url 'home' %}" style="
-        display:inline-block;
-        margin-top:20px;
-        padding:12px 20px;
-        background:#111;
-        color:white;
-        text-decoration:none;
-    ">
-        Voltar para a loja
-    </a>
+                <div class="confirmado-linha">
+                    <span>Subtotal</span>
+                    <span>R$ {{ pedido.total_produtos }}</span>
+                </div>
+                <div class="confirmado-linha">
+                    <span>Frete</span>
+                    <span>R$ {{ pedido.valor_frete }}</span>
+                </div>
+                <div class="confirmado-divider"></div>
+                <div class="confirmado-linha total">
+                    <span>Total pago</span>
+                    <span>R$ {{ pedido.total_geral }}</span>
+                </div>
 
+                {% if pedido.cep_entrega %}
+                <div class="confirmado-entrega">
+                    <span class="confirmado-entrega-icone">📦</span>
+                    <div>
+                        <strong>Entrega para</strong>
+                        <p>CEP {{ pedido.cep_entrega }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <a href="{% url 'lista_produtos' %}" class="btn-continuar">
+                Continuar comprando 🛍️
+            </a>
+        </div>
+
+    </div>
 </div>
-
 {% endblock %}

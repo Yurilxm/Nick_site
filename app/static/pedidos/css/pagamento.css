@@ -1,0 +1,329 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+:root {
+    --baby-blue:   #bde0fe;
+    --baby-pink:   #ffafcc;
+    --baby-lilac:  #cdb4db;
+    --pink-mid:    #ff85a1;
+    --lilac-mid:   #b695c0;
+    --text-dark:   #4a3f5c;
+    --text-mid:    #7a6a8a;
+    --text-light:  #c4b5d0;
+    --bg-card:     #fff9fc;
+    --border:      rgba(205, 180, 219, 0.35);
+    --shadow-soft: 0 6px 24px rgba(182, 149, 192, 0.14);
+    --radius:      18px;
+}
+
+.pagamento-wrapper {
+    font-family: 'Nunito', sans-serif;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 32px 60px;
+}
+
+.pagamento-titulo {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 28px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--border);
+    position: relative;
+}
+
+.pagamento-titulo::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0;
+    width: 70px; height: 2px;
+    background: linear-gradient(90deg, var(--baby-pink), var(--baby-lilac));
+    border-radius: 2px;
+}
+
+/* ====================================
+   LAYOUT
+==================================== */
+.pagamento-layout {
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+}
+
+.pagamento-metodos { flex: 3; }
+.pagamento-resumo  { flex: 1; min-width: 280px; position: sticky; top: 24px; }
+
+/* ====================================
+   ABAS DE MÉTODO
+==================================== */
+.metodo-abas {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.metodo-aba {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 10px;
+    border-radius: 14px;
+    border: 2px solid var(--border);
+    background: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.metodo-aba:hover {
+    border-color: var(--baby-pink);
+    color: var(--text-mid);
+    transform: translateY(-1px);
+}
+
+.metodo-aba.ativa {
+    background: linear-gradient(135deg, rgba(255,175,204,0.15), rgba(205,180,219,0.15));
+    border-color: var(--baby-pink);
+    color: var(--text-dark);
+    box-shadow: 0 3px 12px rgba(255,133,161,0.2);
+}
+
+.aba-icone { font-size: 16px; }
+
+/* ====================================
+   PAINÉIS
+==================================== */
+.metodo-painel {
+    display: none;
+    animation: painelEntrada 0.3s ease forwards;
+}
+
+.metodo-painel.ativo { display: block; }
+
+@keyframes painelEntrada {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ====================================
+   CARD DE PAGAMENTO
+==================================== */
+.pagamento-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    box-shadow: var(--shadow-soft);
+    padding: 24px;
+}
+
+/* ====================================
+   PIX
+==================================== */
+.pix-destaque {
+    background: linear-gradient(135deg, rgba(189,224,254,0.2), rgba(205,180,219,0.15));
+    border: 1.5px solid rgba(189,224,254,0.5);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+}
+
+.pix-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--baby-blue), var(--baby-lilac));
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+}
+
+.pix-desc {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-mid);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* ====================================
+   FORMULÁRIO CARTÃO
+==================================== */
+.pagamento-form { display: flex; flex-direction: column; gap: 16px; }
+
+.campo-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.campo-label {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-mid);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.campo-input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    outline: none;
+    appearance: none;
+}
+
+.campo-input::placeholder { color: var(--text-light); }
+
+.campo-input:focus {
+    border-color: var(--baby-pink);
+    box-shadow: 0 0 0 3px rgba(255,175,204,0.2);
+}
+
+.campo-select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b695c0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+}
+
+.campo-linha {
+    display: flex;
+    gap: 14px;
+}
+
+.campo-linha .campo-grupo { flex: 1; }
+
+/* ====================================
+   BOLETO
+==================================== */
+.boleto-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: linear-gradient(135deg, rgba(255,175,204,0.08), rgba(205,180,219,0.08));
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+}
+
+.boleto-icone { font-size: 28px; flex-shrink: 0; }
+
+.boleto-info strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+}
+
+.boleto-info p {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-mid);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* ====================================
+   BOTÕES PAGAR
+==================================== */
+.btn-pagar {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.3px;
+}
+
+.btn-pagar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -75%;
+    width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.5s ease;
+}
+
+.btn-pagar:hover::before { left: 130%; }
+
+.btn-pagar:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+}
+
+.btn-pix {
+    background: linear-gradient(135deg, #32bcad, #1fa899);
+    color: white;
+    box-shadow: 0 4px 16px rgba(50,188,173,0.3);
+}
+
+.btn-pix:hover { box-shadow: 0 8px 24px rgba(50,188,173,0.4); }
+
+.btn-cartao {
+    background: linear-gradient(135deg, var(--baby-pink), var(--baby-lilac));
+    color: white;
+    box-shadow: 0 4px 16px rgba(255,133,161,0.3);
+}
+
+.btn-cartao:hover { box-shadow: 0 8px 24px rgba(255,133,161,0.4); }
+
+.btn-boleto {
+    background: linear-gradient(135deg, #f4a261, #e76f51);
+    color: white;
+    box-shadow: 0 4px 16px rgba(231,111,81,0.3);
+}
+
+.btn-boleto:hover { box-shadow: 0 8px 24px rgba(231,111,81,0.4); }
+
+/* Voltar */
+.btn-voltar-pagamento {
+    display: block;
+    text-align: center;
+    margin-top: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-light);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.btn-voltar-pagamento:hover { color: var(--lilac-mid); }
+
+
+@media (max-width: 768px) {
+    .pagamento-layout { flex-direction: column; }
+    .pagamento-resumo { position: static; width: 100%; min-width: unset; }
+    .pagamento-wrapper { padding: 24px 16px 40px; }
+}
+
+@media (max-width: 480px) {
+    .campo-linha { flex-direction: column; gap: 16px; }
+    .metodo-aba span:not(.aba-icone) { display: none; }
+    .metodo-aba { padding: 13px; }
+}

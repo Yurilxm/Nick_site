@@ -17,26 +17,23 @@ def pagamento(request):
     if not carrinho.itens.exists():
         return redirect("ver_carrinho")
 
-    frete = request.session.get("frete")
+    frete = request.session.get("frete", 0)
 
     if request.method == "POST":
 
         metodo = request.POST.get("metodo")
 
-        # cria pedido
         pedido = criar_pedido(request.user, carrinho, frete)
 
-        # antifraude
+        pedido.status = "aguardando_pagamento"
+        pedido.save()
+
         if not validar_pedido(pedido):
 
             pedido.status = "cancelado"
             pedido.save()
 
             return redirect("loja")
-
-        # ========================
-        # PIX
-        # ========================
 
         if metodo == "pix":
 
@@ -51,19 +48,11 @@ def pagamento(request):
                 }
             )
 
-        # ========================
-        # BOLETO
-        # ========================
-
         if metodo == "boleto":
 
             pagamento = criar_pagamento_boleto(pedido)
 
             return redirect(pagamento.boleto_url)
-
-        # ========================
-        # CARTÃO
-        # ========================
 
         if metodo == "cartao":
 
@@ -86,9 +75,10 @@ def pagamento(request):
                     pedido_id=pedido.id
                 )
 
-            return redirect(
-                "pedidos:pagamento",
-            )
+            pedido.status = "aguardando_pagamento"
+            pedido.save()
+
+            return redirect("pedidos:pagamento")
 
     return render(
         request,
@@ -116,9 +106,25 @@ def pedido_confirmado(request, pedido_id):
 
 def parcelas_cartao(request):
 
-    valor = request.GET.get("valor")
-    bandeira = request.GET.get("bandeira")
+    valor = request.GET.get("valor", 0)
+    bandeira = request.GET.get("bandeira", "")
 
     parcelas = obter_parcelas(valor, bandeira)
 
     return JsonResponse(parcelas, safe=False)
+
+
+@login_required
+def meus_pedidos(request):
+
+    pedidos = Pedido.objects.filter(
+        usuario=request.user
+    ).select_related("usuario").order_by("-criado_em")
+
+    return render(
+        request,
+        "pedidos/meus_pedidos.html",
+        {
+            "pedidos": pedidos
+        }
+    )

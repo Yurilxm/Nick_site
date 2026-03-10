@@ -1,0 +1,25 @@
+<h1>Meus pedidos</h1>
+
+{% for pedido in pedidos %}
+
+<div>
+
+<h3>Pedido #{{ pedido.id }}</h3>
+
+<p>Status: {{ pedido.status }}</p>
+
+<p>Total: R$ {{ pedido.total }}</p>
+
+<a href="{% url 'pedidos:pedido_confirmado' pedido.id %}">
+Ver detalhes
+</a>
+
+</div>
+
+<hr>
+
+{% empty %}
+
+<p>Você ainda não fez pedidos.</p>
+
+{% endfor %}
