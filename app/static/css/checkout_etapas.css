@@ -2,12 +2,18 @@
     margin-bottom: 36px;
 }
 
+/* ====================================
+   CONTAINER DAS ETAPAS
+==================================== */
 .etapas {
     display: flex;
     align-items: center;
     gap: 0;
 }
 
+/* ====================================
+   ETAPA
+==================================== */
 .etapa {
     display: flex;
     flex-direction: column;
@@ -171,9 +177,7 @@
     width: 100%;
 }
 
-/* ====================================
-   RESPONSIVO
-==================================== */
+
 @media (max-width: 600px) {
     .etapa-label { display: none; }
 

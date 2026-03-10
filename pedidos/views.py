@@ -1,9 +1,15 @@
-from decimal import Decimal
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from carrinho.services import obter_carrinho
-from .models import Pedido, PedidoItem
+from .models import Pedido
+from pedidos.services.pedido_service import criar_pedido
+from pedidos.services.pagamento_service import (criar_pagamento_pix, criar_pagamento_boleto, criar_pagamento_cartao)
+from pedidos.services.antifraude_service import validar_pedido
+from django.http import JsonResponse
+from pedidos.services.parcelamento_service import obter_parcelas
 
 
+@login_required
 def pagamento(request):
 
     carrinho = obter_carrinho(request)
@@ -11,50 +17,108 @@ def pagamento(request):
     if not carrinho.itens.exists():
         return redirect("ver_carrinho")
 
-    # calcular totais
-    total_produtos = sum(item.subtotal for item in carrinho.itens.all())
-
     frete = request.session.get("frete")
-    valor_frete = Decimal(frete["valor"]) if frete else Decimal("0.00")
-
-    total_geral = total_produtos + valor_frete
 
     if request.method == "POST":
 
-        pedido = Pedido.objects.create(
-            usuario=request.user if request.user.is_authenticated else None,
-            total_produtos=total_produtos,
-            valor_frete=valor_frete,
-            total_geral=total_geral,
-            cep_entrega=frete.get("cep", "") if frete else ""
-        )
+        metodo = request.POST.get("metodo")
 
-        for item in carrinho.itens.all():
-            PedidoItem.objects.create(
-                pedido=pedido,
-                produto=item.produto,
-                preco_unitario=item.preco_unitario,
-                quantidade=item.quantidade,
-                opcoes=item.opcoes
+        # cria pedido
+        pedido = criar_pedido(request.user, carrinho, frete)
+
+        # antifraude
+        if not validar_pedido(pedido):
+
+            pedido.status = "cancelado"
+            pedido.save()
+
+            return redirect("loja")
+
+        # ========================
+        # PIX
+        # ========================
+
+        if metodo == "pix":
+
+            pagamento = criar_pagamento_pix(pedido)
+
+            return render(
+                request,
+                "pedidos/pagamentos/pix.html",
+                {
+                    "pedido": pedido,
+                    "pagamento": pagamento,
+                }
             )
 
-        # limpar carrinho
-        carrinho.itens.all().delete()
+        # ========================
+        # BOLETO
+        # ========================
 
-        return redirect("pedidos:pedido_confirmado", pedido_id=pedido.id)
+        if metodo == "boleto":
 
-    return render(request, "pedidos/pagamento.html", {
-        "carrinho": carrinho,
-        "total_produtos": total_produtos,
-        "frete": frete,
-        "total_geral": total_geral,
-    })
+            pagamento = criar_pagamento_boleto(pedido)
+
+            return redirect(pagamento.boleto_url)
+
+        # ========================
+        # CARTÃO
+        # ========================
+
+        if metodo == "cartao":
+
+            token = request.POST.get("token")
+            parcelas = request.POST.get("parcelas")
+
+            pagamento = criar_pagamento_cartao(
+                pedido,
+                token,
+                parcelas
+            )
+
+            if pagamento.status == "aprovado":
+
+                pedido.status = "pago"
+                pedido.save()
+
+                return redirect(
+                    "pedidos:pedido_confirmado",
+                    pedido_id=pedido.id
+                )
+
+            return redirect(
+                "pedidos:pagamento",
+            )
+
+    return render(
+        request,
+        "pedidos/pagamento.html"
+    )
 
 
+@login_required
 def pedido_confirmado(request, pedido_id):
 
-    pedido = get_object_or_404(Pedido, id=pedido_id)
+    pedido = get_object_or_404(
+        Pedido,
+        id=pedido_id,
+        usuario=request.user
+    )
 
-    return render(request, "pedidos/pedido_confirmado.html", {
-        "pedido": pedido
-    })
+    return render(
+        request,
+        "pedidos/pedido_confirmado.html",
+        {
+            "pedido": pedido
+        }
+    )
+
+
+def parcelas_cartao(request):
+
+    valor = request.GET.get("valor")
+    bandeira = request.GET.get("bandeira")
+
+    parcelas = obter_parcelas(valor, bandeira)
+
+    return JsonResponse(parcelas, safe=False)

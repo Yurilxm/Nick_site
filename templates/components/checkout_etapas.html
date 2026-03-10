@@ -42,10 +42,16 @@
 
         <!-- ETAPA 3: Pagamento -->
         <div class="etapa {% if etapa > 3 %}concluida{% elif etapa == 3 %}ativa{% endif %}">
-            <div class="etapa-circulo">
-                {% if etapa > 3 %}<span class="etapa-check">✓</span>{% else %}3{% endif %}
-            </div>
-            <span class="etapa-label">Pagamento</span>
+            {% if etapa > 3 %}
+            <a href="{% url 'pedidos:pagamento' %}" class="etapa-link" title="Voltar ao pagamento">
+            {% endif %}
+                <div class="etapa-circulo">
+                    {% if etapa > 3 %}<span class="etapa-check">✓</span>{% else %}3{% endif %}
+                </div>
+                <span class="etapa-label">Pagamento</span>
+            {% if etapa > 3 %}
+            </a>
+            {% endif %}
         </div>
 
         <div class="etapa-linha">
@@ -53,7 +59,7 @@
         </div>
 
         <!-- ETAPA 4: Confirmação -->
-        <div class="etapa {% if etapa == 4 %}ativa{% endif %}">
+        <div class="etapa {% if etapa > 4 %}concluida{% elif etapa == 4 %}ativa{% endif %}">
             <div class="etapa-circulo">
                 {% if etapa > 4 %}<span class="etapa-check">✓</span>{% else %}4{% endif %}
             </div>

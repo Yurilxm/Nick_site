@@ -1,0 +1,34 @@
+<div class="checkout-resumo">
+    <div class="checkout-card">
+        <h3 class="checkout-card-titulo">Resumo do pedido</h3>
+
+        <div class="checkout-linha">
+            <span>Subtotal</span>
+            <span>R$ {{ total_produtos }}</span>
+        </div>
+
+        {% if frete %}
+        <div class="checkout-linha">
+            <span>Frete ({{ frete.tipo }})</span>
+            <span>R$ {{ frete.valor }}</span>
+        </div>
+        {% else %}
+        <div class="checkout-linha frete-pendente">
+            <span>Frete</span>
+            <span>A calcular</span>
+        </div>
+        {% endif %}
+
+        <div class="checkout-divider"></div>
+
+        <div class="checkout-linha total">
+            <span>Total</span>
+            <span>R$ {{ total_geral }}</span>
+        </div>
+    </div>
+
+    <div class="checkout-seguranca">
+        <span>🔒</span>
+        <p>Seus dados estão protegidos. Compra 100% segura.</p>
+    </div>
+</div>

@@ -146,6 +146,10 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
 
+MERCADOPAGO_ACCESS_TOKEN = "SEU_ACCESS_TOKEN"
+MERCADOPAGO_PUBLIC_KEY = "SUA_PUBLIC_KEY"
+
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = 'smtp.gmail.com'
