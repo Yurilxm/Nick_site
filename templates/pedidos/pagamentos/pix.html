@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'pedidos/css/pix.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="pix-wrapper">
+
+    {% include "components/checkout_etapas.html" with etapa=3 %}
+
+    <div class="pix-card">
+
+        <div class="pix-header">
+            <div class="pix-icone">⚡</div>
+            <h2 class="pix-titulo">Pague com Pix</h2>
+            <p class="pix-subtitulo">Escaneie o QR Code ou copie o código abaixo. Válido por <strong>30 minutos</strong>.</p>
+        </div>
+
+        <div class="pix-corpo">
+
+            <!-- QR CODE -->
+            <div class="pix-qr-area">
+                {% if pagamento.qr_code_base64 %}
+                <img src="data:image/png;base64,{{ pagamento.qr_code_base64 }}"
+                     alt="QR Code Pix"
+                     class="pix-qr-img">
+                {% else %}
+                <div class="pix-qr-placeholder">QR Code indisponível</div>
+                {% endif %}
+
+                <div class="pix-timer" id="pix-timer">
+                    <span>⏱</span> <span id="tempo-restante">30:00</span>
+                </div>
+            </div>
+
+            <!-- COPIA E COLA -->
+            <div class="pix-copia">
+                <p class="pix-copia-label">Ou copie o código Pix:</p>
+                <div class="pix-copia-campo">
+                    <input type="text"
+                           id="pix-codigo"
+                           class="pix-codigo-input"
+                           value="{{ pagamento.qr_code }}"
+                           readonly>
+                    <button type="button" class="btn-copiar" id="btn-copiar">
+                        Copiar
+                    </button>
+                </div>
+                <p class="pix-copia-copiado" id="pix-copiado">✓ Código copiado!</p>
+            </div>
+
+        </div>
+
+        <!-- RESUMO COMPACTO -->
+        <div class="pix-resumo">
+            <div class="pix-resumo-linha">
+                <span>Pedido</span>
+                <strong>#{{ pedido.id }}</strong>
+            </div>
+            <div class="pix-resumo-linha">
+                <span>Total</span>
+                <strong class="pix-total">R$ {{ pedido.total }}</strong>
+            </div>
+        </div>
+
+        <p class="pix-aviso">
+            🔄 Aguardando confirmação do pagamento. A página será atualizada automaticamente.
+        </p>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'pedidos/js/pix.js' %}"></script>
+<script>
+    window.PEDIDO_CONFIRMADO_URL = "{% url 'pedidos:pedido_confirmado' pedido.id %}";
+    window.VERIFICAR_PAGAMENTO_URL = "{% url 'pedidos:verificar_pagamento' pedido.id %}";
+</script>
+{% endblock %}

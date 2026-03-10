@@ -14,22 +14,18 @@
 
     <div class="pagamento-layout">
 
-        <!-- MÉTODOS DE PAGAMENTO -->
+        <!-- MÉTODOS -->
         <div class="pagamento-metodos">
 
-            <!-- ABAS -->
             <div class="metodo-abas">
-                <button class="metodo-aba ativa" data-metodo="pix">
-                    <span class="aba-icone">⚡</span>
-                    <span>Pix</span>
+                <button type="button" class="metodo-aba ativa" data-metodo="pix">
+                    <span class="aba-icone">⚡</span><span>Pix</span>
                 </button>
-                <button class="metodo-aba" data-metodo="cartao">
-                    <span class="aba-icone">💳</span>
-                    <span>Cartão</span>
+                <button type="button" class="metodo-aba" data-metodo="cartao">
+                    <span class="aba-icone">💳</span><span>Cartão</span>
                 </button>
-                <button class="metodo-aba" data-metodo="boleto">
-                    <span class="aba-icone">🧾</span>
-                    <span>Boleto</span>
+                <button type="button" class="metodo-aba" data-metodo="boleto">
+                    <span class="aba-icone">🧾</span><span>Boleto</span>
                 </button>
             </div>
 
@@ -40,13 +36,10 @@
                         <div class="pix-badge">⚡ Aprovação imediata</div>
                         <p class="pix-desc">Pague com Pix e tenha seu pedido confirmado na hora. Válido por <strong>30 minutos</strong>.</p>
                     </div>
-
-                    <form method="post" class="pagamento-form">
+                    <form method="post">
                         {% csrf_token %}
                         <input type="hidden" name="metodo" value="pix">
-                        <button type="submit" class="btn-pagar btn-pix">
-                            Gerar QR Code Pix
-                        </button>
+                        <button type="submit" class="btn-pagar btn-pix">Gerar QR Code Pix</button>
                     </form>
                 </div>
             </div>
@@ -54,48 +47,52 @@
             <!-- CARTÃO -->
             <div class="metodo-painel" id="painel-cartao">
                 <div class="pagamento-card">
-                    <form method="post" class="pagamento-form" id="form-cartao">
+                    <form method="post" id="form-cartao">
                         {% csrf_token %}
                         <input type="hidden" name="metodo" value="cartao">
+                        <input type="hidden" name="card_token" id="card-token">
+                        <input type="hidden" name="parcelas" id="parcelas-hidden" value="1">
 
+                        <!-- Campos lidos pelo SDK MercadoPago — não vão ao servidor -->
                         <div class="campo-grupo">
                             <label class="campo-label">Número do cartão</label>
-                            <input type="text" name="numero_cartao" class="campo-input"
+                            <input type="text" id="card-number" class="campo-input"
                                    placeholder="0000 0000 0000 0000" maxlength="19"
-                                   id="numero-cartao">
+                                   autocomplete="cc-number">
                         </div>
 
                         <div class="campo-grupo">
                             <label class="campo-label">Nome no cartão</label>
-                            <input type="text" name="nome_cartao" class="campo-input"
-                                   placeholder="Como está impresso no cartão">
+                            <input type="text" id="card-name" class="campo-input"
+                                   placeholder="Como está impresso no cartão"
+                                   autocomplete="cc-name">
                         </div>
 
                         <div class="campo-linha">
                             <div class="campo-grupo">
                                 <label class="campo-label">Validade</label>
-                                <input type="text" name="validade" class="campo-input"
-                                       placeholder="MM/AA" maxlength="5" id="validade-cartao">
+                                <input type="text" id="card-expiry" class="campo-input"
+                                       placeholder="MM/AA" maxlength="5"
+                                       autocomplete="cc-exp">
                             </div>
                             <div class="campo-grupo">
                                 <label class="campo-label">CVV</label>
-                                <input type="text" name="cvv" class="campo-input"
-                                       placeholder="123" maxlength="4">
+                                <input type="text" id="card-cvv" class="campo-input"
+                                       placeholder="123" maxlength="4"
+                                       autocomplete="cc-csc">
                             </div>
                         </div>
 
                         <div class="campo-grupo">
                             <label class="campo-label">Parcelamento</label>
-                            <select name="parcelas" class="campo-input campo-select">
-                                <option value="1">1x sem juros</option>
-                                <option value="2">2x sem juros</option>
-                                <option value="3">3x sem juros</option>
-                                <option value="6">6x sem juros</option>
-                                <option value="12">12x com juros</option>
+                            <select id="select-parcelas" class="campo-input campo-select">
+                                <option value="1">1x — carregando...</option>
                             </select>
                         </div>
 
-                        <button type="submit" class="btn-pagar btn-cartao">
+                        <div class="cartao-erro" id="cartao-erro"></div>
+
+                        <button type="submit" class="btn-pagar btn-cartao" id="btn-pagar-cartao">
                             Pagar com cartão
                         </button>
                     </form>
@@ -112,13 +109,10 @@
                             <p>Prazo de compensação: <strong>1 a 3 dias úteis</strong>. Válido por <strong>3 dias</strong>.</p>
                         </div>
                     </div>
-
-                    <form method="post" class="pagamento-form">
+                    <form method="post">
                         {% csrf_token %}
                         <input type="hidden" name="metodo" value="boleto">
-                        <button type="submit" class="btn-pagar btn-boleto">
-                            Gerar boleto
-                        </button>
+                        <button type="submit" class="btn-pagar btn-boleto">Gerar boleto</button>
                     </form>
                 </div>
             </div>
@@ -128,7 +122,6 @@
         <!-- RESUMO -->
         <div class="pagamento-resumo">
             {% include "components/resumo_pedido.html" %}
-
             <a href="{% url 'finalizar_compra' %}" class="btn-voltar-pagamento">
                 ← Voltar ao pedido
             </a>
@@ -137,34 +130,12 @@
     </div>
 </div>
 
+{# Passa a public key do MercadoPago pro JS sem expor no HTML #}
 <script>
-document.querySelectorAll('.metodo-aba').forEach(aba => {
-    aba.addEventListener('click', () => {
-        document.querySelectorAll('.metodo-aba').forEach(a => a.classList.remove('ativa'));
-        document.querySelectorAll('.metodo-painel').forEach(p => p.classList.remove('ativo'));
-
-        aba.classList.add('ativa');
-        document.getElementById('painel-' + aba.dataset.metodo).classList.add('ativo');
-    });
-});
-
-// Máscara cartão
-const campoCartao = document.getElementById('numero-cartao');
-if (campoCartao) {
-    campoCartao.addEventListener('input', e => {
-        let v = e.target.value.replace(/\D/g, '').substring(0, 16);
-        e.target.value = v.replace(/(.{4})/g, '$1 ').trim();
-    });
-}
-
-// Máscara validade
-const campoValidade = document.getElementById('validade-cartao');
-if (campoValidade) {
-    campoValidade.addEventListener('input', e => {
-        let v = e.target.value.replace(/\D/g, '').substring(0, 4);
-        if (v.length > 2) v = v.slice(0, 2) + '/' + v.slice(2);
-        e.target.value = v;
-    });
-}
+    window.MP_PUBLIC_KEY = "{{ mp_public_key }}";
+    window.PARCELAS_URL = "{% url 'pedidos:parcelas_cartao' %}";
+    window.TOTAL_GERAL = "{{ total_geral }}";
 </script>
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+<script src="{% static 'pedidos/js/pagamento.js' %}"></script>
 {% endblock %}

@@ -1,3 +1,6 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/components/resumo_pedido.css' %}">
+
 <div class="checkout-resumo">
     <div class="checkout-card">
         <h3 class="checkout-card-titulo">Resumo do pedido</h3>
@@ -21,10 +24,23 @@
 
         <div class="checkout-divider"></div>
 
-        <div class="checkout-linha total">
+        <div class="checkout-linha total" data-total-geral="{{ total_geral }}">
             <span>Total</span>
             <span>R$ {{ total_geral }}</span>
         </div>
+
+        {% if btn_confirmar %}
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn-confirmar">
+                Confirmar pedido
+            </button>
+        </form>
+        <a href="{% url 'ver_carrinho' %}" class="btn-voltar-carrinho">
+            ← Voltar ao carrinho
+        </a>
+        {% endif %}
+
     </div>
 
     <div class="checkout-seguranca">

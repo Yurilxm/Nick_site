@@ -3,7 +3,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-from pedidos.models import Pedido, PedidoItem
 from produtos.models import Produto, GrupoOpcao, Opcao
 from .models import ItemCarrinho
 from .services import obter_carrinho
@@ -25,6 +24,29 @@ def calcular_total_produtos(carrinho):
     )
 
 
+def traduzir_opcoes(itens):
+    """Adiciona opcoes_formatadas em cada item do carrinho."""
+    for item in itens:
+        opcoes_traduzidas = []
+        for chave, valor in item.opcoes.items():
+            if chave == "personalizacao":
+                opcoes_traduzidas.append({
+                    "grupo": "Personalização",
+                    "valores": [valor]
+                })
+                continue
+            try:
+                grupo = GrupoOpcao.objects.get(id=int(chave))
+                opcoes = Opcao.objects.filter(id__in=valor)
+                opcoes_traduzidas.append({
+                    "grupo": grupo.nome,
+                    "valores": [op.nome for op in opcoes]
+                })
+            except (GrupoOpcao.DoesNotExist, ValueError):
+                continue
+        item.opcoes_formatadas = opcoes_traduzidas
+
+
 # ==========================
 # CARRINHO
 # ==========================
@@ -34,9 +56,6 @@ def adicionar_ao_carrinho(request, produto_id):
     carrinho = obter_carrinho(request)
     produto = get_object_or_404(Produto, id=produto_id)
 
-    # ==========================
-    # QUANTIDADE
-    # ==========================
     try:
         quantidade = int(request.POST.get("quantidade", 1))
         if quantidade < 1:
@@ -44,31 +63,19 @@ def adicionar_ao_carrinho(request, produto_id):
     except (ValueError, TypeError):
         quantidade = 1
 
-    # ==========================
-    # PERSONALIZAÇÃO
-    # ==========================
     personalizacao = request.POST.get("personalizacao", "").strip()
 
-    # ==========================
-    # CAPTURAR OPÇÕES
-    # ==========================
     opcoes_escolhidas = {}
-
     for key in request.POST:
         if key.startswith("grupo_"):
             grupo_id = key.replace("grupo_", "")
             valores = request.POST.getlist(key)
-
             if valores:
                 opcoes_escolhidas[grupo_id] = valores
 
-    # adiciona personalização dentro das opções
     if personalizacao:
         opcoes_escolhidas["personalizacao"] = personalizacao
 
-    # ==========================
-    # VERIFICA SE JÁ EXISTE ITEM IGUAL
-    # ==========================
     item = ItemCarrinho.objects.filter(
         carrinho=carrinho,
         produto=produto,
@@ -101,14 +108,13 @@ def remover_do_carrinho(request, item_id):
     item.delete()
     limpar_frete_se_carrinho_vazio(request, carrinho)
 
-    carrinho_vazio = not carrinho.itens.exists()
     total = calcular_total_produtos(carrinho)
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         return JsonResponse({
             "quantidade_total": sum(i.quantidade for i in carrinho.itens.all()),
             "total": float(total),
-            "carrinho_vazio": carrinho_vazio,
+            "carrinho_vazio": not carrinho.itens.exists(),
         })
 
     return redirect("ver_carrinho")
@@ -121,49 +127,20 @@ def ver_carrinho(request):
     if not itens.exists():
         request.session.pop("frete", None)
 
-    # 🔥 TRADUZINDO OPÇÕES
-    for item in itens:
-        opcoes_traduzidas = []
-
-        for chave, valor in item.opcoes.items():
-
-            if chave == "personalizacao":
-                opcoes_traduzidas.append({
-                    "grupo": "Personalização",
-                    "valores": [valor]
-                })
-                continue
-
-            try:
-                grupo = GrupoOpcao.objects.get(id=int(chave))
-                opcoes = Opcao.objects.filter(id__in=valor)
-
-                opcoes_traduzidas.append({
-                    "grupo": grupo.nome,
-                    "valores": [op.nome for op in opcoes]
-                })
-
-            except (GrupoOpcao.DoesNotExist, ValueError):
-                continue
-
-        item.opcoes_formatadas = opcoes_traduzidas
+    traduzir_opcoes(itens)
 
     total_produtos = calcular_total_produtos(carrinho)
-
     frete = request.session.get("frete")
     valor_frete = Decimal(frete["valor"]) if frete else Decimal("0.00")
-
     total_geral = total_produtos + valor_frete
 
-    context = {
+    return render(request, "carrinho/carrinho.html", {
         "carrinho": carrinho,
         "itens": itens,
         "total_produtos": total_produtos,
         "frete": frete,
         "total_geral": total_geral,
-    }
-
-    return render(request, "carrinho/carrinho.html", context)
+    })
 
 
 @require_POST
@@ -176,7 +153,6 @@ def aumentar_quantidade(request, item_id):
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         total = calcular_total_produtos(carrinho)
-
         return JsonResponse({
             "quantidade_item": item.quantidade,
             "subtotal_item": float(item.subtotal),
@@ -204,7 +180,6 @@ def diminuir_quantidade(request, item_id):
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         total = calcular_total_produtos(carrinho)
-
         return JsonResponse({
             "removido": removido,
             "item_id": item_id,
@@ -239,13 +214,12 @@ def mini_carrinho_json(request):
 
 
 # ==========================
-# FRETE (FAKE)
+# FRETE
 # ==========================
 
 @require_POST
 def calcular_frete(request):
     cep = request.POST.get("cep")
-
     frete_valor = Decimal("29.90")
     frete_tipo = "PAC"
 
@@ -266,55 +240,35 @@ def calcular_frete(request):
 
 
 # ==========================
-# FINALIZAR
+# FINALIZAR (CHECKOUT)
 # ==========================
 
 @login_required
 def finalizar_compra(request):
-
     carrinho = obter_carrinho(request)
 
     if not carrinho.itens.exists():
         return redirect("ver_carrinho")
 
     itens = carrinho.itens.select_related("produto")
-
-    # traduz opções (igual ao carrinho)
-    for item in itens:
-        opcoes_traduzidas = []
-
-        for chave, valor in item.opcoes.items():
-
-            if chave == "personalizacao":
-                opcoes_traduzidas.append({
-                    "grupo": "Personalização",
-                    "valores": [valor]
-                })
-                continue
-
-            try:
-                grupo = GrupoOpcao.objects.get(id=int(chave))
-                opcoes = Opcao.objects.filter(id__in=valor)
-
-                opcoes_traduzidas.append({
-                    "grupo": grupo.nome,
-                    "valores": [op.nome for op in opcoes]
-                })
-
-            except (GrupoOpcao.DoesNotExist, ValueError):
-                continue
-
-        item.opcoes_formatadas = opcoes_traduzidas
+    traduzir_opcoes(itens)
 
     total_produtos = calcular_total_produtos(carrinho)
-
     frete = request.session.get("frete")
     valor_frete = Decimal(frete["valor"]) if frete else Decimal("0.00")
-
     total_geral = total_produtos + valor_frete
 
+    if request.method == "POST":
+        # Salva resumo na sessão para a view de pagamento exibir
+        request.session["resumo_checkout"] = {
+            "total_produtos": str(total_produtos),
+            "valor_frete": str(valor_frete),
+            "total_geral": str(total_geral),
+            "frete": frete,
+        }
+        return redirect("pedidos:pagamento")
+
     return render(request, "carrinho/checkout.html", {
-        "carrinho": carrinho,
         "itens": itens,
         "total_produtos": total_produtos,
         "frete": frete,

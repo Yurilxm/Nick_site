@@ -1,130 +1,109 @@
+from decimal import Decimal
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.http import JsonResponse
 from carrinho.services import obter_carrinho
 from .models import Pedido
 from pedidos.services.pedido_service import criar_pedido
-from pedidos.services.pagamento_service import (criar_pagamento_pix, criar_pagamento_boleto, criar_pagamento_cartao)
+from pedidos.services.pagamento_service import (criar_pagamento_pix, criar_pagamento_boleto, criar_pagamento_cartao,)
 from pedidos.services.antifraude_service import validar_pedido
-from django.http import JsonResponse
 from pedidos.services.parcelamento_service import obter_parcelas
 
 
 @login_required
 def pagamento(request):
-
     carrinho = obter_carrinho(request)
 
     if not carrinho.itens.exists():
         return redirect("ver_carrinho")
 
-    frete = request.session.get("frete", 0)
+    resumo = request.session.get("resumo_checkout", {})
+    frete = resumo.get("frete") or request.session.get("frete")
+    total_produtos = Decimal(resumo.get("total_produtos", "0"))
+    valor_frete = Decimal(resumo.get("valor_frete", "0"))
+    total_geral = Decimal(resumo.get("total_geral", "0"))
 
     if request.method == "POST":
-
         metodo = request.POST.get("metodo")
+        frete_sessao = request.session.get("frete") or {}
 
-        pedido = criar_pedido(request.user, carrinho, frete)
-
+        pedido = criar_pedido(request.user, carrinho, frete_sessao)
         pedido.status = "aguardando_pagamento"
         pedido.save()
 
         if not validar_pedido(pedido):
-
             pedido.status = "cancelado"
             pedido.save()
-
-            return redirect("loja")
+            # Limpa sessão mas NÃO limpa carrinho — pedido foi cancelado
+            request.session.pop("resumo_checkout", None)
+            return redirect("home")
 
         if metodo == "pix":
-
-            pagamento = criar_pagamento_pix(pedido)
-
-            return render(
-                request,
-                "pedidos/pagamentos/pix.html",
-                {
-                    "pedido": pedido,
-                    "pagamento": pagamento,
-                }
-            )
+            pagamento_obj = criar_pagamento_pix(pedido)
+            # Limpa sessão após criar pedido com sucesso
+            request.session.pop("resumo_checkout", None)
+            request.session.pop("frete", None)
+            return render(request, "pedidos/pagamentos/pix.html", {
+                "pedido": pedido,
+                "pagamento": pagamento_obj,
+            })
 
         if metodo == "boleto":
-
-            pagamento = criar_pagamento_boleto(pedido)
-
-            return redirect(pagamento.boleto_url)
+            pagamento_obj = criar_pagamento_boleto(pedido)
+            request.session.pop("resumo_checkout", None)
+            request.session.pop("frete", None)
+            return redirect(pagamento_obj.boleto_url)
 
         if metodo == "cartao":
+            token = request.POST.get("card_token")
+            parcelas = request.POST.get("parcelas", "1")
 
-            token = request.POST.get("token")
-            parcelas = request.POST.get("parcelas")
+            pagamento_obj = criar_pagamento_cartao(pedido, token, parcelas)
 
-            pagamento = criar_pagamento_cartao(
-                pedido,
-                token,
-                parcelas
-            )
-
-            if pagamento.status == "aprovado":
-
+            if pagamento_obj.status == "aprovado":
                 pedido.status = "pago"
                 pedido.save()
+                request.session.pop("resumo_checkout", None)
+                request.session.pop("frete", None)
+                return redirect("pedidos:pedido_confirmado", pedido_id=pedido.id)
 
-                return redirect(
-                    "pedidos:pedido_confirmado",
-                    pedido_id=pedido.id
-                )
-
+            # Cartão recusado — mantém carrinho e sessão intactos
             pedido.status = "aguardando_pagamento"
             pedido.save()
-
             return redirect("pedidos:pagamento")
 
-    return render(
-        request,
-        "pedidos/pagamento.html"
-    )
+    return render(request, "pedidos/pagamento.html", {
+        "total_produtos": total_produtos,
+        "frete": frete,
+        "total_geral": total_geral,
+        "mp_public_key": settings.MERCADOPAGO_PUBLIC_KEY,
+    })
 
 
 @login_required
 def pedido_confirmado(request, pedido_id):
+    pedido = get_object_or_404(Pedido, id=pedido_id, usuario=request.user)
+    return render(request, "pedidos/pedido_confirmado.html", {"pedido": pedido})
 
-    pedido = get_object_or_404(
-        Pedido,
-        id=pedido_id,
-        usuario=request.user
-    )
 
-    return render(
-        request,
-        "pedidos/pedido_confirmado.html",
-        {
-            "pedido": pedido
-        }
-    )
+@login_required
+def verificar_pagamento(request, pedido_id):
+    """Polling do pix.js — verifica se o pedido foi pago."""
+    pedido = get_object_or_404(Pedido, id=pedido_id, usuario=request.user)
+    return JsonResponse({"pago": pedido.status == "pago"})
 
 
 def parcelas_cartao(request):
-
     valor = request.GET.get("valor", 0)
     bandeira = request.GET.get("bandeira", "")
-
     parcelas = obter_parcelas(valor, bandeira)
-
     return JsonResponse(parcelas, safe=False)
 
 
 @login_required
 def meus_pedidos(request):
-
     pedidos = Pedido.objects.filter(
         usuario=request.user
-    ).select_related("usuario").order_by("-criado_em")
-
-    return render(
-        request,
-        "pedidos/meus_pedidos.html",
-        {
-            "pedidos": pedidos
-        }
-    )
+    ).order_by("-criado_em")
+    return render(request, "pedidos/meus_pedidos.html", {"pedidos": pedidos})

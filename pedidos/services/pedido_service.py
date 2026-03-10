@@ -8,16 +8,16 @@ def criar_pedido(usuario, carrinho, frete):
     pedido = Pedido.objects.create(
         usuario=usuario,
         total=total,
-        cep_entrega=frete["cep"]
+        cep_entrega=frete["cep"] if frete else ""
     )
 
     for item in carrinho.itens.all():
-
         PedidoItem.objects.create(
             pedido=pedido,
             produto=item.produto,
             quantidade=item.quantidade,
-            preco_unitario=item.preco_unitario
+            preco_unitario=item.preco_unitario,
+            opcoes=item.opcoes or {}
         )
 
     return pedido

@@ -155,12 +155,16 @@
 /* ====================================
    FORMULÁRIO CARTÃO
 ==================================== */
-.pagamento-form { display: flex; flex-direction: column; gap: 16px; }
+.pagamento-form { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 20px; }
 
 .campo-grupo {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    padding: 0 4px;
 }
 
 .campo-label {
@@ -169,6 +173,8 @@
     color: var(--text-mid);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    margin-top: 6px;
+    margin-left: 4px;
 }
 
 .campo-input {
@@ -289,6 +295,7 @@
     background: linear-gradient(135deg, var(--baby-pink), var(--baby-lilac));
     color: white;
     box-shadow: 0 4px 16px rgba(255,133,161,0.3);
+    margin-top: 10px;
 }
 
 .btn-cartao:hover { box-shadow: 0 8px 24px rgba(255,133,161,0.4); }

@@ -57,20 +57,9 @@
             </div>
         </div>
 
-        <!-- RESUMO + BOTÕES -->
+        <!-- RESUMO COM BOTÕES -->
         <div class="checkout-resumo">
-            {% include "components/resumo_pedido.html" %}
-
-            <form method="post">
-                {% csrf_token %}
-                <button type="submit" class="btn-confirmar">
-                    Confirmar pedido
-                </button>
-            </form>
-
-            <a href="{% url 'ver_carrinho' %}" class="btn-voltar-carrinho">
-                ← Voltar ao carrinho
-            </a>
+            {% include "components/resumo_pedido.html" with btn_confirmar=True %}
         </div>
 
     </div>
