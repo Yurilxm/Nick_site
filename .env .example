@@ -1,0 +1,10 @@
+# Configuração de e-mail
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=seu_email_aqui
+EMAIL_HOST_PASSWORD=sua_senha_aqui
+
+# Configuração Mercado Pago
+MERCADO_PAGO_ACCESS_TOKEN=seu_access_token_aqui
+MERCADO_PAGO_PUBLIC_KEY=seu_public_key_aqui

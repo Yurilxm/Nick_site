@@ -77,7 +77,7 @@ def pagamento(request):
         "total_produtos": total_produtos,
         "frete": frete,
         "total_geral": total_geral,
-        "mp_public_key": settings.MERCADOPAGO_PUBLIC_KEY,
+        "mp_public_key": settings.MERCADO_PAGO_PUBLIC_KEY,
     })
 
 

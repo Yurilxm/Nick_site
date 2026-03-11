@@ -5,7 +5,7 @@ from django.conf import settings
 from carrinho.models import Carrinho
 from pedidos.models import Pagamento
 
-sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
+sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
 
 
 def webhook_mercadopago(request):
