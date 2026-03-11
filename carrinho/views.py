@@ -196,20 +196,31 @@ def mini_carrinho_json(request):
     carrinho = obter_carrinho(request)
     itens = carrinho.itens.select_related("produto")
 
+    traduzir_opcoes(itens)
+
+    lista_itens = []
+
+    for item in itens:
+        opcao_principal = None
+
+        if hasattr(item, "opcoes_formatadas") and item.opcoes_formatadas:
+            opc = item.opcoes_formatadas[0]
+            opcao_principal = f"{opc['grupo']}: {', '.join(opc['valores'])}"
+
+        lista_itens.append({
+            "id": item.id,
+            "nome": item.produto.nome,
+            "quantidade": item.quantidade,
+            "preco": float(item.preco_unitario),
+            "imagem": item.produto.imagem.url if item.produto.imagem else "",
+            "url": item.produto.get_absolute_url(),
+            "opcao": opcao_principal
+        })
+
     return JsonResponse({
         "quantidade_total": sum(item.quantidade for item in itens),
         "total": float(calcular_total_produtos(carrinho)),
-        "itens": [
-            {
-                "id": item.id,
-                "nome": item.produto.nome,
-                "quantidade": item.quantidade,
-                "preco": float(item.preco_unitario),
-                "imagem": item.produto.imagem.url if item.produto.imagem else "",
-                "url": item.produto.get_absolute_url(),
-            }
-            for item in itens
-        ]
+        "itens": lista_itens
     })
 
 

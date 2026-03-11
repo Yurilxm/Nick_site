@@ -1,0 +1,257 @@
+.meus-pedidos-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+.mp-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.mp-titulo {
+  font-family: 'Pacifico', cursive;
+  font-size: 2.4rem;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+}
+
+.mp-subtitulo {
+  color: var(--text-mid);
+  font-size: 1rem;
+}
+
+.pedido-card {
+  background: var(--bg-card);
+  border-radius: 20px;
+  border: 1.5px solid #f0e0f5;
+  box-shadow: 0 4px 18px rgba(180, 130, 200, 0.08);
+  margin-bottom: 24px;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+
+.pedido-card:hover {
+  box-shadow: 0 8px 28px rgba(180, 130, 200, 0.15);
+}
+
+.pedido-cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #fff0f8 0%, #f5f0ff 100%);
+  border-bottom: 1.5px solid #f0e0f5;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pedido-info-esq {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pedido-numero {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--text-dark);
+}
+
+.pedido-data {
+  font-size: 0.85rem;
+  color: var(--text-mid);
+}
+
+.pedido-info-dir {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pedido-total {
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--text-dark);
+}
+
+/* Status badges */
+.pedido-status {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.status-pago {
+  background: #e6f9f0;
+  color: #2d8a5e;
+}
+
+.status-enviado {
+  background: #e8f0ff;
+  color: #3a5fb5;
+}
+
+.status-entregue {
+  background: #f0e8ff;
+  color: #7a4cc0;
+}
+
+.status-aguardando_pagamento {
+  background: #fff8e0;
+  color: #a07020;
+}
+
+.status-cancelado {
+  background: #fff0f0;
+  color: #c05050;
+}
+
+.pedido-itens {
+  padding: 8px 0;
+}
+
+.pedido-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+  border-bottom: 1px solid #f5eef8;
+}
+
+.pedido-item:last-child {
+  border-bottom: none;
+}
+
+.item-img-wrap {
+  flex-shrink: 0;
+}
+
+.item-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1.5px solid #f0e0f5;
+}
+
+.item-img-placeholder {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ffd6e7, #e8d5f5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+}
+
+.item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.item-nome {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+}
+
+.item-opcoes {
+  font-size: 0.8rem;
+  color: var(--text-mid);
+}
+
+.item-qtd {
+  font-size: 0.8rem;
+  color: var(--text-mid);
+}
+
+.item-preco {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  white-space: nowrap;
+}
+
+.pedido-rodape {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background: #fdf8ff;
+  border-top: 1.5px solid #f0e0f5;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pedido-endereco {
+  font-size: 0.85rem;
+  color: var(--text-mid);
+}
+
+.pedido-total-final {
+  font-size: 0.95rem;
+  color: var(--text-dark);
+}
+
+.pedido-total-final strong {
+  color: var(--pink-mid);
+}
+
+/* Estado vazio */
+.pedidos-vazio {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.vazio-icone {
+  font-size: 4rem;
+  margin-bottom: 16px;
+}
+
+.vazio-titulo {
+  font-family: 'Pacifico', cursive;
+  font-size: 1.8rem;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+}
+
+.vazio-texto {
+  color: var(--text-mid);
+  margin-bottom: 28px;
+}
+
+.btn-explorar {
+  display: inline-block;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--baby-pink), var(--baby-lilac));
+  color: var(--text-dark);
+  border-radius: 30px;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.btn-explorar:hover {
+  box-shadow: 0 6px 20px rgba(180, 130, 200, 0.3);
+  transform: translateY(-2px);
+  color: var(--text-dark);
+  text-decoration: none;
+}
+
+
+@media (max-width: 600px) {
+  .mp-titulo { font-size: 1.8rem; }
+  .pedido-cabecalho { padding: 12px 16px; }
+  .pedido-item { padding: 10px 16px; gap: 12px; }
+  .pedido-rodape { padding: 10px 16px; }
+  .item-img, .item-img-placeholder { width: 48px; height: 48px; }
+}

@@ -278,3 +278,8 @@ def search_products_view(request):
     ]
 
     return JsonResponse({'results': results})
+
+
+
+def sobre_view(request):
+    return render(request, 'marketing/sobre.html')

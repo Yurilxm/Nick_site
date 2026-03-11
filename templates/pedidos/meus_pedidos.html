@@ -1,25 +1,91 @@
-<h1>Meus pedidos</h1>
+{% extends "base.html" %}
+{% load static %}
 
-{% for pedido in pedidos %}
+{% block title %}Meus Pedidos — Nick Brindes{% endblock %}
 
-<div>
+{% block content %}
+<div class="meus-pedidos-page">
 
-<h3>Pedido #{{ pedido.id }}</h3>
+  <div class="mp-header">
+    <h1 class="mp-titulo">Meus Pedidos</h1>
+    <p class="mp-subtitulo">Acompanhe tudo que você já pediu 🎀</p>
+  </div>
 
-<p>Status: {{ pedido.status }}</p>
+  {% if pedidos %}
+    <div class="pedidos-lista">
+      {% for pedido in pedidos %}
+      <div class="pedido-card">
 
-<p>Total: R$ {{ pedido.total }}</p>
+        <!-- Cabeçalho do pedido -->
+        <div class="pedido-cabecalho">
+          <div class="pedido-info-esq">
+            <span class="pedido-numero">#{{ pedido.id }}</span>
+            <span class="pedido-data">{{ pedido.criado_em|date:"d/m/Y" }}</span>
+          </div>
+          <div class="pedido-info-dir">
+            <span class="pedido-status status-{{ pedido.status }}">
+              {% if pedido.status == "pago" %}✅ Pago
+              {% elif pedido.status == "enviado" %}📦 Enviado
+              {% elif pedido.status == "entregue" %}🎉 Entregue
+              {% elif pedido.status == "aguardando_pagamento" %}⏳ Aguardando Pagamento
+              {% elif pedido.status == "cancelado" %}❌ Cancelado
+              {% else %}{{ pedido.status }}
+              {% endif %}
+            </span>
+            <span class="pedido-total">R$ {{ pedido.total|floatformat:2 }}</span>
+          </div>
+        </div>
 
-<a href="{% url 'pedidos:pedido_confirmado' pedido.id %}">
-Ver detalhes
-</a>
+        <!-- Itens do pedido -->
+        <div class="pedido-itens">
+          {% for item in pedido.itens.all %}
+          <div class="pedido-item">
+            <div class="item-img-wrap">
+              {% if item.produto.imagens.first %}
+                <img src="{{ item.produto.imagens.first.imagem.url }}" alt="{{ item.produto.nome }}" class="item-img">
+              {% else %}
+                <div class="item-img-placeholder">🎁</div>
+              {% endif %}
+            </div>
+            <div class="item-info">
+              <span class="item-nome">{{ item.produto.nome }}</span>
+              {% if item.opcoes %}
+                <span class="item-opcoes">
+                  {% for chave, valor in item.opcoes.items %}
+                    {{ chave }}: {{ valor }}{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
+                </span>
+              {% endif %}
+              <span class="item-qtd">Qtd: {{ item.quantidade }}</span>
+            </div>
+            <div class="item-preco">
+              R$ {{ item.preco_unitario|floatformat:2 }}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Rodapé do pedido -->
+        <div class="pedido-rodape">
+          {% if pedido.cep_entrega %}
+          <span class="pedido-endereco">📍 CEP {{ pedido.cep_entrega }}</span>
+          {% endif %}
+          <span class="pedido-total-final">Total: <strong>R$ {{ pedido.total|floatformat:2 }}</strong></span>
+        </div>
+
+      </div>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <!-- Estado vazio -->
+    <div class="pedidos-vazio">
+      <div class="vazio-icone">🛍️</div>
+      <h2 class="vazio-titulo">Nenhum pedido ainda</h2>
+      <p class="vazio-texto">Você ainda não fez nenhum pedido. Que tal começar agora?</p>
+      <a href="{% url 'lista_produtos' %}" class="btn-explorar">Ver produtos</a>
+    </div>
+  {% endif %}
 
 </div>
-
-<hr>
-
-{% empty %}
-
-<p>Você ainda não fez pedidos.</p>
-
-{% endfor %}
+{% endblock %}

@@ -1,0 +1,79 @@
+body.pagina-produtos {
+  min-height: 100vh;
+  background: linear-gradient(
+    135deg,
+    #fce4f3,
+    #ead5f5,
+    #d0eeff,
+    #ffd6e8,
+    #cdb4db,
+    #bde0fe
+  );
+  background-size: 400% 400%;
+  animation: gradientFlow 16s ease infinite;
+}
+
+@keyframes gradientFlow {
+  0%   { background-position: 0% 50%; }
+  33%  { background-position: 100% 50%; }
+  66%  { background-position: 50% 0%; }
+  100% { background-position: 0% 50%; }
+}
+
+.bg-emojis {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.bg-emojis span {
+  position: absolute;
+  bottom: -60px;
+  font-size: 20px;
+  opacity: 0;
+  user-select: none;
+  animation: floatEmoji linear infinite;
+  /* variáveis CSS para o parallax do mouse */
+  --mx: 0px;
+  --my: 0px;
+}
+
+/* Posição e tamanho de cada emoji */
+.bg-emojis span:nth-child(1)  { left: 4%;  font-size: 18px; animation-duration: 12s; animation-delay: 0s;   }
+.bg-emojis span:nth-child(2)  { left: 12%; font-size: 22px; animation-duration: 16s; animation-delay: 3s;   }
+.bg-emojis span:nth-child(3)  { left: 22%; font-size: 16px; animation-duration: 11s; animation-delay: 6s;   }
+.bg-emojis span:nth-child(4)  { left: 33%; font-size: 20px; animation-duration: 14s; animation-delay: 1s;   }
+.bg-emojis span:nth-child(5)  { left: 44%; font-size: 18px; animation-duration: 13s; animation-delay: 4s;   }
+.bg-emojis span:nth-child(6)  { left: 55%; font-size: 24px; animation-duration: 17s; animation-delay: 2s;   }
+.bg-emojis span:nth-child(7)  { left: 65%; font-size: 16px; animation-duration: 10s; animation-delay: 7s;   }
+.bg-emojis span:nth-child(8)  { left: 75%; font-size: 20px; animation-duration: 15s; animation-delay: 0.5s; }
+.bg-emojis span:nth-child(9)  { left: 85%; font-size: 18px; animation-duration: 12s; animation-delay: 5s;   }
+.bg-emojis span:nth-child(10) { left: 93%; font-size: 22px; animation-duration: 14s; animation-delay: 2.5s; }
+.bg-emojis span:nth-child(11) { left: 8%;  font-size: 20px; animation-duration: 18s; animation-delay: 8s;   }
+.bg-emojis span:nth-child(12) { left: 60%; font-size: 17px; animation-duration: 13s; animation-delay: 1.5s; }
+
+/* Animação de subida — usa variáveis CSS para parallax */
+@keyframes floatEmoji {
+  0% {
+    transform: translate(var(--mx), calc(0px + var(--my))) rotate(0deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.18;
+  }
+  92% {
+    opacity: 0.18;
+  }
+  100% {
+    transform: translate(var(--mx), calc(-105vh + var(--my))) rotate(25deg);
+    opacity: 0;
+  }
+}
+
+/* Garante que o conteúdo da página fica acima dos emojis */
+.site-content > * {
+  position: relative;
+  z-index: 1;
+}

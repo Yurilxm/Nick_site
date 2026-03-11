@@ -30,12 +30,14 @@
 
     <link rel="stylesheet" href="{% static 'css/checkout_etapas.css' %}">
     <link rel="stylesheet" href="{% static 'produtos/css/detalhe_produto.css' %}">
+    <link rel="stylesheet" href="{% static 'marketing/css/sobre.css' %}">
+    <link rel="stylesheet" href="{% static 'pedidos/css/meus_pedidos.css' %}">
     
 
     {% block css %}
     {% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
 
     {% if messages %}
     <div class="toast-container">

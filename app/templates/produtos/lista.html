@@ -1,9 +1,18 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block body_class %}pagina-produtos{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/fundo_produtos.css' %}">
+{% endblock %}
+
+
 {% block content %}
 
 <section class="produtos-section">
+
+{% include "include/fundo_produtos.html" %}
 
     <div class="categoria-header">
         {% if categoria %}
@@ -35,5 +44,9 @@
     {% endif %}
 
 </section>
+
+{% block scripts %}
+<script src="{% static 'js/fundo_produtos.js' %}"></script>
+{% endblock %}
 
 {% endblock %}

@@ -92,9 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function atualizarMiniatura(){
-
         miniaturas.forEach(m => m.classList.remove("ativa"));
-
         miniaturas[indiceAtual].classList.add("ativa");
 
     }
@@ -104,15 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // =============================
 
     miniaturas.forEach((miniatura, index)=>{
-
         miniatura.addEventListener("click", ()=>{
-
-            trocarImagem(index);
-
-        });
-
-        miniatura.addEventListener("mouseenter", ()=>{
-
             trocarImagem(index);
 
         });
@@ -124,9 +114,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // =============================
 
     imagemPrincipal.addEventListener("click", ()=>{
-
         modal.style.display = "flex";
-
         modalImg.src = imagens[indiceAtual];
 
     });
@@ -136,7 +124,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // =============================
 
     fechar.onclick = ()=> modal.style.display = "none";
-
     modal.onclick = (e)=>{
 
         if(e.target === modal){

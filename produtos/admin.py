@@ -5,6 +5,7 @@ from django.forms.models import BaseInlineFormSet
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from .models import Produto, Categoria, ProdutoImagem, GrupoOpcao, Opcao
+from adminsortable2.admin import SortableAdminBase, SortableAdminMixin
 
 
 # =====================================================
@@ -195,13 +196,16 @@ class ProdutoAdmin(admin.ModelAdmin):
 
 
 @admin.register(Categoria)
-class CategoriaAdmin(admin.ModelAdmin):
+class CategoriaAdmin(SortableAdminMixin, SortableAdminBase, admin.ModelAdmin):
 
     actions = None
 
     prepopulated_fields = {"slug": ("nome",)}
-    list_display = ("nome", "slug", "acoes")
-    ordering = ("nome",)
+    list_display = ("nome", "slug", "ordem", "acoes")
+    ordering = ("ordem",)
+    list_display_links = ("nome",)
+    sortable_field_name = "ordem"
+    exclude = ("ordem",)
 
     def acoes(self, obj):
         return action_buttons(obj, "produtos", "categoria")

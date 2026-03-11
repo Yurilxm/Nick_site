@@ -91,6 +91,9 @@ function atualizarMiniCarrinho() {
           ${item.imagem ? `<img src="${item.imagem}" class="item-carrinho-img" alt="${item.nome}">` : ''}
           <div class="item-carrinho-info">
             <strong>${item.nome}</strong>
+
+            ${item.opcao ? `<div class="mini-opcao">${item.opcao}</div>` : ''}
+
             <span>${item.quantidade} x R$ ${item.preco.toFixed(2)}</span>
           </div>
           <button class="btn-remover-mini" data-item-id="${item.id}" aria-label="Remover item">×</button>

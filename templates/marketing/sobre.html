@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Sobre — Nick Brindes{% endblock %}
+
+
+{% block content %}
+<div class="sobre-page">
+
+  <!-- HERO -->
+  <section class="sobre-hero">
+    <div class="hero-bolha hero-bolha-1"></div>
+    <div class="hero-bolha hero-bolha-2"></div>
+    <div class="hero-bolha hero-bolha-3"></div>
+    <div class="hero-content">
+      <h1 class="hero-titulo">Feito com carinho,<br>entregue com amor 🎀</h1>
+      <p class="hero-texto">
+        A Nick Brindes nasceu da vontade de tornar cada presente especial.
+        Aqui você encontra brindes personalizados, embalagens lindas e um atendimento que parece de amiga.
+      </p>
+    </div>
+  </section>
+
+  <!-- HISTÓRIA -->
+  <section class="sobre-historia">
+    <div class="historia-inner">
+      <div class="historia-texto">
+        <h2 class="secao-titulo">Nossa história</h2>
+        <p>
+          Tudo começou com uma ideia simples: presentear de verdade. Sem aquele presente genérico,
+          sem aquela embalagem sem graça. A gente acredita que cada detalhe conta — desde o laço
+          até o bilhetinho escrito à mão.
+        </p>
+        <p>
+          Cada pedido é preparado com atenção e cuidado, como se fosse para alguém da nossa família.
+          Porque no final, é isso que faz a diferença.
+        </p>
+        <div class="historia-numeros">
+          <div class="numero-item">
+            <span class="numero-valor">500+</span>
+            <span class="numero-label">Pedidos entregues</span>
+          </div>
+          <div class="numero-item">
+            <span class="numero-valor">100%</span>
+            <span class="numero-label">Feito com amor</span>
+          </div>
+          <div class="numero-item">
+            <span class="numero-valor">⭐ 5.0</span>
+            <span class="numero-label">Avaliação média</span>
+          </div>
+        </div>
+      </div>
+      <div class="historia-img-wrap">
+        <div class="historia-img-placeholder">
+          <span>📸</span>
+          <small>Foto da loja / equipe</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOTOS DE ENTREGAS -->
+  <section class="sobre-fotos">
+    <h2 class="secao-titulo text-center">Cada entrega, uma alegria 📦</h2>
+    <p class="secao-sub text-center">Olha como chegam os pedidos dos nossos clientes</p>
+
+    <div class="fotos-grid">
+      {% if fotos_entrega %}
+        {% for foto in fotos_entrega %}
+        <div class="foto-item">
+          <img src="{{ foto.imagem.url }}" alt="{{ foto.descricao }}" loading="lazy">
+          {% if foto.descricao %}
+          <div class="foto-legenda">{{ foto.descricao }}</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      {% else %}
+        <!-- Placeholders enquanto não há fotos cadastradas -->
+        {% for i in "123456" %}
+        <div class="foto-item foto-placeholder">
+          <div class="placeholder-inner">
+            <span>🎁</span>
+          </div>
+        </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- DEPOIMENTOS -->
+  <section class="sobre-depoimentos">
+    <h2 class="secao-titulo text-center">O que nossos clientes dizem 💬</h2>
+    <p class="secao-sub text-center">Nada melhor do que a opinião de quem já recebeu em casa</p>
+
+    <div class="depoimentos-grid">
+      {% if depoimentos %}
+        {% for dep in depoimentos %}
+        <div class="depoimento-card">
+          <div class="dep-estrelas">
+            {% for i in "12345" %}⭐{% endfor %}
+          </div>
+          <p class="dep-texto">"{{ dep.texto }}"</p>
+          <div class="dep-autor">
+            <div class="dep-avatar">{{ dep.nome|slice:":1"|upper }}</div>
+            <div class="dep-info">
+              <span class="dep-nome">{{ dep.nome }}</span>
+              {% if dep.produto %}
+              <span class="dep-produto">{{ dep.produto }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <!-- Depoimentos de exemplo enquanto não há cadastrados -->
+        <div class="depoimento-card">
+          <div class="dep-estrelas">⭐⭐⭐⭐⭐</div>
+          <p class="dep-texto">"Chegou muito bem embalado e super rápido! Minha filha amou o presente, ficou perfeito. Com certeza vou comprar de novo!"</p>
+          <div class="dep-autor">
+            <div class="dep-avatar">A</div>
+            <div class="dep-info">
+              <span class="dep-nome">Ana Paula</span>
+              <span class="dep-produto">Kit presente personalizado</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="depoimento-card">
+          <div class="dep-estrelas">⭐⭐⭐⭐⭐</div>
+          <p class="dep-texto">"Atendimento incrível, tirei todas as dúvidas pelo WhatsApp e o produto veio exatamente como na foto. Recomendo demais!"</p>
+          <div class="dep-autor">
+            <div class="dep-avatar">M</div>
+            <div class="dep-info">
+              <span class="dep-nome">Mariana</span>
+              <span class="dep-produto">Brinde corporativo</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="depoimento-card">
+          <div class="dep-estrelas">⭐⭐⭐⭐⭐</div>
+          <p class="dep-texto">"Já é a terceira vez que compro aqui. Qualidade e carinho em cada detalhe. O laço na embalagem é um charme à parte!"</p>
+          <div class="dep-autor">
+            <div class="dep-avatar">C</div>
+            <div class="dep-info">
+              <span class="dep-nome">Camila</span>
+              <span class="dep-produto">Caixa surpresa</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="depoimento-card">
+          <div class="dep-estrelas">⭐⭐⭐⭐⭐</div>
+          <p class="dep-texto">"Presentei minha mãe no dia das mães e ela ficou emocionada. A embalagem é muito linda e o produto de ótima qualidade!"</p>
+          <div class="dep-autor">
+            <div class="dep-avatar">J</div>
+            <div class="dep-info">
+              <span class="dep-nome">Julia</span>
+              <span class="dep-produto">Kit dia das mães</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="depoimento-card">
+          <div class="dep-estrelas">⭐⭐⭐⭐⭐</div>
+          <p class="dep-texto">"Entrega super cuidadosa, produto idêntico ao anunciado. Preço justo e atendimento humanizado. Adorei a experiência!"</p>
+          <div class="dep-autor">
+            <div class="dep-avatar">F</div>
+            <div class="dep-info">
+              <span class="dep-nome">Fernanda</span>
+              <span class="dep-produto">Caneca personalizada</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="depoimento-card">
+          <div class="dep-estrelas">⭐⭐⭐⭐⭐</div>
+          <p class="dep-texto">"Comprei para o aniversário da minha namorada e ela amou! Chegou antes do prazo e a embalagem estava impecável. Nota 10!"</p>
+          <div class="dep-autor">
+            <div class="dep-avatar">R</div>
+            <div class="dep-info">
+              <span class="dep-nome">Rafael</span>
+              <span class="dep-produto">Presente personalizado</span>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- CONTATO / REDES -->
+  <section class="sobre-contato">
+    <div class="contato-inner">
+      <h2 class="secao-titulo text-center">Fale com a gente 💌</h2>
+      <p class="secao-sub text-center">Estamos por aqui para te ajudar a encontrar o presente perfeito</p>
+
+      <div class="contato-cards">
+
+        <a href="https://wa.me/55SEUNUMERO" target="_blank" class="contato-card contato-wpp">
+          <div class="contato-icone">📱</div>
+          <div class="contato-info">
+            <span class="contato-label">WhatsApp</span>
+            <span class="contato-valor">(XX) XXXXX-XXXX</span>
+          </div>
+        </a>
+
+        <a href="https://instagram.com/SEUPERFIL" target="_blank" class="contato-card contato-insta">
+          <div class="contato-icone">📷</div>
+          <div class="contato-info">
+            <span class="contato-label">Instagram</span>
+            <span class="contato-valor">@nickbrindes</span>
+          </div>
+        </a>
+
+        <a href="mailto:contato@nickbrindes.com" class="contato-card contato-email">
+          <div class="contato-icone">✉️</div>
+          <div class="contato-info">
+            <span class="contato-label">E-mail</span>
+            <span class="contato-valor">contato@nickbrindes.com</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

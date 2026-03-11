@@ -1,8 +1,6 @@
 import mercadopago
 from django.conf import settings
 
-print("TOKEN CARREGADO:", settings.MERCADO_PAGO_ACCESS_TOKEN[:20])
-
 sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
 
 class MercadoPagoGateway:

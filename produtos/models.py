@@ -115,16 +115,18 @@ class Opcao(models.Model):
 class Categoria(models.Model):
     nome = models.CharField(max_length=50, unique=True)
     slug = models.SlugField(max_length=60, unique=True, blank=True)
+    ordem = models.PositiveIntegerField(default=0)
 
     class Meta:
         verbose_name_plural = "Categorias"
+        ordering = ["ordem"]
 
     def __str__(self):
         return self.nome
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = self.nome.lower().replace(" ", "-")
+            self.slug = slugify(self.nome)
         super().save(*args, **kwargs)
 
 
