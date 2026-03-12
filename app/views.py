@@ -273,6 +273,7 @@ def search_products_view(request):
             'slug': produto.slug,
             'imagem': produto.imagem.url if produto.imagem else '',
             'preco': str(produto.preco),
+            'selo': produto.selo or '',
         }
         for produto in produtos
     ]

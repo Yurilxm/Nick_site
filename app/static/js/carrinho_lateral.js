@@ -16,7 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.classList.remove("no-scroll");
   }
 
-  // Expoe globalmente para o toast chamar
   window.abrirCarrinho = abrirCarrinho;
   window.atualizarMiniCarrinho = atualizarMiniCarrinho;
 
@@ -46,9 +45,9 @@ const csrfToken = document
 function atualizarBadge(qtd) {
   const badge = document.getElementById("badge-carrinho");
   if (!badge) return;
-
   badge.innerText = qtd;
-  badge.style.display = qtd > 0 ? "inline-block" : "none";
+  badge.classList.toggle("visivel", qtd > 0);
+  badge.style.display = qtd > 0 ? "flex" : "none";
 }
 
 /* =========================
@@ -66,39 +65,33 @@ function atualizarMiniCarrinho() {
 
       if (!lista || !totalEl) return;
 
-      // 🔥 LIMPA A LISTA COMPLETAMENTE
       lista.innerHTML = "";
 
       if (data.itens.length === 0) {
-        // CARRINHO VAZIO
         lista.innerHTML = "<p>Seu carrinho está vazio.</p>";
         totalEl.innerText = "0,00";
         if (finais) finais.style.display = "none";
         return;
       }
 
-      // 🔥 CARRINHO COM ITENS - MOSTRA RODAPÉ
       if (finais) finais.style.display = "block";
 
-      // 🔥 ADICIONA OS ITENS
       data.itens.forEach((item) => {
         const li = document.createElement("li");
         li.className = "item-carrinho clicavel";
         li.dataset.itemId = item.id;
         li.dataset.url = item.url;
-        
+
         li.innerHTML = `
-          ${item.imagem ? `<img src="${item.imagem}" class="item-carrinho-img" alt="${item.nome}">` : ''}
+          ${item.imagem ? `<img src="${item.imagem}" class="item-carrinho-img" alt="${item.nome}">` : ""}
           <div class="item-carrinho-info">
             <strong>${item.nome}</strong>
-
-            ${item.opcao ? `<div class="mini-opcao">${item.opcao}</div>` : ''}
-
+            ${item.opcao ? `<div class="mini-opcao">${item.opcao}</div>` : ""}
             <span>${item.quantidade} x R$ ${item.preco.toFixed(2)}</span>
           </div>
           <button class="btn-remover-mini" data-item-id="${item.id}" aria-label="Remover item">×</button>
         `;
-        
+
         lista.appendChild(li);
       });
 
@@ -108,7 +101,56 @@ function atualizarMiniCarrinho() {
 }
 
 /* =========================
-   REMOVER ITEM (DELEGACAO)
+   ATUALIZA PÁGINA CARRINHO VIA AJAX
+   (sem recarregar, sem fechar o lateral)
+========================= */
+function atualizarPaginaCarrinho(data) {
+  // Atualiza subtotal geral
+  const subtotalGeralEl = document.getElementById("subtotal-geral");
+  if (subtotalGeralEl) {
+    subtotalGeralEl.innerText = data.total.toFixed(2);
+  }
+
+  // Atualiza total geral (soma frete se existir)
+  const totalGeralEl = document.getElementById("total-geral");
+  const freteValorEl = document.getElementById("frete-valor");
+  if (totalGeralEl) {
+    const frete = parseFloat(freteValorEl?.innerText?.replace(",", ".")) || 0;
+    totalGeralEl.innerText = (data.total + frete).toFixed(2);
+  }
+
+  // Remove o item da lista visualmente
+  data.itens_removidos?.forEach((itemId) => {
+    const li = document.querySelector(`.carrinho-lista li[data-item-id="${itemId}"]`);
+    if (li) {
+      li.style.transition = "opacity 0.25s ease, transform 0.25s ease";
+      li.style.opacity = "0";
+      li.style.transform = "translateX(16px)";
+      setTimeout(() => li.remove(), 250);
+    }
+  });
+
+  // Se carrinho ficou vazio, mostra mensagem
+  if (data.carrinho_vazio) {
+    setTimeout(() => {
+      const lista = document.querySelector(".carrinho-lista");
+      const resumo = document.querySelector(".carrinho-resumo");
+      const layout = document.querySelector(".carrinho-layout");
+      const wrapper = document.querySelector(".carrinho-wrapper");
+
+      if (layout) layout.remove();
+
+      if (wrapper) {
+        const vazio = document.createElement("p");
+        vazio.textContent = "Seu carrinho está vazio.";
+        wrapper.appendChild(vazio);
+      }
+    }, 280);
+  }
+}
+
+/* =========================
+   REMOVER ITEM (DELEGAÇÃO)
 ========================= */
 document.addEventListener("click", function (e) {
   const btn = e.target.closest(".btn-remover-mini");
@@ -127,16 +169,17 @@ document.addEventListener("click", function (e) {
     .then((data) => {
       atualizarBadge(data.quantidade_total ?? 0);
 
-      if (data.carrinho_vazio) {
-        atualizarMiniCarrinho();
-
-        if (window.location.pathname.includes("/carrinho")) {
-          window.location.reload();
-        }
-        return;
-      }
-
+      // Atualiza mini carrinho lateral
       atualizarMiniCarrinho();
+
+      // Se estiver na página do carrinho, atualiza sem recarregar
+      if (window.location.pathname.includes("/carrinho")) {
+        atualizarPaginaCarrinho({
+          total: data.total,
+          carrinho_vazio: data.carrinho_vazio,
+          itens_removidos: [itemId],
+        });
+      }
     })
     .catch((err) => console.error("Erro ao remover item:", err));
 });
@@ -147,11 +190,8 @@ document.addEventListener("click", function (e) {
 document.addEventListener("click", function (e) {
   const item = e.target.closest(".item-carrinho.clicavel");
   if (!item) return;
-
   if (e.target.closest(".btn-remover-mini")) return;
 
   const url = item.dataset.url;
-  if (url) {
-    window.location.href = url;
-  }
+  if (url) window.location.href = url;
 });

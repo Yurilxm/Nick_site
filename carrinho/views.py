@@ -8,9 +8,7 @@ from .models import ItemCarrinho
 from .services import obter_carrinho
 
 
-# ==========================
 # HELPERS
-# ==========================
 
 def limpar_frete_se_carrinho_vazio(request, carrinho):
     if not carrinho.itens.exists():
@@ -46,10 +44,6 @@ def traduzir_opcoes(itens):
                 continue
         item.opcoes_formatadas = opcoes_traduzidas
 
-
-# ==========================
-# CARRINHO
-# ==========================
 
 @require_POST
 def adicionar_ao_carrinho(request, produto_id):
@@ -224,10 +218,6 @@ def mini_carrinho_json(request):
     })
 
 
-# ==========================
-# FRETE
-# ==========================
-
 @require_POST
 def calcular_frete(request):
     cep = request.POST.get("cep")
@@ -249,10 +239,6 @@ def calcular_frete(request):
         }
     })
 
-
-# ==========================
-# FINALIZAR (CHECKOUT)
-# ==========================
 
 @login_required
 def finalizar_compra(request):

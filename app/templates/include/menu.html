@@ -1,8 +1,6 @@
 {% load static %}
 
 <header class="topbar">
-
-  <!-- LINHA 1: logo + busca + ícones -->
   <div class="topbar-linha1">
 
     <a href="{% url 'home' %}" class="topbar-logo">
@@ -18,8 +16,8 @@
     <div class="topbar-icones">
 
       {% if user.is_authenticated %}
-        <!-- Ícone SETA (logado) abre dropdown com Meus Pedidos + Sair -->
-        <div class="user-dropdown">
+        <!-- Dropdown usuário — oculto no mobile -->
+        <div class="user-dropdown topbar-oculto-mobile">
           <button class="icon-btn" id="btn-user-menu" title="Minha conta">
             <i class="bi bi-box-arrow-right"></i>
           </button>
@@ -39,23 +37,26 @@
             </form>
           </div>
         </div>
-
       {% else %}
-        <!-- Ícone PESSOA (deslogado) -->
-        <a href="{% url 'login' %}" class="icon-btn" title="Entrar">
+        <a href="{% url 'login' %}" class="icon-btn topbar-oculto-mobile" title="Entrar">
           <i class="bi bi-person-fill"></i>
         </a>
       {% endif %}
 
-      <a href="#" id="btn-carrinho" class="icon-btn icone-carrinho" title="Carrinho">
+      <!-- Carrinho — oculto no mobile -->
+      <a href="#" id="btn-carrinho" class="icon-btn icone-carrinho topbar-oculto-mobile" title="Carrinho">
         <i class="bi bi-cart-fill"></i>
         <span id="badge-carrinho" class="badge-carrinho">0</span>
       </a>
 
+      <!-- Hambúrguer — dentro do flex, só aparece no mobile -->
+      <button class="menu-hamburguer" id="btn-hamburguer" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+
     </div>
   </div>
 
-  <!-- LINHA 2: navegação centralizada -->
   <nav class="topbar-linha2">
     <div class="topbar-menu">
       <a href="{% url 'home' %}" class="menu-link">Início</a>
@@ -78,37 +79,88 @@
     </div>
   </nav>
 
-  <!-- Hamburguer mobile -->
-  <button class="menu-hamburguer" id="btn-hamburguer" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
-
-  <!-- Drawer mobile -->
   <div class="menu-mobile-overlay" id="menu-mobile-overlay"></div>
+
+  <!-- ============================================
+       DRAWER MOBILE
+       ============================================ -->
   <div class="menu-mobile-drawer" id="menu-mobile-drawer">
+
     <div class="drawer-header">
       <img src="{% static 'imagens/Nick_sem_fundo.png' %}" alt="Nick Brindes" class="drawer-logo">
-      <button class="drawer-fechar" id="btn-fechar-drawer"><i class="bi bi-x-lg"></i></button>
+      <button class="drawer-fechar" id="btn-fechar-drawer">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
+
     <nav class="drawer-nav">
-      <a href="{% url 'home' %}" class="drawer-link">Início</a>
-      <a href="{% url 'lista_produtos' %}" class="drawer-link">Produtos</a>
-      {% for categoria in categorias_menu %}
-        <a href="{% url 'produtos_por_categoria' categoria.slug %}" class="drawer-link">{{ categoria.nome }}</a>
-      {% endfor %}
-      <a href="{% url 'sobre' %}" class="drawer-link">Sobre</a>
+
+      <a href="{% url 'home' %}" class="drawer-link">
+        <span class="drawer-icon"><i class="bi bi-house-heart-fill"></i></span>
+        Início
+      </a>
+
+      <a href="{% url 'lista_produtos' %}" class="drawer-link">
+        <span class="drawer-icon"><i class="bi bi-grid-fill"></i></span>
+        Produtos
+      </a>
+
+      <!-- Accordion de categorias -->
+      <div class="drawer-accordion">
+        <button class="drawer-link drawer-accordion-btn" id="btn-drawer-categorias">
+          <span class="drawer-icon"><i class="bi bi-tag-fill"></i></span>
+          Categorias
+          <i class="bi bi-chevron-down drawer-acc-chevron"></i>
+        </button>
+        <div class="drawer-accordion-body" id="drawer-categorias-body">
+          {% for categoria in categorias_menu %}
+            <a href="{% url 'produtos_por_categoria' categoria.slug %}" class="drawer-sub-link">
+              <i class="bi bi-dot"></i> {{ categoria.nome }}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+
+      <a href="{% url 'sobre' %}" class="drawer-link">
+        <span class="drawer-icon"><i class="bi bi-heart-fill"></i></span>
+        Sobre
+      </a>
+
+      <div class="drawer-divider"></div>
+
+      <!-- Carrinho (só aparece no drawer mobile) -->
+      <a href="#" class="drawer-link" id="btn-carrinho-drawer">
+        <span class="drawer-icon"><i class="bi bi-cart-fill"></i></span>
+        Carrinho
+        <span class="drawer-badge" id="badge-carrinho-drawer"></span>
+      </a>
+
       {% if user.is_authenticated %}
+        <a href="{% url 'pedidos:meus_pedidos' %}" class="drawer-link">
+          <span class="drawer-icon"><i class="bi bi-bag-heart-fill"></i></span>
+          Meus Pedidos
+        </a>
         <div class="drawer-divider"></div>
-        <a href="{% url 'pedidos:meus_pedidos' %}" class="drawer-link">Meus Pedidos</a>
         <form action="{% url 'logout' %}" method="post">
           {% csrf_token %}
-          <button type="submit" class="drawer-link drawer-sair">Sair</button>
+          <button type="submit" class="drawer-link drawer-sair">
+            <span class="drawer-icon"><i class="bi bi-box-arrow-right"></i></span>
+            Sair
+          </button>
         </form>
       {% else %}
-        <div class="drawer-divider"></div>
-        <a href="{% url 'login' %}" class="drawer-link">Entrar</a>
+        <a href="{% url 'login' %}" class="drawer-link">
+          <span class="drawer-icon"><i class="bi bi-person-fill"></i></span>
+          Entrar
+        </a>
       {% endif %}
+
     </nav>
+
+    <div class="drawer-footer">
+      🎀 Mimos da Nick Personalizados
+    </div>
+
   </div>
 
 </header>

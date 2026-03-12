@@ -1,5 +1,3 @@
-/* ===== LISTAGEM MAIS LIMPA ===== */
-
 #result_list tbody tr {
     border-bottom: 1px solid #e5e7eb;
 }
@@ -14,14 +12,17 @@
     vertical-align: middle;
 }
 
-
-/* ===== IMAGENS ===== */
-
 .admin-list-img {
     width: 55px;
     height: 55px;
     object-fit: cover;
     border-radius: 8px;
+    cursor: zoom-in;
+    transition: transform 0.15s ease;
+}
+
+.admin-list-img:hover {
+    transform: scale(1.08);
 }
 
 .admin-preview-img {
@@ -30,6 +31,93 @@
     object-fit: cover;
     border-radius: 12px;
     border: 1px solid #ddd;
+    cursor: zoom-in;
+    transition: transform 0.15s ease;
+}
+
+.admin-preview-img:hover {
+    transform: scale(1.05);
+}
+
+.admin-preview-principal {
+    margin-top: 12px;
+}
+
+.admin-preview-img-principal {
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid #2f6f95;
+    cursor: zoom-in;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    display: block;
+}
+
+.admin-preview-img-principal:hover {
+    transform: scale(1.04);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+
+#admin-lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(0, 0, 0, 0.88);
+    align-items: center;
+    justify-content: center;
+}
+
+#admin-lightbox.ativo {
+    display: flex;
+}
+
+#admin-lightbox-overlay {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+#admin-lightbox-img {
+    max-width: 88vw;
+    max-height: 88vh;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    animation: lightboxEntrar 0.2s ease;
+}
+
+@keyframes lightboxEntrar {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+#admin-lightbox-fechar {
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    background: rgba(255,255,255,0.12);
+    border: none;
+    color: white;
+    font-size: 22px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    z-index: 100000;
+}
+
+#admin-lightbox-fechar:hover {
+    background: rgba(255,255,255,0.25);
 }
 
 
@@ -87,14 +175,12 @@
     font-weight: 600;
 }
 
-/* Linha azul separando cada inline */
 .inline-group {
     border-top: 4px solid #2f6f95;
     margin-top: 30px;
     padding-top: 20px;
 }
 
-/* Caixa visual para cada item */
 .inline-related {
     border: 2px solid #2f6f95;
     border-radius: 8px;
@@ -103,7 +189,6 @@
     background: #111;
 }
 
-/* Botão lixeira */
 .inline-delete-btn {
     background: transparent;
     border: none;
@@ -112,21 +197,18 @@
     margin-left: 15px;
 }
 
-/* Estrutura do título */
 .inline-related h3 {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-/* Container de ações (✏️ 🗑️) */
 .inline-actions {
     display: flex;
     gap: 10px;
     align-items: center;
 }
 
-/* Remove aparência padrão do link */
 .inlinechangelink {
     background: none !important;
     padding-left: 0 !important;
@@ -151,7 +233,6 @@
   gap: 8px;
 }
 
-/* Dark mode automático via prefers-color-scheme ou classe do admin */
 .selo-select,
 .selo-direct-input {
   padding: 6px 10px;
@@ -197,7 +278,6 @@
   color: #fff;
 }
 
-/* Lista de selos salvos */
 .selo-saved-list {
   display: flex;
   flex-wrap: wrap;

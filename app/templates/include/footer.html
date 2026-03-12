@@ -1,66 +1,88 @@
 {% load static %}
 
-<footer class="reveal footer-reveal">
+<footer class="footer">
 
-    <!-- BLOCO 1 — Cadastro -->
-    <div class="footer-cadastro">
-        <span class="titulo">Fique por dentro das novidades!</span>
-        <span class="descricao">Cadastre-se para receber novidades e ofertas exclusivas!</span>
+  <!-- TOPO: cadastro newsletter -->
+  <div class="footer-newsletter">
+    <div class="footer-newsletter-inner">
+      <div class="footer-newsletter-texto">
+        <span class="footer-newsletter-titulo">💌 Fique por dentro das novidades!</span>
+        <span class="footer-newsletter-descricao">Cadastre seu e-mail e receba ofertas exclusivas em primeira mão.</span>
+      </div>
+      <form class="footer-newsletter-form" method="POST" action="{% url 'cadastrar_email_marketing' %}">
+        {% csrf_token %}
+        <div class="footer-newsletter-campo">
+          <i class="bi bi-envelope-heart-fill"></i>
+          <input type="email" name="email" placeholder="seu@email.com" required>
+        </div>
+        <button type="submit">Cadastrar</button>
+      </form>
+    </div>
+  </div>
 
-        <form class="cadastro-form" method="POST" action="{% url 'cadastrar_email_marketing' %}">
-            {% csrf_token %}
-            <input type="email" name="email" placeholder="Digite seu e-mail" required>
-            <button type="submit">Cadastrar</button>
-        </form>
+  <!-- MEIO: colunas -->
+  <div class="footer-main">
+
+    <!-- Sobre -->
+    <div class="footer-col footer-col-sobre">
+      <img src="{% static 'imagens/Nick_sem_fundo.png' %}" alt="Nick Brindes" class="footer-logo">
+      <p class="footer-descricao">
+        Criando momentos especiais com produtos artesanais únicos, feitos com muito carinho para sua família. 🎀
+      </p>
+      <div class="footer-social-icons">
+        <a href="#" class="footer-social-btn" title="Facebook"><i class="bi bi-facebook"></i></a>
+        <a href="#" class="footer-social-btn" title="Instagram"><i class="bi bi-instagram"></i></a>
+        <a href="#" class="footer-social-btn" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+      </div>
     </div>
 
-    <!-- BLOCO 2 — Conteúdo principal do footer -->
-    <div class="footer-main">
-
-        <!-- Sobre -->
-        <div class="footer-sobre">
-            <span class="titulo">Mimos da Nick</span>
-            <span class="descricao">
-                Criando momentos especiais com produtos artesanais únicos,
-                feitos com muito carinho para sua família.
-            </span>
-        </div>
-
-        <!-- Links -->
-        <div class="footer-links">
-            <span class="titulo">Produtos</span>
-                <a href="{% url 'lista_produtos' %}">Todos os produtos</a>
-                <a href="{% url 'produtos_por_categoria' 'agendas' %}">Agendas</a>
-                <a href="{% url 'produtos_por_categoria' 'canecas' %}">Canecas</a>
-                <a href="{% url 'produtos_por_categoria' 'cadernetas' %}">Cadernetas de vacinação</a>
-                <a href="{% url 'sobre' %}">Sobre</a>
-                <a href="{% url 'contato' %}">Contato</a>
-        </div>
-
-        <!-- Redes sociais -->
-        <div class="footer-social">
-            <span class="titulo">Siga-nos</span>
-                <ul class="social-links">
-                    <li><a href="#">Facebook</a></li>
-                    <li><a href="#">Instagram</a></li>
-                    <li><a href="#">WhatsApp</a></li>
-                </ul>
-        </div>
-
-        <!-- Informações extras -->
-        <div class="footer-info">
-            <span class="titulo">Informações</span>
-                <span><strong>Envio para todo Brasil</strong></span>
-                <span><strong>Prazo:</strong> 7 a 15 dias úteis após a confirmação do pagamento.</span>
-                <span><strong>Parcelamento:</strong> Até 3x sem juros.</span>
-                <span><strong>Pix:</strong> 5% de desconto.</span>
-        </div>
-
+    <!-- Links -->
+    <div class="footer-col">
+      <span class="footer-col-titulo">Navegação</span>
+      <div class="footer-links">
+        <a href="{% url 'home' %}"><i class="bi bi-house-heart"></i> Início</a>
+        <a href="{% url 'lista_produtos' %}"><i class="bi bi-bag-heart"></i> Todos os produtos</a>
+        <a href="{% url 'sobre' %}"><i class="bi bi-stars"></i> Sobre nós</a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'pedidos:meus_pedidos' %}"><i class="bi bi-box-seam"></i> Meus Pedidos</a>
+        {% endif %}
+      </div>
     </div>
 
-    <!-- BLOCO 3 — Créditos -->
-    <div class="footer-credit">
-        <span>Site criado por Yuri Lima</span>
+    <!-- Entregas e pagamento -->
+    <div class="footer-col">
+      <span class="footer-col-titulo">Entrega e Pagamento</span>
+      <div class="footer-info-lista">
+        <div class="footer-info-item">
+          <i class="bi bi-truck"></i>
+          <div>
+            <strong>Envio para todo Brasil</strong>
+            <span>7 a 15 dias úteis após confirmação</span>
+          </div>
+        </div>
+        <div class="footer-info-item">
+          <i class="bi bi-credit-card-2-front"></i>
+          <div>
+            <strong>Parcelamento</strong>
+            <span>Até 2x sem juros</span>
+          </div>
+        </div>
+        <div class="footer-info-item">
+          <i class="bi bi-qr-code"></i>
+          <div>
+            <strong>Pix</strong>
+            <span>5% de desconto à vista</span>
+          </div>
+        </div>
+      </div>
     </div>
+
+  </div>
+
+  <!-- RODAPÉ -->
+  <div class="footer-bottom">
+    <span>© {% now "Y" %} Nick Brindes — Todos os direitos reservados</span>
+    <span class="footer-credit">Desenvolvido por Yuri Lima</span>
+  </div>
 
 </footer>

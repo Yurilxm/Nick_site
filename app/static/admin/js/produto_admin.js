@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    // ==========================================
-    // 1️⃣ CONTROLE IMAGEM HOVER
-    // ==========================================
     function atualizarOpcoesHover() {
         const selects = document.querySelectorAll("select[id$='-tipo']");
         let hoverSelecionado = false;
@@ -31,9 +28,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ==========================================
-    // 2️⃣ PREVIEW NO CAMPO CORRETO
-    // ==========================================
     function previewImagem(input) {
         const file = input.files[0];
         if (!file) return;
@@ -47,54 +41,144 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!previewField) return;
 
             previewField.innerHTML = `
-                <img src="${e.target.result}"
-                     class="admin-preview-img">
+                <img src="${e.target.result}" class="admin-preview-img admin-lightbox-trigger">
             `;
+
+            // Aplica lightbox na nova imagem
+            aplicarLightboxNaImagem(previewField.querySelector("img"));
         };
 
         reader.readAsDataURL(file);
     }
 
-    // ==========================================
-    // 3️⃣ LIXEIRA INLINE
-    // ==========================================
+    function iniciarPreviewImagemPrincipal() {
+        // Campo de imagem principal fica em .field-imagem
+        const fieldImagem = document.querySelector(".field-imagem");
+        if (!fieldImagem) return;
+
+        const input = fieldImagem.querySelector("input[type='file']");
+        if (!input) return;
+
+        // Cria o container de preview se não existir
+        let previewContainer = fieldImagem.querySelector(".admin-preview-principal");
+        if (!previewContainer) {
+            previewContainer = document.createElement("div");
+            previewContainer.className = "admin-preview-principal";
+            // Insere depois do widget de arquivo
+            const widget = fieldImagem.querySelector(".file-upload");
+            if (widget) {
+                widget.after(previewContainer);
+            } else {
+                fieldImagem.appendChild(previewContainer);
+            }
+        }
+
+        // Se já tem imagem salva, envolve ela no lightbox
+        const imgExistente = fieldImagem.querySelector("a img, .readonly img");
+        if (imgExistente) {
+            imgExistente.classList.add("admin-lightbox-trigger");
+            aplicarLightboxNaImagem(imgExistente);
+        }
+
+        // Preview ao selecionar novo arquivo
+        input.addEventListener("change", function () {
+            const file = this.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                previewContainer.innerHTML = `
+                    <img src="${e.target.result}"
+                         class="admin-preview-img-principal admin-lightbox-trigger"
+                         alt="Preview">
+                `;
+                aplicarLightboxNaImagem(previewContainer.querySelector("img"));
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function criarLightbox() {
+        if (document.getElementById("admin-lightbox")) return;
+
+        const lb = document.createElement("div");
+        lb.id = "admin-lightbox";
+        lb.innerHTML = `
+            <div id="admin-lightbox-overlay">
+                <button id="admin-lightbox-fechar">✕</button>
+                <img id="admin-lightbox-img" src="" alt="">
+            </div>
+        `;
+        document.body.appendChild(lb);
+
+        // Fecha ao clicar no fundo ou no X
+        lb.addEventListener("click", function (e) {
+            if (e.target === lb || e.target.id === "admin-lightbox-fechar") {
+                fecharLightbox();
+            }
+        });
+
+        // Fecha com ESC
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") fecharLightbox();
+        });
+    }
+
+    function abrirLightbox(src) {
+        const lb = document.getElementById("admin-lightbox");
+        const img = document.getElementById("admin-lightbox-img");
+        if (!lb || !img) return;
+        img.src = src;
+        lb.classList.add("ativo");
+        document.body.style.overflow = "hidden";
+    }
+
+    function fecharLightbox() {
+        const lb = document.getElementById("admin-lightbox");
+        if (!lb) return;
+        lb.classList.remove("ativo");
+        document.body.style.overflow = "";
+    }
+
+    function aplicarLightboxNaImagem(img) {
+        if (!img) return;
+        img.style.cursor = "zoom-in";
+        img.addEventListener("click", function () {
+            abrirLightbox(this.src);
+        });
+    }
+
+    function aplicarLightboxEmTodas() {
+        document.querySelectorAll(".admin-preview-img, .admin-list-img, .admin-preview-img-principal").forEach(img => {
+            if (!img.dataset.lightboxOk) {
+                img.dataset.lightboxOk = "1";
+                aplicarLightboxNaImagem(img);
+            }
+        });
+    }
+
     function aplicarLixeiraInline() {
-
         document.querySelectorAll(".inline-related").forEach(function (inline) {
-
             const deleteCheckbox = inline.querySelector("input[type='checkbox'][name$='-DELETE']");
             const titulo = inline.querySelector("h3");
             const changeLink = inline.querySelector(".inlinechangelink");
 
             if (!titulo) return;
 
-            // ============================
-            // Criar container de ações
-            // ============================
             let actionContainer = inline.querySelector(".inline-actions");
-
             if (!actionContainer) {
                 actionContainer = document.createElement("div");
                 actionContainer.className = "inline-actions";
                 titulo.appendChild(actionContainer);
             }
 
-            // ============================
-            // Ajustar botão editar
-            // ============================
             if (changeLink && !changeLink.classList.contains("iconified")) {
-
                 changeLink.textContent = "✏️";
                 changeLink.classList.add("iconified");
-
                 actionContainer.appendChild(changeLink);
             }
 
-            // ============================
-            // Criar botão lixeira
-            // ============================
             if (deleteCheckbox && !inline.querySelector(".inline-delete-btn")) {
-
                 deleteCheckbox.style.display = "none";
 
                 const btn = document.createElement("button");
@@ -109,21 +193,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 actionContainer.appendChild(btn);
             }
-
         });
-
     }
-    // ==========================================
-    // EVENTOS
-    // ==========================================
-    document.addEventListener("change", function (e) {
 
+    document.addEventListener("change", function (e) {
         if (e.target.matches("select[id$='-tipo']")) {
             atualizarOpcoesHover();
         }
 
         if (e.target.matches("input[type='file']")) {
-            previewImagem(e.target);
+            // Inline images
+            if (e.target.closest(".inline-related")) {
+                previewImagem(e.target);
+            }
         }
     });
 
@@ -136,15 +218,20 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // IMPORTANTE: roda depois que tudo carregou
     window.addEventListener("load", function () {
+        criarLightbox();
         atualizarOpcoesHover();
         aplicarLixeiraInline();
+        iniciarPreviewImagemPrincipal();
+        aplicarLightboxEmTodas();
     });
 
 });
 
 
+// ==========================================
+// SELOS
+// ==========================================
 document.addEventListener("DOMContentLoaded", function () {
 
   const STORAGE_KEY = "selo_custom_options";
@@ -246,11 +333,9 @@ document.addEventListener("DOMContentLoaded", function () {
       select.value = value;
     }
 
-    // Carrega salvos
     getCustomSelosStored().forEach(val => addOptionToSelect(val));
     renderSavedList();
 
-    // Select onChange
     select.addEventListener("change", function () {
       if (select.value) {
         setValue(select.value);
@@ -258,37 +343,28 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-    // Input direto — só atualiza o valor, SEM salvar
     directInput.addEventListener("input", function () {
       const val = directInput.value.trim();
       setValue(val);
       if (val) select.value = "";
     });
 
-    // Botão ✏️ — salva na lista
     addBtn.addEventListener("click", function () {
       const val = directInput.value.trim();
-      if (!val) {
-        directInput.focus();
-        return;
-      }
+      if (!val) { directInput.focus(); return; }
       saveCustomSelo(val);
       addOptionToSelect(val);
       setValue(val);
       renderSavedList();
     });
 
-    // Botão limpar
     clearBtn.addEventListener("click", function () {
       setValue("");
       select.value = "";
       directInput.value = "";
     });
 
-    // Estado inicial
     const initialValue = hiddenInput.value;
     if (initialValue) setValue(initialValue);
-
   });
-
 });
