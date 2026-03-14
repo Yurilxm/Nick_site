@@ -54,8 +54,8 @@ def criar_pagamento_boleto(pedido):
     )
     return pagamento
 
-def criar_pagamento_cartao(pedido, token, parcelas):
-    response = gateway.criar_cartao(pedido, token, parcelas)
+def criar_pagamento_cartao(pedido, token, parcelas, bandeira):
+    response = gateway.criar_cartao(pedido, token, parcelas, bandeira)
     payment_id = response.get("id")
     status = response.get("status", "pendente")
 
@@ -66,6 +66,6 @@ def criar_pagamento_cartao(pedido, token, parcelas):
         pedido=pedido,
         metodo="cartao",
         transaction_id=payment_id,
-        status=status
+        status="aprovado" if status == "approved" else status
     )
     return pagamento

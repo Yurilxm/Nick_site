@@ -11,7 +11,7 @@ def obter_parcelas(valor, bandeira):
     }
 
     headers = {
-        "Authorization": f"Bearer {settings.MERCADOPAGO_ACCESS_TOKEN}"
+        "Authorization": f"Bearer {settings.MERCADO_PAGO_ACCESS_TOKEN}"
     }
 
     try:

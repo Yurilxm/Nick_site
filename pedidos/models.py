@@ -75,6 +75,18 @@ class Pedido(models.Model):
         auto_now_add=True
     )
 
+    @property
+    def total_produtos(self):
+        return sum(item.subtotal for item in self.itens.all())
+
+    @property
+    def valor_frete(self):
+        return self.total - self.total_produtos
+
+    @property
+    def total_geral(self):
+        return self.total
+
     def __str__(self):
         return f"Pedido {self.id} - {self.status}"
 

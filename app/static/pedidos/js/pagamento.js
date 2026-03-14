@@ -35,10 +35,10 @@ if (campoValidade) {
 function detectarBandeira(numero) {
     const n = numero.replace(/\s/g, '');
     if (/^4/.test(n)) return 'visa';
-    if (/^5[1-5]/.test(n)) return 'master';
+    if (/^(5[1-5]|2[2-7]|50[0-9])/.test(n)) return 'master';
     if (/^3[47]/.test(n)) return 'amex';
     if (/^(636368|438935|504175|451416|509)/.test(n)) return 'elo';
-    return '';
+    return 'master';
 }
 
 // =============================================
@@ -53,7 +53,7 @@ function carregarParcelas() {
         if (numero.length < 6) return;
 
         const bandeira = detectarBandeira(numero);
-        const valor = window.TOTAL_GERAL || '0';
+        const valor = (window.TOTAL_GERAL || '0').replace(',', '.');
         const url = `${window.PARCELAS_URL}?valor=${valor}&bandeira=${bandeira}`;
 
         fetch(url)
@@ -67,7 +67,7 @@ function carregarParcelas() {
                     const opt = document.createElement('option');
                     opt.value = p.numero;   // chave correta do service
                     const parcela = Number(p.valor_parcela).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-                    const total   = Number(p.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                    const total = Number(p.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
                     opt.textContent = `${p.numero}x de R$ ${parcela} (total R$ ${total})`;
                     sel.appendChild(opt);
                 });
@@ -78,7 +78,7 @@ function carregarParcelas() {
                 // Dispara onchange para setar o valor inicial
                 sel.dispatchEvent(new Event('change'));
             })
-            .catch(() => {});
+            .catch(() => { });
     }, 600);
 }
 
@@ -93,16 +93,16 @@ if (window.MP_PUBLIC_KEY) {
 document.getElementById('form-cartao')?.addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    const btn    = document.getElementById('btn-pagar-cartao');
+    const btn = document.getElementById('btn-pagar-cartao');
     const erroEl = document.getElementById('cartao-erro');
     erroEl.textContent = '';
     btn.disabled = true;
     btn.textContent = 'Processando...';
 
-    const numero   = document.getElementById('card-number').value.replace(/\s/g, '');
-    const nome     = document.getElementById('card-name').value;
+    const numero = document.getElementById('card-number').value.replace(/\s/g, '');
+    const nome = document.getElementById('card-name').value;
     const validade = document.getElementById('card-expiry').value;
-    const cvv      = document.getElementById('card-cvv').value;
+    const cvv = document.getElementById('card-cvv').value;
     const [mes, ano] = (validade || '/').split('/');
 
     if (!numero || !nome || !mes || !ano || !cvv) {
@@ -121,20 +121,23 @@ document.getElementById('form-cartao')?.addEventListener('submit', async functio
 
     try {
         const token = await mp.createCardToken({
-            cardNumber:          numero,
-            cardholderName:      nome,
+            cardNumber: numero,
+            cardholderName: nome,
             cardExpirationMonth: mes,
-            cardExpirationYear:  '20' + ano,
-            securityCode:        cvv,
+            cardExpirationYear: '20' + ano,
+            securityCode: cvv,
         });
 
-        document.getElementById('card-token').value      = token.id;
+        document.getElementById('card-token').value = token.id;
         document.getElementById('parcelas-hidden').value =
             document.getElementById('select-parcelas').value || '1';
+        document.getElementById('card-bandeira').value = detectarBandeira(numero);
 
         this.submit();
 
     } catch (err) {
+        console.log('ERRO COMPLETO:', JSON.stringify(err));
+        console.log('CAUSA:', err?.cause);
         const msg = err?.cause?.[0]?.description
             || 'Erro ao processar cartão. Verifique os dados e tente novamente.';
         erroEl.textContent = msg;

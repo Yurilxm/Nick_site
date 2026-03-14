@@ -42,6 +42,7 @@ def pagamento(request):
         if metodo == "pix":
             pagamento_obj = criar_pagamento_pix(pedido)
             # Limpa sessão após criar pedido com sucesso
+            carrinho.itens.all().delete()
             request.session.pop("resumo_checkout", None)
             request.session.pop("frete", None)
             return render(request, "pedidos/pagamentos/pix.html", {
@@ -51,6 +52,7 @@ def pagamento(request):
 
         if metodo == "boleto":
             pagamento_obj = criar_pagamento_boleto(pedido)
+            carrinho.itens.all().delete()
             request.session.pop("resumo_checkout", None)
             request.session.pop("frete", None)
             return redirect(pagamento_obj.boleto_url)
@@ -58,12 +60,14 @@ def pagamento(request):
         if metodo == "cartao":
             token = request.POST.get("card_token")
             parcelas = request.POST.get("parcelas", "1")
+            bandeira = request.POST.get("card_bandeira", "visa")
 
-            pagamento_obj = criar_pagamento_cartao(pedido, token, parcelas)
+            pagamento_obj = criar_pagamento_cartao(pedido, token, parcelas, bandeira)
 
-            if pagamento_obj.status == "aprovado":
+            if pagamento_obj.status in ("aprovado", "approved"):
                 pedido.status = "pago"
                 pedido.save()
+                carrinho.itens.all().delete
                 request.session.pop("resumo_checkout", None)
                 request.session.pop("frete", None)
                 return redirect("pedidos:pedido_confirmado", pedido_id=pedido.id)

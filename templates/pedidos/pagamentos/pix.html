@@ -73,10 +73,10 @@
 </div>
 {% endblock %}
 
-{% block js %}
-<script src="{% static 'pedidos/js/pix.js' %}"></script>
+{% block scripts %}
 <script>
     window.PEDIDO_CONFIRMADO_URL = "{% url 'pedidos:pedido_confirmado' pedido.id %}";
     window.VERIFICAR_PAGAMENTO_URL = "{% url 'pedidos:verificar_pagamento' pedido.id %}";
 </script>
+<script src="{% static 'pedidos/js/pix.js' %}"></script>
 {% endblock %}
