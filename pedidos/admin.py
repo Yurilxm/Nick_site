@@ -4,6 +4,7 @@ from produtos.models import Opcao, Categoria
 from django.utils.html import format_html
 from django.urls import reverse
 from django.contrib.admin import SimpleListFilter
+from django.utils.safestring import mark_safe
 
 
 class PedidoItemInline(admin.TabularInline):
@@ -28,25 +29,19 @@ class PedidoItemInline(admin.TabularInline):
     )
 
     def mostrar_personalizacao(self, obj):
-
         if not obj.opcoes:
             return "Sem personalização"
 
-        texto = ""
-
+        linhas = []
         for chave, valor in obj.opcoes.items():
-
             try:
                 opcao = Opcao.objects.get(id=valor)
                 valor_final = opcao.nome
             except:
                 valor_final = valor
+            linhas.append(f"<b>{chave.capitalize()}</b>: {valor_final}<br>")
 
-            texto += f"<b>{chave.capitalize()}</b>: {valor_final}<br>"
-
-        return format_html(texto)
-
-    mostrar_personalizacao.short_description = "Personalização"
+        return mark_safe("".join(linhas))
 
 
 class CategoriaPedidoFilter(SimpleListFilter):
@@ -148,45 +143,35 @@ class PedidoAdmin(admin.ModelAdmin):
     produtos.short_description = "Produtos"
 
     def ficha_producao(self, obj):
-
         cliente = obj.usuario.username if obj.usuario else "Cliente anônimo"
 
-        texto = f"""
-        <h3>PEDIDO #{obj.id}</h3>
-
-        <b>Cliente:</b> {cliente}<br>
-        <b>CEP:</b> {obj.cep_entrega}<br>
-        <b>Endereço:</b> {obj.rua}, {obj.numero}<br>
-        <b>Bairro:</b> {obj.bairro}<br>
-        <b>Cidade:</b> {obj.cidade}/{obj.estado}<br>
-        <b>Complemento:</b> {obj.complemento}<br>
-
-        <hr>
-        <h4>Itens do pedido</h4>
-        """
+        linhas = []
+        linhas.append(f"<h3>PEDIDO #{obj.id}</h3>")
+        linhas.append(f"<b>Cliente:</b> {cliente}<br>")
+        linhas.append(f"<b>CEP:</b> {obj.cep_entrega}<br>")
+        linhas.append(f"<b>Endereço:</b> {obj.rua}, {obj.numero}<br>")
+        linhas.append(f"<b>Bairro:</b> {obj.bairro}<br>")
+        linhas.append(f"<b>Cidade:</b> {obj.cidade}/{obj.estado}<br>")
+        linhas.append(f"<b>Complemento:</b> {obj.complemento}<br>")
+        linhas.append("<hr><h4>Itens do pedido</h4>")
 
         for item in obj.itens.all():
-
-            texto += f"<b>Produto:</b> {item.produto.nome}<br>"
-            texto += f"<b>Quantidade:</b> {item.quantidade}<br>"
+            linhas.append(f"<b>Produto:</b> {item.produto.nome}<br>")
+            linhas.append(f"<b>Quantidade:</b> {item.quantidade}<br>")
 
             if item.opcoes:
-
-                texto += "<b>Personalização:</b><br>"
-
+                linhas.append("<b>Personalização:</b><br>")
                 for chave, valor in item.opcoes.items():
-
                     try:
                         opcao = Opcao.objects.get(id=valor)
                         valor_final = opcao.nome
                     except:
                         valor_final = valor
+                    linhas.append(f"{chave.capitalize()}: {valor_final}<br>")
 
-                    texto += f"{chave.capitalize()}: {valor_final}<br>"
+            linhas.append("<br>")
 
-            texto += "<br>"
-
-        return format_html(texto)
+        return mark_safe("".join(linhas))
 
     ficha_producao.short_description = "Ficha de Produção"
 

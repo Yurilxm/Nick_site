@@ -38,7 +38,10 @@ def calcular_frete_melhor_envio(cep_destino, itens):
     try:
         response = requests.post(url, json=payload, headers=headers, timeout=10)
         data = response.json()
-    except Exception:
+        print("DEBUG MELHOR ENVIO STATUS:", response.status_code)
+        print("DEBUG MELHOR ENVIO RESPONSE:", data)
+    except Exception as e:
+        print("DEBUG MELHOR ENVIO ERRO:", e)
         return []
 
     opcoes = []

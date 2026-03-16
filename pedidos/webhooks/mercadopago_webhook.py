@@ -2,12 +2,13 @@ import json
 import mercadopago
 from django.http import HttpResponse
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 from carrinho.models import Carrinho
 from pedidos.models import Pagamento
 
 sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
 
-
+@csrf_exempt
 def webhook_mercadopago(request):
     data = json.loads(request.body)
     payment_id = data.get("data", {}).get("id")
@@ -28,7 +29,6 @@ def webhook_mercadopago(request):
         pedido.status = "pago"
         pedido.save()
 
-        # Limpa o carrinho do usuário após pagamento confirmado
         if pedido.usuario:
             carrinho = Carrinho.objects.filter(usuario=pedido.usuario).first()
             if carrinho:

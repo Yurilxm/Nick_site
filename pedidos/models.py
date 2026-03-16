@@ -118,6 +118,8 @@ class PedidoItem(models.Model):
 
     @property
     def subtotal(self):
+        if self.preco_unitario is None or self.quantidade is None:
+            return 0
         return self.preco_unitario * self.quantidade
 
     def __str__(self):

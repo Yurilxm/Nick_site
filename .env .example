@@ -8,3 +8,7 @@ EMAIL_HOST_PASSWORD=sua_senha_aqui
 # Configuração Mercado Pago
 MERCADO_PAGO_ACCESS_TOKEN=seu_access_token_aqui
 MERCADO_PAGO_PUBLIC_KEY=seu_public_key_aqui
+
+# Melhor envio
+MELHOR_ENVIO_TOKEN=seu_token_aqui
+CEP_LOJA=CEP_AQUI
