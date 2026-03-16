@@ -1,0 +1,15 @@
+Olá {{ pedido.usuario.username }},
+
+Seu pedido foi confirmado com sucesso!
+
+Pedido: #{{ pedido.id }}
+
+Itens do pedido:
+
+{% for item in itens %}
+- {{ item.quantidade }}x {{ item.produto.nome }}
+{% endfor %}
+
+Total: R$ {{ total }}
+
+Obrigado por comprar na Mimos da Nick!

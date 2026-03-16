@@ -9,6 +9,7 @@ from pedidos.services.pedido_service import criar_pedido
 from pedidos.services.pagamento_service import (criar_pagamento_pix, criar_pagamento_boleto, criar_pagamento_cartao,)
 from pedidos.services.antifraude_service import validar_pedido
 from pedidos.services.parcelamento_service import obter_parcelas
+from pedidos.services.email_service import enviar_email_pedido_confirmado
 
 
 @login_required
@@ -65,9 +66,14 @@ def pagamento(request):
             pagamento_obj = criar_pagamento_cartao(pedido, token, parcelas, bandeira)
 
             if pagamento_obj.status in ("aprovado", "approved"):
-                pedido.status = "pago"
-                pedido.save()
-                carrinho.itens.all().delete
+
+                if pedido.status != "pago":
+                    pedido.status = "pago"
+                    pedido.save()
+
+                    enviar_email_pedido_confirmado(pedido)
+
+                carrinho.itens.all().delete()
                 request.session.pop("resumo_checkout", None)
                 request.session.pop("frete", None)
                 return redirect("pedidos:pedido_confirmado", pedido_id=pedido.id)

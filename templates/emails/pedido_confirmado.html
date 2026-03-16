@@ -1,0 +1,17 @@
+<h2>Pedido confirmado 🎉</h2>
+
+<p>Olá {{ pedido.usuario.username }},</p>
+
+<p>Seu pedido <strong>#{{ pedido.id }}</strong> foi confirmado.</p>
+
+<h3>Itens do pedido:</h3>
+
+<ul>
+{% for item in itens %}
+<li>{{ item.quantidade }}x {{ item.produto.nome }}</li>
+{% endfor %}
+</ul>
+
+<p><strong>Total:</strong> R$ {{ total }}</p>
+
+<p>Obrigado por comprar na <strong>Nick Brindes</strong>!</p>
