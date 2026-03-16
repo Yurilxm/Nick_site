@@ -1,5 +1,4 @@
-from .models import Carrinho, ItemCarrinho
-
+from carrinho.models import Carrinho, ItemCarrinho
 
 def obter_carrinho(request):
     """

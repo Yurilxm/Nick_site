@@ -12,6 +12,11 @@ from django.core.mail import send_mail
 from django.conf import settings
 from .models import LoginCode
 from .utils import login_code
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+
+
+
 
 class LoginCustomView(LoginView):
     template_name = "auth/login.html"
@@ -150,13 +155,19 @@ def send_login_code_view(request):
         code = login_code()
         LoginCode.create_code(email=email, code=code)
 
-        send_mail(
-            subject='Seu código de acesso | Nick Brindes',
-            message=f'Seu código de acesso é: {code}\n\nEle expira em 10 minutos.',
+        # Renderiza templates
+        contexto = {'code': code}
+        mensagem_texto = render_to_string('emails/login_code_email.txt', contexto)
+        mensagem_html = render_to_string('emails/login_code_email.html', contexto)
+
+        email_msg = EmailMultiAlternatives(
+            subject='Seu código de acesso | Mimos da Nick',
+            body=mensagem_texto,
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email],
-            fail_silently=False,
+            to=[email],
         )
+        email_msg.attach_alternative(mensagem_html, 'text/html')
+        email_msg.send()
 
         messages.success(
             request,
@@ -211,6 +222,8 @@ def login_code_confirm_view(request):
 # =========================
 class PasswordResetCustomView(PasswordResetView):
     template_name = 'auth/password_reset.html'
+    email_template_name = 'emails/password_reset_email.txt'
+    html_email_template_name = 'emails/password_reset_email.html'
     success_url = reverse_lazy('password_reset_done')
 
     def form_valid(self, form):

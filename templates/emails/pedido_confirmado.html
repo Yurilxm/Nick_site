@@ -1,17 +1,117 @@
-<h2>Pedido confirmado 🎉</h2>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pedido confirmado</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f9f0f5;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
 
-<p>Olá {{ pedido.usuario.username }},</p>
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f9f0f5;padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:600px;width:100%;">
 
-<p>Seu pedido <strong>#{{ pedido.id }}</strong> foi confirmado.</p>
+          <!-- HEADER -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#ffb6c8,#d4aaff);padding:40px 40px 32px;text-align:center;">
+              <h1 style="margin:0;font-size:28px;color:#fff;font-weight:800;letter-spacing:-0.5px;">
+                🎀 Mimos da Nick
+              </h1>
+              <p style="margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:15px;">
+                Seu pedido foi confirmado!
+              </p>
+            </td>
+          </tr>
 
-<h3>Itens do pedido:</h3>
+          <!-- HERO -->
+          <tr>
+            <td style="padding:40px 40px 24px;text-align:center;">
+              <div style="width:72px;height:72px;background:linear-gradient(135deg,#ffb6c8,#d4aaff);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:16px;">
+                ✓
+              </div>
+              <h2 style="margin:0 0 8px;font-size:22px;color:#2d1b3d;font-weight:800;">
+                Pedido #{{ pedido.id }} confirmado!
+              </h2>
+              <p style="margin:0;color:#6b5b7b;font-size:15px;">
+                Olá, <strong>{{ pedido.usuario.first_name|default:pedido.usuario.username }}</strong>! Recebemos seu pagamento com sucesso 🌸
+              </p>
+            </td>
+          </tr>
 
-<ul>
-{% for item in itens %}
-<li>{{ item.quantidade }}x {{ item.produto.nome }}</li>
-{% endfor %}
-</ul>
+          <!-- ITENS -->
+          <tr>
+            <td style="padding:0 40px 32px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#fdf6fa;border-radius:12px;overflow:hidden;">
+                <tr>
+                  <td style="padding:16px 20px;background:#f5e6f0;">
+                    <p style="margin:0;font-size:13px;font-weight:700;color:#9b6b8a;text-transform:uppercase;letter-spacing:0.8px;">
+                      Itens do pedido
+                    </p>
+                  </td>
+                </tr>
+                {% for item in itens %}
+                <tr>
+                  <td style="padding:14px 20px;border-bottom:1px solid #f0e0eb;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="color:#2d1b3d;font-size:14px;font-weight:600;">
+                          {{ item.produto.nome }}
+                        </td>
+                        <td align="right" style="color:#6b5b7b;font-size:14px;white-space:nowrap;">
+                          {{ item.quantidade }}x &nbsp;
+                          <strong style="color:#2d1b3d;">R$ {{ item.subtotal }}</strong>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                {% endfor %}
+                <!-- TOTAL -->
+                <tr>
+                  <td style="padding:16px 20px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="font-size:15px;font-weight:700;color:#2d1b3d;">Total pago</td>
+                        <td align="right" style="font-size:18px;font-weight:800;color:#c0527a;">
+                          R$ {{ total }}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-<p><strong>Total:</strong> R$ {{ total }}</p>
+          <!-- MENSAGEM -->
+          <tr>
+            <td style="padding:0 40px 40px;text-align:center;">
+              <p style="margin:0 0 24px;color:#6b5b7b;font-size:14px;line-height:1.7;">
+                Agora é com a gente! 💕 Vamos preparar seu pedido com muito carinho.<br>
+                Você receberá atualizações por aqui quando seu pedido for enviado.
+              </p>
+              <a href="https://nickbrindes.com.br/pedidos/meus-pedidos/"
+                 style="display:inline-block;background:linear-gradient(135deg,#ffb6c8,#d4aaff);color:#fff;text-decoration:none;font-size:14px;font-weight:700;padding:14px 32px;border-radius:50px;">
+                Ver meus pedidos
+              </a>
+            </td>
+          </tr>
 
-<p>Obrigado por comprar na <strong>Nick Brindes</strong>!</p>
+          <!-- FOOTER -->
+          <tr>
+            <td style="background:#fdf6fa;padding:24px 40px;text-align:center;border-top:1px solid #f0e0eb;">
+              <p style="margin:0;color:#b09ab8;font-size:12px;">
+                Mimos da Nick — Feito com 💕 para você<br>
+                Dúvidas? Fale com a gente pelo Instagram ou WhatsApp.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

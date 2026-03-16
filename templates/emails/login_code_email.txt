@@ -1,0 +1,9 @@
+Mimos da Nick — Código de acesso
+
+Seu código de acesso é: {{ code }}
+
+Ele expira em 10 minutos.
+
+Se você não solicitou este código, ignore este e-mail.
+
+Mimos da Nick 💕
