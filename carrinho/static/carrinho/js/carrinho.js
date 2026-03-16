@@ -87,44 +87,105 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // ==========================
-  // CALCULAR FRETE
-  // ==========================
-  if (btnCalcularFrete) {
-    btnCalcularFrete.addEventListener("click", function () {
-      const cep = cepInput.value.replace(/\D/g, "");
+// ==========================
+// CALCULAR FRETE
+// ==========================
+if (btnCalcularFrete) {
+  btnCalcularFrete.addEventListener("click", function () {
+    const cep = cepInput.value.replace(/\D/g, "");
 
-      if (cep.length !== 8) {
-        alert("CEP inválido");
-        return;
-      }
+    if (cep.length !== 8) {
+      alert("CEP inválido");
+      return;
+    }
 
-      fetch("/carrinho/frete/calcular/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "X-CSRFToken": getCSRFToken(),
-          "X-Requested-With": "XMLHttpRequest",
-        },
-        body: `cep=${cep}`
-      })
-        .then(response => response.json())
-        .then(data => {
-          // Backend é a fonte da verdade
-          valorFrete = parseFloat(data.frete.valor) || 0;
+    btnCalcularFrete.disabled = true;
+    btnCalcularFrete.textContent = "Calculando...";
 
-          if (freteValorEl) {
-            freteValorEl.innerText = valorFrete.toFixed(2);
-          }
+    fetch("/carrinho/frete/calcular/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-CSRFToken": getCSRFToken(),
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      body: `cep=${cep}`
+    })
+      .then(response => response.json())
+      .then(data => {
+        btnCalcularFrete.disabled = false;
+        btnCalcularFrete.textContent = "Calcular";
 
+        if (data.status === "erro") {
           if (freteResultadoEl) {
+            freteResultadoEl.innerHTML = `<p class="frete-erro">${data.mensagem}</p>`;
             freteResultadoEl.style.display = "block";
           }
+          return;
+        }
 
-          // Atualiza total corretamente (produto + frete)
-          atualizarTotal();
+        // Monta opções de frete
+        let html = '<div class="frete-opcoes">';
+        data.opcoes.forEach((opcao, index) => {
+          const checked = index === 0 ? "checked" : "";
+          html += `
+            <label class="frete-opcao ${index === 0 ? 'selecionada' : ''}">
+              <input type="radio" name="frete-opcao" value="${opcao.id}"
+                data-valor="${opcao.preco}"
+                data-nome="${opcao.nome}"
+                data-prazo="${opcao.prazo}"
+                data-transportadora="${opcao.transportadora}"
+                ${checked}>
+              <div class="frete-opcao-info">
+                <span class="frete-opcao-nome">${opcao.transportadora} — ${opcao.nome}</span>
+                <span class="frete-opcao-prazo">${opcao.prazo} dia(s) úteis</span>
+              </div>
+              <span class="frete-opcao-preco">R$ ${parseFloat(opcao.preco).toFixed(2).replace(".", ",")}</span>
+            </label>`;
         });
-    });
-  }
+        html += '</div>';
 
+        if (freteResultadoEl) {
+          freteResultadoEl.innerHTML = html;
+          freteResultadoEl.style.display = "block";
+        }
+
+        // Seleciona o primeiro por padrão
+        const primeiroValor = parseFloat(data.opcoes[0].preco) || 0;
+        valorFrete = primeiroValor;
+        if (freteValorEl) freteValorEl.innerText = valorFrete.toFixed(2).replace(".", ",");
+        atualizarTotal();
+
+        // Ao trocar opção
+        document.querySelectorAll('input[name="frete-opcao"]').forEach(radio => {
+          radio.addEventListener("change", function () {
+            document.querySelectorAll(".frete-opcao").forEach(el => el.classList.remove("selecionada"));
+            this.closest(".frete-opcao").classList.add("selecionada");
+
+            valorFrete = parseFloat(this.dataset.valor) || 0;
+            if (freteValorEl) freteValorEl.innerText = valorFrete.toFixed(2).replace(".", ",");
+            atualizarTotal();
+
+            // Atualiza sessão com opção escolhida
+            fetch("/carrinho/frete/selecionar/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),
+                "X-Requested-With": "XMLHttpRequest",
+              },
+              body: JSON.stringify({
+                id: this.value,
+                valor: this.dataset.valor,
+                nome: this.dataset.nome,
+                prazo: this.dataset.prazo,
+                transportadora: this.dataset.transportadora,
+                cep: cep,
+              })
+            });
+          });
+        });
+      });
+  });
+}
 });

@@ -131,6 +131,10 @@ LOGOUT_REDIRECT_URL = 'home'
 
 MERCADO_PAGO_ACCESS_TOKEN = config('MERCADO_PAGO_ACCESS_TOKEN')
 MERCADO_PAGO_PUBLIC_KEY = config('MERCADO_PAGO_PUBLIC_KEY')
+SITE_URL = config('SITE_URL', default='http://localhost:8000')
+
+MELHOR_ENVIO_TOKEN = config('MELHOR_ENVIO_TOKEN', default='')
+CEP_LOJA = config('CEP_LOJA', default='')
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

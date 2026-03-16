@@ -19,6 +19,34 @@ class Produto(models.Model):
     descricao = models.TextField(blank=True)
     preco = models.DecimalField(max_digits=10, decimal_places=2)
 
+    peso = models.DecimalField(
+        max_digits=6,
+        decimal_places=3,
+        default=0.3,
+        help_text="Peso em kg (ex: 0.300)"
+    )
+
+    altura = models.DecimalField(
+        max_digits=5,
+        decimal_places=1,
+        default=10,
+        help_text="Altura em cm"
+    )
+
+    largura = models.DecimalField(
+        max_digits=5,
+        decimal_places=1,
+        default=10,
+        help_text="Largura em cm"
+    )
+
+    comprimento = models.DecimalField(
+        max_digits=5,
+        decimal_places=1,
+        default=10,
+        help_text="Comprimento em cm"
+    )
+
     imagem = models.ImageField(upload_to="produtos/", blank=True)
 
     permite_personalizacao = models.BooleanField(default=False)

@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from produtos.models import Produto, GrupoOpcao, Opcao
 from .models import ItemCarrinho
 from .services import obter_carrinho
+from carrinho.services.melhor_envio_service import calcular_frete_melhor_envio
 
 
 # HELPERS
@@ -220,24 +221,52 @@ def mini_carrinho_json(request):
 
 @require_POST
 def calcular_frete(request):
-    cep = request.POST.get("cep")
-    frete_valor = Decimal("29.90")
-    frete_tipo = "PAC"
+    cep = request.POST.get("cep", "").replace("-", "").strip()
+    carrinho = obter_carrinho(request)
+    itens = carrinho.itens.select_related("produto")
 
+    if not cep or len(cep) != 8:
+        return JsonResponse({"status": "erro", "mensagem": "CEP inválido."})
+
+    if not itens.exists():
+        return JsonResponse({"status": "erro", "mensagem": "Carrinho vazio."})
+
+    opcoes = calcular_frete_melhor_envio(cep, itens)
+
+    if not opcoes:
+        return JsonResponse({"status": "erro", "mensagem": "Não foi possível calcular o frete para este CEP."})
+
+    # Salva a opção mais barata na sessão por padrão
+    melhor = opcoes[0]
     request.session["frete"] = {
         "cep": cep,
-        "valor": str(frete_valor),
-        "tipo": frete_tipo,
+        "valor": str(melhor["preco"]),
+        "tipo": melhor["nome"],
+        "prazo": melhor["prazo"],
+        "transportadora": melhor["transportadora"],
     }
 
     return JsonResponse({
         "status": "ok",
-        "frete": {
-            "cep": cep,
-            "valor": str(frete_valor),
-            "tipo": frete_tipo,
-        }
+        "opcoes": opcoes,
+        "frete": request.session["frete"],
     })
+
+
+@require_POST
+def selecionar_frete(request):
+    import json
+    data = json.loads(request.body)
+    
+    request.session["frete"] = {
+        "cep": data.get("cep"),
+        "valor": str(data.get("valor")),
+        "tipo": data.get("nome"),
+        "prazo": data.get("prazo"),
+        "transportadora": data.get("transportadora"),
+    }
+    
+    return JsonResponse({"status": "ok"})
 
 
 @login_required

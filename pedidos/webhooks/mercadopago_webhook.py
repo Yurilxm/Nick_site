@@ -30,9 +30,8 @@ def webhook_mercadopago(request):
 
         # Limpa o carrinho do usuário após pagamento confirmado
         if pedido.usuario:
-            Carrinho.objects.filter(usuario=pedido.usuario).first(
-            ).itens.all().delete() if Carrinho.objects.filter(
-                usuario=pedido.usuario
-            ).exists() else None
+            carrinho = Carrinho.objects.filter(usuario=pedido.usuario).first()
+            if carrinho:
+                carrinho.itens.all().delete()
 
     return HttpResponse(status=200)

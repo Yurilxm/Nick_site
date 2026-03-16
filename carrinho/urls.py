@@ -9,5 +9,6 @@ urlpatterns = [
     path('diminuir/<int:item_id>/', views.diminuir_quantidade, name='diminuir_quantidade'),
     path('mini/', views.mini_carrinho_json, name='mini_carrinho_json'),
     path("frete/calcular/", views.calcular_frete, name="calcular_frete"),
+    path("frete/selecionar/", views.selecionar_frete, name="selecionar_frete"),
     path('finalizar/', views.finalizar_compra, name='finalizar_compra'),
 ]

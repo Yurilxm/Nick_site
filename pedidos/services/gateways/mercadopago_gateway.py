@@ -10,6 +10,7 @@ class MercadoPagoGateway:
             "transaction_amount": float(pedido.total),
             "payment_method_id": "pix",
             "description": f"Pedido {pedido.id}",
+            "notification_url": f"{settings.SITE_URL}/pedidos/webhook/mercadopago/",
             "payer": {
                 "email": pedido.usuario.email
             }
