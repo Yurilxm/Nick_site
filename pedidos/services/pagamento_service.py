@@ -18,9 +18,6 @@ def criar_pagamento_pix(pedido):
 
     response = gateway.criar_pix(pedido)
 
-    # DEBUG: veja no console o response real
-    print("DEBUG PIX RESPONSE:", response)
-
     payment_id = response.get("id")
     # Alguns campos podem estar dentro de point_of_interaction ou transaction_data
     qr_code = response.get("point_of_interaction", {}).get("transaction_data", {}).get("qr_code")

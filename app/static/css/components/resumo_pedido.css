@@ -50,6 +50,30 @@
     font-style: italic;
 }
 
+/* Botão alterar frete */
+.btn-alterar-frete {
+    display: block;
+    width: calc(100% - 40px);
+    margin: 0 20px 0;
+    padding: 7px 12px;
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-light);
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.btn-alterar-frete:hover {
+    border-color: var(--baby-lilac);
+    color: var(--lilac-mid);
+    background: rgba(205, 180, 219, 0.07);
+}
+
 /* Divisor */
 .checkout-divider {
     height: 2px;

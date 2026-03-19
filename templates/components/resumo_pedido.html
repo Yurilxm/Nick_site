@@ -11,11 +11,30 @@
         </div>
 
         {% if frete %}
-        <div class="checkout-linha">
+        <!-- Frete já calculado — mostra com opção de alterar -->
+        <div class="checkout-linha" id="linha-frete-atual">
             <span>Frete ({{ frete.tipo }})</span>
             <span>R$ {{ frete.valor }}</span>
         </div>
+        <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
+            <button type="button" class="btn-alterar-frete" id="btn-alterar-frete">
+                Alterar frete
+            </button>
+
+            <!-- Bloco de recálculo — oculto por padrão -->
+            <div id="frete-box-checkout" class="frete-box-checkout" style="display:none">
+                <div class="frete-form-checkout">
+                    <input type="text" id="cep-input-checkout"
+                        placeholder="Digite seu CEP" maxlength="9"
+                        value="{{ frete.cep|default:'' }}">
+                    <button type="button" id="btn-calcular-frete-checkout">Calcular</button>
+                </div>
+                <div id="frete-resultado-checkout" style="display:none"></div>
+            </div>
+        </div>
+        
         {% else %}
+        <!-- Frete ainda não calculado -->
         <div class="checkout-linha frete-pendente" id="linha-frete-pendente">
             <span>Frete</span>
             <span>A calcular</span>
@@ -25,7 +44,8 @@
         <div class="frete-box-checkout" id="frete-box-checkout">
             <p class="frete-label">Calcule o frete para continuar</p>
             <div class="frete-form-checkout">
-                <input type="text" id="cep-input-checkout" placeholder="Digite seu CEP" maxlength="9">
+                <input type="text" id="cep-input-checkout"
+                       placeholder="Digite seu CEP" maxlength="9">
                 <button type="button" id="btn-calcular-frete-checkout">Calcular</button>
             </div>
             <div id="frete-resultado-checkout" style="display:none"></div>

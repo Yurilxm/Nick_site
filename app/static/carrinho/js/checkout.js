@@ -1,128 +1,41 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    const cepInput = document.getElementById("cep-input-checkout");
-    const btnCalcular = document.getElementById("btn-calcular-frete-checkout");
-    const freteResultado = document.getElementById("frete-resultado-checkout");
-    const btnConfirmar = document.getElementById("btn-confirmar");
-    const totalEl = document.getElementById("total-geral-checkout");
-    const linhafretePendente = document.getElementById("linha-frete-pendente");
     const cepEnderecoInput = document.getElementById("endereco-cep");
     const btnBuscarCep = document.getElementById("btn-buscar-cep");
+    const btnConfirmar = document.getElementById("btn-confirmar");
+    const linhafretePendente = document.getElementById("linha-frete-pendente");
+    const linhaFreteAtual = document.getElementById("linha-frete-atual");
+    const totalEl = document.getElementById("total-geral-checkout");
+    const btnAlterar = document.getElementById("btn-alterar-frete");
+    const freteBox = document.getElementById("frete-box-checkout");
 
-    if (!btnCalcular) return;
+    // Campos de frete do resumo (podem não existir se frete já está calculado e box está oculto)
+    const cepFreteInput = document.getElementById("cep-input-checkout");
+    const btnCalcularFrete = document.getElementById("btn-calcular-frete-checkout");
+    const freteResultado = document.getElementById("frete-resultado-checkout");
 
     function getCSRFToken() {
         return document.querySelector("[name=csrfmiddlewaretoken]")?.value || "";
     }
 
     // ==========================
-    // VERIFICAR SE CEP FOI APAGADO NO CARRINHO
+    // BOTÃO ALTERAR FRETE
     // ==========================
-    function verificarCepApagado() {
-        const foiApagado = sessionStorage.getItem('cep_foi_apagado') === 'true';
-        const cepBackend = document.getElementById("endereco-cep")?.value.replace(/\D/g, "");
-
-        // Se foi apagado no carrinho OU backend está vazio, limpa tudo
-        if (foiApagado || !cepBackend || cepBackend.length === 0) {
-            [
-                "cep_digitado",
-                "endereco_cep",
-                "endereco_rua",
-                "endereco_numero",
-                "endereco_complemento",
-                "endereco_bairro",
-                "endereco_cidade",
-                "endereco_estado",
-                "frete_selecionado_id"
-            ].forEach(key => sessionStorage.removeItem(key));
-
-            // Limpa os campos do formulário também
-            [
-                "endereco-cep",
-                "endereco-rua",
-                "endereco-numero",
-                "endereco-complemento",
-                "endereco-bairro",
-                "endereco-cidade",
-                "endereco-estado"
-            ].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = "";
-            });
-
-            sessionStorage.removeItem('cep_foi_apagado');
-            return true;
+    btnAlterar?.addEventListener("click", function () {
+        freteBox.style.display = "block";
+        this.style.display = "none";
+        const cepSalvo = sessionStorage.getItem('cep_digitado');
+        if (cepSalvo && cepSalvo.length === 8 && cepFreteInput) {
+            // ✅ Com máscara
+            cepFreteInput.value = cepSalvo.slice(0, 5) + "-" + cepSalvo.slice(5);
         }
-        return false;
-    }
+    });
 
     // ==========================
-    // SALVAR ENDEREÇO
-    // ==========================
-    function salvarEndereco() {
-        const endereco = {
-            cep: document.getElementById("endereco-cep")?.value.replace(/\D/g, "") || "",
-            rua: document.getElementById("endereco-rua")?.value || "",
-            numero: document.getElementById("endereco-numero")?.value || "",
-            complemento: document.getElementById("endereco-complemento")?.value || "",
-            bairro: document.getElementById("endereco-bairro")?.value || "",
-            cidade: document.getElementById("endereco-cidade")?.value || "",
-            estado: document.getElementById("endereco-estado")?.value || "",
-        };
-
-        // Salva no sessionStorage
-        Object.entries(endereco).forEach(([key, val]) => {
-            sessionStorage.setItem(`endereco_${key}`, val);
-        });
-
-        // Salva na sessão do Django
-        fetch("/carrinho/endereco/salvar/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken(), "X-Requested-With": "XMLHttpRequest" },
-            body: JSON.stringify(endereco)
-        });
-    }
-
-    function restaurarEndereco() {
-        // Primeiro: verifica se o CEP foi apagado no carrinho
-        if (verificarCepApagado()) {
-            return;
-        }
-
-        // Só tenta restaurar do sessionStorage se tiver dados
-        const campos = {
-            "endereco-rua": sessionStorage.getItem("endereco_rua"),
-            "endereco-numero": sessionStorage.getItem("endereco_numero"),
-            "endereco-complemento": sessionStorage.getItem("endereco_complemento"),
-            "endereco-bairro": sessionStorage.getItem("endereco_bairro"),
-            "endereco-cidade": sessionStorage.getItem("endereco_cidade"),
-            "endereco-estado": sessionStorage.getItem("endereco_estado"),
-        };
-
-        let preencheuAlgo = false;
-        Object.entries(campos).forEach(([id, valor]) => {
-            if (valor) {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.value = valor;
-                    preencheuAlgo = true;
-                }
-            }
-        });
-
-        if (!preencheuAlgo) {
-            const cepBackend = document.getElementById("endereco-cep")?.value.replace(/\D/g, "");
-            if (cepBackend && cepBackend.length === 8) {
-                setTimeout(() => buscarCep(true), 200);
-            }
-        }
-    }
-
-    // ==========================
-    // VALIDAÇÃO BOTÃO CONFIRMAR
+    // VALIDAÇÃO DO BOTÃO CONFIRMAR
     // ==========================
     function validarEndereco() {
-        const cep = document.getElementById("endereco-cep")?.value.replace(/\D/g, "");
+        const cep = cepEnderecoInput?.value.replace(/\D/g, "");
         const rua = document.getElementById("endereco-rua")?.value.trim();
         const numero = document.getElementById("endereco-numero")?.value.trim();
         const bairro = document.getElementById("endereco-bairro")?.value.trim();
@@ -133,42 +46,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function atualizarBotaoConfirmar() {
         if (!btnConfirmar) return;
-        const temFrete = linhafretePendente
-            ? !linhafretePendente.classList.contains("frete-pendente")
-            : true;
-        if (validarEndereco() && temFrete) {
-            btnConfirmar.disabled = false;
-            btnConfirmar.style.opacity = "1";
-            btnConfirmar.style.cursor = "pointer";
-        } else {
-            btnConfirmar.disabled = true;
-            btnConfirmar.style.opacity = "0.5";
-            btnConfirmar.style.cursor = "not-allowed";
-        }
+        // Se tem linha-frete-pendente ainda com classe pendente, frete não foi calculado
+        const fretePendente = linhafretePendente?.classList.contains("frete-pendente");
+        const enderecoOk = validarEndereco();
+        const ok = enderecoOk && !fretePendente;
+
+        btnConfirmar.disabled = !ok;
+        btnConfirmar.style.opacity = ok ? "1" : "0.5";
+        btnConfirmar.style.cursor = ok ? "pointer" : "not-allowed";
     }
 
-    ["endereco-cep", "endereco-rua", "endereco-numero", "endereco-complemento",
-        "endereco-bairro", "endereco-cidade", "endereco-estado"].forEach(id => {
-            document.getElementById(id)?.addEventListener("input", () => {
-                salvarEndereco();
-                atualizarBotaoConfirmar();
-            });
-        });
+    ["endereco-cep", "endereco-rua", "endereco-numero",
+        "endereco-complemento", "endereco-bairro", "endereco-cidade", "endereco-estado"
+    ].forEach(id => {
+        document.getElementById(id)?.addEventListener("input", atualizarBotaoConfirmar);
+    });
 
     // ==========================
     // BUSCA CEP VIA VIACEP
     // ==========================
     function buscarCep(silencioso = false) {
-        console.log("Buscando CEP:", cepEnderecoInput?.value);
-
         const cep = cepEnderecoInput?.value.replace(/\D/g, "");
         if (!cep || cep.length !== 8) {
             if (!silencioso) alert("Digite um CEP válido");
             return;
         }
-
-        // Remove flag de apagado ao buscar novo CEP
-        sessionStorage.removeItem('cep_foi_apagado');
 
         if (btnBuscarCep) {
             btnBuscarCep.textContent = "Buscando...";
@@ -191,17 +93,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("endereco-bairro").value = data.bairro || "";
                 document.getElementById("endereco-cidade").value = data.localidade || "";
                 document.getElementById("endereco-estado").value = data.uf || "";
-                salvarEndereco();
 
-                if (!silencioso) document.getElementById("endereco-numero")?.focus();
-
-                sessionStorage.setItem("cep_digitado", cep);
-
-                // Sincroniza campo de frete
-                if (cepInput) {
-                    cepInput.value = cep.slice(0, 5) + "-" + cep.slice(5);
+                // Espelha CEP no campo de frete
+                if (cepFreteInput) {
+                    cepFreteInput.value = cep.slice(0, 5) + "-" + cep.slice(5);
                 }
 
+                if (!silencioso) document.getElementById("endereco-numero")?.focus();
                 atualizarBotaoConfirmar();
             })
             .catch(() => {
@@ -214,181 +112,82 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     btnBuscarCep?.addEventListener("click", () => buscarCep(false));
-    cepEnderecoInput?.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") { e.preventDefault(); buscarCep(false); }
-    });
 
     // ==========================
-    // MÁSCARA + AUTOCOMPLETE PROFISSIONAL
+    // MÁSCARA + AUTOCOMPLETE CEP ENDEREÇO
     // ==========================
     cepEnderecoInput?.addEventListener("input", (e) => {
         let v = e.target.value.replace(/\D/g, "").substring(0, 8);
         if (v.length > 5) v = v.slice(0, 5) + "-" + v.slice(5);
         e.target.value = v;
 
-        if (cepInput) cepInput.value = v;
-
         const cepLimpo = v.replace(/\D/g, "");
 
-        // Se está digitando, remove flag de apagado
-        if (cepLimpo.length > 0) {
-            sessionStorage.removeItem('cep_foi_apagado');
-        }
+        // Espelha no campo de frete
+        if (cepFreteInput) cepFreteInput.value = v;
 
-        sessionStorage.setItem("cep_digitado", cepLimpo);
-
-        // 🔥 AUTOCOMPLETE PROFISSIONAL quando CEP completo
+        // CEP completo → busca endereço automaticamente
         if (cepLimpo.length === 8) {
-            // Cancela qualquer timeout anterior
-            clearTimeout(window.cepTimeout);
-
-            // Só executa após 500ms sem digitar
-            window.cepTimeout = setTimeout(() => {
-                // Busca endereço automaticamente
+            clearTimeout(window.cepEnderecoTimeout);
+            window.cepEnderecoTimeout = setTimeout(() => {
                 buscarCep(true);
-
-                // Calcula frete automaticamente (com um pequeno delay extra)
-                setTimeout(() => {
-                    if (btnCalcular) btnCalcular.click();
-                }, 300);
+                // Se ainda não tem frete calculado, calcula automaticamente
+                if (linhafretePendente?.classList.contains("frete-pendente")) {
+                    setTimeout(() => btnCalcularFrete?.click(), 400);
+                }
             }, 500);
         }
 
-        // Limpeza quando apaga o CEP
+        // CEP apagado → limpa campos
         if (cepLimpo.length === 0) {
-            // Marca que foi apagado
-            sessionStorage.setItem('cep_foi_apagado', 'true');
-
             document.getElementById("endereco-rua").value = "";
             document.getElementById("endereco-bairro").value = "";
             document.getElementById("endereco-cidade").value = "";
             document.getElementById("endereco-estado").value = "";
-            salvarEndereco();
-
-            if (freteResultado) freteResultado.style.display = "none";
-            if (linhafretePendente) {
-                linhafretePendente.innerHTML = `<span>Frete</span><span>A calcular</span>`;
-                linhafretePendente.classList.add("frete-pendente");
-            }
-            fetch("/carrinho/frete/limpar/", {
-                method: "POST",
-                headers: { "X-CSRFToken": getCSRFToken(), "X-Requested-With": "XMLHttpRequest" }
-            });
+            if (cepFreteInput) cepFreteInput.value = "";
         }
 
         atualizarBotaoConfirmar();
     });
 
-
-    // CARREGA CEP E ENDEREÇO SALVOS AO ENTRAR NA PÁGINA
-    restaurarEndereco();
-
-    const cepSalvo = sessionStorage.getItem("cep_digitado");
-    const cepBackend = cepEnderecoInput?.value.replace(/\D/g, "");
-
-    // Só usa cepSalvo se NÃO tiver sido apagado
-    const foiApagado = sessionStorage.getItem('cep_foi_apagado') === 'true';
-    const cepFinal = !foiApagado && cepSalvo && cepSalvo.length === 8 ? cepSalvo : cepBackend;
-
-    if (cepFinal && cepFinal.length === 8 && !foiApagado) {
-
-        const formatado = cepFinal.slice(0, 5) + "-" + cepFinal.slice(5);
-
-        if (cepEnderecoInput) cepEnderecoInput.value = formatado;
-        if (cepInput && !cepInput.value) cepInput.value = formatado;
-
-        // 🔥 SEMPRE BUSCA O ENDEREÇO AO CARREGAR
-        setTimeout(() => buscarCep(true), 300);
-
-        // 🔥 E CALCULA FRETE AO CARREGAR
-        setTimeout(() => btnCalcular?.click(), 600);
-    }
-
-    // ==========================
-    // CEP FRETE — ENTER + LIMPAR + SINCRONIZA ENDEREÇO
-    // ==========================
-    cepInput?.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") { e.preventDefault(); btnCalcular.click(); }
+    cepEnderecoInput?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); buscarCep(false); }
     });
 
-    cepInput?.addEventListener("input", () => {
-        const v = cepInput.value;
-        if (cepEnderecoInput) {
-            cepEnderecoInput.value = v;
+    // ==========================
+    // MÁSCARA + SYNC CEP FRETE → ENDEREÇO
+    // ==========================
+    cepFreteInput?.addEventListener("input", () => {
+        let v = cepFreteInput.value.replace(/\D/g, "").substring(0, 8);
+        if (v.length > 5) v = v.slice(0, 5) + "-" + v.slice(5);
+        cepFreteInput.value = v;
 
-            const cepLimpo = v.replace(/\D/g, "");
+        // Espelha no campo de endereço
+        if (cepEnderecoInput) cepEnderecoInput.value = v;
 
-            // Se está digitando, remove flag de apagado
-            if (cepLimpo.length > 0) {
-                sessionStorage.removeItem('cep_foi_apagado');
-            }
+        const cepLimpo = v.replace(/\D/g, "");
 
-            sessionStorage.setItem("cep_digitado", cepLimpo);
+        // CEP completo → busca endereço automaticamente
+        if (cepLimpo.length === 8) {
+            clearTimeout(window.cepFreteTimeout);
+            window.cepFreteTimeout = setTimeout(() => buscarCep(true), 500);
         }
 
-        // CEP completo — busca endereço automaticamente
-        if (v.replace(/\D/g, "").length === 8) {
-            setTimeout(() => buscarCep(true), 400);
-        }
-
-        if (v.replace(/\D/g, "").length === 0) {
-
-            // Marca que foi apagado
-            sessionStorage.setItem('cep_foi_apagado', 'true');
-
-            // 🔥 LIMPA CAMPOS DE ENDEREÇO
-            [
-                "endereco-cep",
-                "endereco-rua",
-                "endereco-numero",
-                "endereco-complemento",
-                "endereco-bairro",
-                "endereco-cidade",
-                "endereco-estado"
-            ].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = "";
-            });
-
-            // 🔥 LIMPA SESSION STORAGE
-            [
-                "cep_digitado",
-                "endereco_cep",
-                "endereco_rua",
-                "endereco_numero",
-                "endereco_complemento",
-                "endereco_bairro",
-                "endereco_cidade",
-                "endereco_estado"
-            ].forEach(key => sessionStorage.removeItem(key));
-
-            // 🔥 LIMPA ENDEREÇO NO BACKEND
-            fetch("/carrinho/endereco/salvar/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": getCSRFToken(),
-                    "X-Requested-With": "XMLHttpRequest"
-                },
-                body: JSON.stringify({
-                    cep: "",
-                    rua: "",
-                    numero: "",
-                    complemento: "",
-                    bairro: "",
-                    cidade: "",
-                    estado: ""
-                })
-            });
-
-            // 🔥 LIMPA FRETE
-            if (freteResultado) freteResultado.style.display = "none";
-
-            if (linhafretePendente) {
-                linhafretePendente.innerHTML = `<span>Frete</span><span>A calcular</span>`;
-                linhafretePendente.classList.add("frete-pendente");
+        if (cepLimpo.length === 0) {
+            // Some as opções
+            if (freteResultado) {
+                freteResultado.innerHTML = "";
+                freteResultado.style.display = "none";
             }
 
+            // Limpa endereço
+            document.getElementById("endereco-rua").value = "";
+            document.getElementById("endereco-bairro").value = "";
+            document.getElementById("endereco-cidade").value = "";
+            document.getElementById("endereco-estado").value = "";
+            if (cepEnderecoInput) cepEnderecoInput.value = "";
+
+            // Limpa frete na sessão Django
             fetch("/carrinho/frete/limpar/", {
                 method: "POST",
                 headers: {
@@ -397,38 +196,40 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
 
-            // 🔥 ATUALIZA TOTAL
-            const subtotal = parseFloat(
-                document.querySelector(".checkout-linha span:last-child")
-                    ?.innerText.replace("R$", "").replace(",", ".").trim() || 0
-            );
-
-            if (totalEl) {
-                totalEl.innerText = `R$ ${subtotal.toFixed(2).replace(".", ",")}`;
+            // Volta linha de frete para pendente
+            if (linhafretePendente) {
+                linhafretePendente.innerHTML = `<span>Frete</span><span>A calcular</span>`;
+                linhafretePendente.classList.add("frete-pendente");
+            }
+            if (linhaFreteAtual) {
+                linhaFreteAtual.innerHTML = `<span>Frete</span><span>A calcular</span>`;
             }
 
+            sessionStorage.removeItem('cep_digitado');
             atualizarBotaoConfirmar();
         }
+    });
+
+    cepFreteInput?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); btnCalcularFrete?.click(); }
     });
 
     // ==========================
     // CALCULAR FRETE
     // ==========================
-    btnCalcular.addEventListener("click", function () {
-        const cep = cepInput.value.replace(/\D/g, "");
+    btnCalcularFrete?.addEventListener("click", function () {
+        const cep = cepFreteInput?.value.replace(/\D/g, "");
+        if (!cep || cep.length !== 8) { alert("CEP inválido"); return; }
 
-        // Remove flag de apagado ao calcular novo CEP
-        sessionStorage.removeItem('cep_foi_apagado');
-        sessionStorage.setItem("cep_digitado", cep);
-
+        // Garante que CEP de endereço também está preenchido
         if (cepEnderecoInput) {
-            cepEnderecoInput.value = cep.length > 5 ? cep.slice(0, 5) + "-" + cep.slice(5) : cep;
+            cepEnderecoInput.value = cep.slice(0, 5) + "-" + cep.slice(5);
         }
 
-        if (cep.length !== 8) { alert("CEP inválido"); return; }
+        sessionStorage.setItem('cep_digitado', cep);
 
-        btnCalcular.disabled = true;
-        btnCalcular.textContent = "Calculando...";
+        btnCalcularFrete.disabled = true;
+        btnCalcularFrete.textContent = "Calculando...";
 
         fetch("/carrinho/frete/calcular/", {
             method: "POST",
@@ -441,8 +242,8 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then(r => r.json())
             .then(data => {
-                btnCalcular.disabled = false;
-                btnCalcular.textContent = "Calcular";
+                btnCalcularFrete.disabled = false;
+                btnCalcularFrete.textContent = "Calcular";
 
                 if (data.status === "erro") {
                     if (freteResultado) {
@@ -469,17 +270,28 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
                 html += '</div>';
 
-                if (freteResultado) { freteResultado.innerHTML = html; freteResultado.style.display = "block"; }
+                if (freteResultado) {
+                    freteResultado.innerHTML = html;
+                    freteResultado.style.display = "block";
+                }
 
                 selecionarOpcao(data.opcoes[0], cep);
+
+                const ruaAtual = document.getElementById("endereco-rua")?.value.trim();
+                if (!ruaAtual) {
+                    setTimeout(() => buscarCep(true), 200);
+                }
 
                 document.querySelectorAll('input[name="frete-opcao-checkout"]').forEach(radio => {
                     radio.addEventListener("change", function () {
                         document.querySelectorAll(".frete-opcao").forEach(el => el.classList.remove("selecionada"));
                         this.closest(".frete-opcao").classList.add("selecionada");
                         selecionarOpcao({
-                            id: this.value, preco: this.dataset.valor, nome: this.dataset.nome,
-                            prazo: this.dataset.prazo, transportadora: this.dataset.transportadora,
+                            id: this.value,
+                            preco: this.dataset.valor,
+                            nome: this.dataset.nome,
+                            prazo: this.dataset.prazo,
+                            transportadora: this.dataset.transportadora,
                         }, cep);
                     });
                 });
@@ -490,21 +302,31 @@ document.addEventListener("DOMContentLoaded", function () {
     // SELECIONAR OPÇÃO DE FRETE
     // ==========================
     function selecionarOpcao(opcao, cep) {
+        sessionStorage.setItem('frete_selecionado_id', String(opcao.id));
+
         fetch("/carrinho/frete/selecionar/", {
             method: "POST",
-            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken(), "X-Requested-With": "XMLHttpRequest" },
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),
+                "X-Requested-With": "XMLHttpRequest"
+            },
             body: JSON.stringify({
-                id: opcao.id, valor: opcao.preco, nome: opcao.nome,
-                prazo: opcao.prazo, transportadora: opcao.transportadora, cep: cep,
+                id: opcao.id,
+                valor: opcao.preco,
+                nome: opcao.nome,
+                prazo: opcao.prazo,
+                transportadora: opcao.transportadora,
+                cep: cep,
             })
         }).then(() => {
-            const subtotal = parseFloat(
-                document.querySelector(".checkout-linha span:last-child")
-                    ?.innerText.replace("R$", "").replace(",", ".").trim() || 0
-            );
+            const subtotalEl = document.querySelector(".checkout-linha span:last-child");
+            const subtotal = parseFloat(subtotalEl?.innerText.replace("R$", "").replace(",", ".").trim() || 0);
             const frete = parseFloat(opcao.preco) || 0;
+
             if (totalEl) totalEl.innerText = `R$ ${(subtotal + frete).toFixed(2).replace(".", ",")}`;
 
+            // Atualiza linha de frete pendente → calculado
             if (linhafretePendente) {
                 linhafretePendente.innerHTML = `
                     <span>Frete (${opcao.transportadora} — ${opcao.nome})</span>
@@ -513,27 +335,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 linhafretePendente.classList.remove("frete-pendente");
             }
 
+            // Atualiza linha de frete já existente (caso "Alterar")
+            if (linhaFreteAtual) {
+                linhaFreteAtual.innerHTML = `
+                    <span>Frete (${opcao.nome})</span>
+                    <span>R$ ${parseFloat(opcao.preco).toFixed(2).replace(".", ",")}</span>
+                `;
+            }
+
             atualizarBotaoConfirmar();
         });
     }
 
-    // Executa verificação inicial
-    verificarCepApagado();
+    // ==========================
+    // ESTADO INICIAL
+    // ==========================
     atualizarBotaoConfirmar();
-
-    // Garantir que se tiver CEP no campo, busque o endereço
-    if (cepEnderecoInput && cepEnderecoInput.value.replace(/\D/g, "").length === 8) {
-        setTimeout(() => buscarCep(true), 100);
-    }
-
-    // Verificação extra
-    setTimeout(() => {
-        const cepAtual = cepEnderecoInput?.value.replace(/\D/g, "");
-        const ruaAtual = document.getElementById("endereco-rua")?.value.trim();
-        const foiApagado = sessionStorage.getItem('cep_foi_apagado') === 'true';
-
-        if (cepAtual && cepAtual.length === 8 && !ruaAtual && !foiApagado) {
-            buscarCep(true);
-        }
-    }, 500);
 });

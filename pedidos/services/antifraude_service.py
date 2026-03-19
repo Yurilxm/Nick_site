@@ -8,9 +8,9 @@ def validar_pedido(pedido):
     if pedido.total > 10000:
         return False
 
-    # 2. Bloqueia admins/staff (descomentado antes do deploy)
-    # if pedido.usuario and pedido.usuario.is_staff:
-    #     return False
+    # 2. Bloqueia admins/staff
+    if pedido.usuario and pedido.usuario.is_staff:
+        return False
 
     # 3. Pedido com valor zerado ou negativo
     if pedido.total <= 0:

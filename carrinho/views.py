@@ -7,6 +7,7 @@ from produtos.models import Produto, GrupoOpcao, Opcao
 from .models import ItemCarrinho
 from .services import obter_carrinho
 from carrinho.services.melhor_envio_service import calcular_frete_melhor_envio
+from carrinho.services.endereco_service import validar_endereco
 
 
 # HELPERS
@@ -121,7 +122,6 @@ def ver_carrinho(request):
 
     if not itens.exists():
         request.session.pop("frete", None)
-        request.session.pop("endereco", None)  # 🔥 NOVO: Limpa endereço se carrinho vazio
 
     traduzir_opcoes(itens)
 
@@ -144,30 +144,6 @@ def limpar_frete(request):
     request.session.pop("frete", None)
     return JsonResponse({"status": "ok"})
 
-
-@require_POST
-def salvar_endereco(request):
-    import json
-    data = json.loads(request.body)
-    
-    # 🔥 MELHORIA: Só salva se tiver CEP ou se for uma limpeza explícita
-    cep = data.get("cep", "")
-    
-    if cep:  # Tem CEP, salva normalmente
-        request.session["endereco"] = {
-            "cep": cep,
-            "rua": data.get("rua", ""),
-            "bairro": data.get("bairro", ""),
-            "cidade": data.get("cidade", ""),
-            "estado": data.get("estado", ""),
-            "numero": data.get("numero", ""),
-            "complemento": data.get("complemento", ""),
-        }
-    else:  # CEP vazio = limpeza
-        request.session.pop("endereco", None)
-        request.session.pop("frete", None)  # 🔥 NOVO: Limpa frete junto
-    
-    return JsonResponse({"status": "ok"})
 
 
 @require_POST
@@ -317,50 +293,25 @@ def finalizar_compra(request):
     total_geral = total_produtos + valor_frete
 
     if request.method == "POST":
-        # Salva endereço na sessão
         request.session["endereco"] = {
-            "cep": request.POST.get("cep_entrega", ""),
-            "rua": request.POST.get("rua", ""),
-            "numero": request.POST.get("numero", ""),
+            "cep":         request.POST.get("cep_entrega", ""),
+            "rua":         request.POST.get("rua", ""),
+            "numero":      request.POST.get("numero", ""),
             "complemento": request.POST.get("complemento", ""),
-            "bairro": request.POST.get("bairro", ""),
-            "cidade": request.POST.get("cidade", ""),
-            "estado": request.POST.get("estado", ""),
-        }
-
-        request.session["resumo_checkout"] = {
-            "total_produtos": str(total_produtos),
-            "valor_frete": str(valor_frete),
-            "total_geral": str(total_geral),
-            "frete": frete,
+            "bairro":      request.POST.get("bairro", ""),
+            "cidade":      request.POST.get("cidade", ""),
+            "estado":      request.POST.get("estado", ""),
         }
         return redirect("pedidos:pagamento")
 
-    # 🔥 MELHORIA: Busca endereço da sessão ou cria vazio
     endereco = request.session.get("endereco", {})
-
-    print("DEBUG ENDERECO SESSAO:", request.session.get("endereco"))
-    
-    # Se não tem endereço completo mas tem frete, usa CEP do frete
-    if (not endereco or not endereco.get("rua")) and frete and frete.get("cep"):
-        endereco = {
-            "cep": frete.get("cep", ""),
-            "rua": "",
-            "bairro": "",
-            "cidade": "",
-            "estado": "",
-            "numero": "",
-            "complemento": "",
-        }
-    
-    # 🔥 Garante que endereço é um dicionário
     if not isinstance(endereco, dict):
         endereco = {}
 
     return render(request, "carrinho/checkout.html", {
-        "itens": itens,
+        "itens":          itens,
         "total_produtos": total_produtos,
-        "frete": frete,
-        "total_geral": total_geral,
-        "endereco": endereco,
+        "frete":          frete,
+        "total_geral":    total_geral,
+        "endereco":       endereco,
     })
