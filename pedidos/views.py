@@ -28,8 +28,12 @@ def pagamento(request):
     if request.method == "POST":
         metodo = request.POST.get("metodo")
         frete_sessao = request.session.get("frete") or {}
+        endereco = request.session.get("endereco", {})
 
-        pedido = criar_pedido(request.user, carrinho, frete_sessao)
+        if not endereco or not endereco.get("cep") or not endereco.get("rua"):
+            return redirect("carrinho:checkout")
+
+        pedido = criar_pedido(request.user, carrinho, frete_sessao, endereco)
         pedido.status = "aguardando_pagamento"
         pedido.save()
 
@@ -42,8 +46,6 @@ def pagamento(request):
 
         if metodo == "pix":
             pagamento_obj = criar_pagamento_pix(pedido)
-            # Limpa sessão após criar pedido com sucesso
-            carrinho.itens.all().delete()
             request.session.pop("resumo_checkout", None)
             request.session.pop("frete", None)
             return render(request, "pedidos/pagamentos/pix.html", {
@@ -53,7 +55,6 @@ def pagamento(request):
 
         if metodo == "boleto":
             pagamento_obj = criar_pagamento_boleto(pedido)
-            carrinho.itens.all().delete()
             request.session.pop("resumo_checkout", None)
             request.session.pop("frete", None)
             return redirect(pagamento_obj.boleto_url)

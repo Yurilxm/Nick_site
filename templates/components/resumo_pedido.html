@@ -16,23 +16,35 @@
             <span>R$ {{ frete.valor }}</span>
         </div>
         {% else %}
-        <div class="checkout-linha frete-pendente">
+        <div class="checkout-linha frete-pendente" id="linha-frete-pendente">
             <span>Frete</span>
             <span>A calcular</span>
         </div>
+
+        {% if btn_confirmar %}
+        <div class="frete-box-checkout" id="frete-box-checkout">
+            <p class="frete-label">Calcule o frete para continuar</p>
+            <div class="frete-form-checkout">
+                <input type="text" id="cep-input-checkout" placeholder="Digite seu CEP" maxlength="9">
+                <button type="button" id="btn-calcular-frete-checkout">Calcular</button>
+            </div>
+            <div id="frete-resultado-checkout" style="display:none"></div>
+        </div>
+        {% endif %}
         {% endif %}
 
         <div class="checkout-divider"></div>
 
-        <div class="checkout-linha total" data-total-geral="{{ total_geral }}">
+        <div class="checkout-linha total" id="linha-total">
             <span>Total</span>
-            <span>R$ {{ total_geral }}</span>
+            <span id="total-geral-checkout">R$ {{ total_geral }}</span>
         </div>
 
         {% if btn_confirmar %}
-        <form method="post">
+        <form method="post" id="form-confirmar">
             {% csrf_token %}
-            <button type="submit" class="btn-confirmar">
+            <button type="submit" class="btn-confirmar" id="btn-confirmar"
+                {% if not frete %}disabled style="opacity:0.5;cursor:not-allowed;"{% endif %}>
                 Confirmar pedido
             </button>
         </form>

@@ -452,8 +452,8 @@
 #frete-resultado {
     margin-top: 10px;
     padding: 10px 14px;
-    background: rgba(189, 224, 254, 0.2);
-    border: 1.5px solid rgba(189, 224, 254, 0.5);
+    background: rgba(205, 180, 219, 0.08);
+    border: 1.5px solid var(--border);
     border-radius: 10px;
     font-size: 13px;
     font-weight: 600;
@@ -463,6 +463,94 @@
 #frete-resultado strong {
     color: var(--text-dark);
     font-weight: 800;
+}
+
+/* =============================================
+   OPÇÕES DE FRETE
+   ============================================= */
+.frete-opcoes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.frete-opcao {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: rgba(255,255,255,0.8);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.frete-opcao:hover {
+    border-color: var(--baby-pink);
+    background: rgba(255, 175, 204, 0.06);
+}
+
+.frete-opcao.selecionada {
+    border-color: var(--pink-mid);
+    background: linear-gradient(135deg, rgba(255,175,204,0.12), rgba(205,180,219,0.12));
+}
+
+.frete-opcao input[type="radio"] {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--baby-pink);
+    background: white;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.frete-opcao input[type="radio"]:checked {
+    background: var(--pink-mid);
+    border-color: var(--pink-mid);
+    box-shadow: 0 0 0 3px rgba(255, 133, 161, 0.2);
+}
+
+.frete-opcao-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.frete-opcao-nome {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.frete-opcao-prazo {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.frete-opcao-preco {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--pink-mid);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.frete-erro {
+    font-size: 12px;
+    color: #e05c5c;
+    font-weight: 600;
+    margin: 0;
+    padding: 10px 14px;
+    background: rgba(224, 92, 92, 0.08);
+    border: 1.5px solid rgba(224, 92, 92, 0.2);
+    border-radius: 10px;
 }
 
 /* =============================================

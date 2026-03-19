@@ -11,4 +11,6 @@ urlpatterns = [
     path("frete/calcular/", views.calcular_frete, name="calcular_frete"),
     path("frete/selecionar/", views.selecionar_frete, name="selecionar_frete"),
     path('finalizar/', views.finalizar_compra, name='finalizar_compra'),
+    path("frete/limpar/", views.limpar_frete, name="limpar_frete"),
+    path("endereco/salvar/", views.salvar_endereco, name="salvar_endereco"),
 ]

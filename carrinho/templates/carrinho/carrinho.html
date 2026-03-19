@@ -83,14 +83,14 @@
         </div>
 
         {% if frete %}
-        <div id="frete-resultado">
-          Entrega padrão:
-          <strong>R$ <span id="frete-valor">{{ frete.valor }}</span></strong>
+        <div id="frete-resultado" style="display:block">
+            <strong>{{ frete.transportadora }} — {{ frete.tipo }}</strong><br>
+            <span style="font-size:11px;color:var(--text-light);">{{ frete.prazo }} dia(s) úteis</span><br>
+            R$ <span id="frete-valor">{{ frete.valor }}</span>
         </div>
         {% else %}
         <div id="frete-resultado" style="display:none">
-          Entrega padrão:
-          <strong>R$ <span id="frete-valor">0.00</span></strong>
+            <span id="frete-valor">0.00</span>
         </div>
         {% endif %}
       </div>

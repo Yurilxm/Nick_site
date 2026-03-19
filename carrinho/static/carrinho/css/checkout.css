@@ -294,8 +294,89 @@
 .checkout-seguranca p { margin: 0; line-height: 1.4; }
 
 /* ====================================
-   RESPONSIVO
+   ENDEREÇO DE ENTREGA
 ==================================== */
+.endereco-form {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.endereco-linha {
+    display: flex;
+    gap: 16px;
+}
+
+.endereco-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.endereco-campo.flex-3 { flex: 3; }
+.endereco-campo.flex-1 { flex: 1; }
+
+.endereco-campo label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-mid);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.endereco-campo input {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: rgba(255,255,255,0.8);
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dark);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.endereco-campo input:focus {
+    border-color: var(--baby-pink);
+    box-shadow: 0 0 0 3px rgba(255, 175, 204, 0.18);
+}
+
+.endereco-campo input::placeholder {
+    color: var(--text-light);
+    font-weight: 400;
+}
+
+.cep-grupo {
+    display: flex;
+    gap: 8px;
+}
+
+.cep-grupo input {
+    flex: 1;
+}
+
+.cep-grupo button {
+    padding: 10px 14px;
+    background: linear-gradient(135deg, var(--baby-blue), var(--baby-lilac));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: filter 0.2s;
+}
+
+.cep-grupo button:hover {
+    filter: brightness(1.08);
+}
+
+
 @media (max-width: 768px) {
     .checkout-layout { flex-direction: column; }
     .checkout-resumo { position: static; width: 100%; min-width: unset; }

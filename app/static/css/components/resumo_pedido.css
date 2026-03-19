@@ -154,3 +154,134 @@
         min-width: unset;
     }
 }
+
+
+/* Frete no checkout */
+.frete-box-checkout {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.frete-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-mid);
+    margin-bottom: 8px;
+}
+
+.frete-form-checkout {
+    display: flex;
+    gap: 8px;
+}
+
+.frete-form-checkout input {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dark);
+    outline: none;
+}
+
+.frete-form-checkout input:focus {
+    border-color: var(--baby-pink);
+}
+
+.frete-form-checkout button {
+    padding: 8px 12px;
+    background: linear-gradient(135deg, var(--baby-blue), var(--baby-lilac));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+#frete-resultado-checkout {
+    margin-top: 8px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+/* Opções de frete — igual ao carrinho */
+#frete-resultado-checkout .frete-opcoes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+#frete-resultado-checkout .frete-opcao {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: rgba(255,255,255,0.8);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+#frete-resultado-checkout .frete-opcao:hover {
+    border-color: var(--baby-pink);
+    background: rgba(255, 175, 204, 0.06);
+}
+
+#frete-resultado-checkout .frete-opcao.selecionada {
+    border-color: var(--pink-mid);
+    background: linear-gradient(135deg, rgba(255,175,204,0.12), rgba(205,180,219,0.12));
+}
+
+#frete-resultado-checkout .frete-opcao input[type="radio"] {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--baby-pink);
+    background: white;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#frete-resultado-checkout .frete-opcao input[type="radio"]:checked {
+    background: var(--pink-mid);
+    border-color: var(--pink-mid);
+    box-shadow: 0 0 0 3px rgba(255, 133, 161, 0.2);
+}
+
+#frete-resultado-checkout .frete-opcao-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+#frete-resultado-checkout .frete-opcao-nome {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+#frete-resultado-checkout .frete-opcao-prazo {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+#frete-resultado-checkout .frete-opcao-preco {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--pink-mid);
+    white-space: nowrap;
+    flex-shrink: 0;
+}

@@ -2,7 +2,7 @@ from decimal import Decimal
 from pedidos.models import Pedido, PedidoItem
 
 
-def criar_pedido(usuario, carrinho, frete):
+def criar_pedido(usuario, carrinho, frete, endereco):
 
     total_produtos = sum(item.subtotal for item in carrinho.itens.all())
     valor_frete = Decimal(frete["valor"]) if frete and frete.get("valor") else Decimal("0")
@@ -11,11 +11,14 @@ def criar_pedido(usuario, carrinho, frete):
     pedido = Pedido.objects.create(
         usuario=usuario,
         total=total,
-        cep_entrega=frete["cep"] if frete else "",
-        rua=frete.get("rua", "") if frete else "",
-        bairro=frete.get("bairro", "") if frete else "",
-        cidade=frete.get("cidade", "") if frete else "",
-        estado=frete.get("estado", "") if frete else "",
+
+        cep_entrega=endereco.get("cep_entrega", ""),
+        rua=endereco.get("rua", ""),
+        numero=endereco.get("numero", ""),
+        complemento=endereco.get("complemento", ""),
+        bairro=endereco.get("bairro", ""),
+        cidade=endereco.get("cidade", ""),
+        estado=endereco.get("estado", ""),
     )
 
     for item in carrinho.itens.all():
