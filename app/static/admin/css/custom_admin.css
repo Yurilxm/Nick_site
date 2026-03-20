@@ -355,3 +355,51 @@
   border-color: var(--link-fg, #447e9b);
   color: #fff;
 }
+
+/* ── AVALIAÇÃO: preview da foto ─────────────────────────── */
+.avaliacao-foto-preview {
+  display: block;
+  max-width: 220px;
+  max-height: 160px;
+  object-fit: contain;
+  border-radius: 8px;
+  margin-top: 10px;
+  border: 1.5px solid #e0c0f0;
+  cursor: zoom-in;
+  transition: opacity 0.2s;
+}
+
+.avaliacao-foto-preview:hover {
+  opacity: 0.85;
+}
+
+.avaliacao-preview-novo {
+  margin-top: 10px;
+}
+
+.avaliacao-preview-label {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+/* ── IMAGEM SOBRE: thumbnail no admin ───────────────────── */
+.imagem-sobre-thumb {
+  display: block;
+  max-width: 200px;
+  max-height: 140px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1.5px solid #e0c0f0;
+  margin-top: 8px;
+  cursor: zoom-in;
+  transition: opacity 0.2s;
+}
+
+.imagem-sobre-thumb:hover {
+  opacity: 0.85;
+}
+
+.imagem-sobre-preview-novo {
+  margin-top: 10px;
+}

@@ -187,3 +187,65 @@ class ProdutoImagem(models.Model):
 
     def __str__(self):
         return f"{self.get_tipo_display()} - {self.produto.nome}"
+
+
+
+class ConfiguracaoSobre(models.Model):
+    foto_equipe = models.ImageField(
+        upload_to="sobre/",
+        blank=True,
+        null=True,
+        help_text="Foto da equipe/loja exibida na seção 'Nossa história'"
+    )
+
+    class Meta:
+        verbose_name = "Configuração da Página Sobre"
+        verbose_name_plural = "Configuração da Página Sobre"
+
+    def __str__(self):
+        return "Configuração da Página Sobre"
+
+    def save(self, *args, **kwargs):
+        # Garante que só existe um registro
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
+
+
+
+class Avaliacao(models.Model):
+    nome = models.CharField(max_length=100)
+    comentario = models.TextField()
+    estrelas = models.PositiveIntegerField(default=5)
+
+    foto = models.ImageField(upload_to="avaliacoes/", blank=True, null=True)
+
+    aprovado = models.BooleanField(default=False)
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criado_em"]
+        verbose_name = "Avaliação"
+        verbose_name_plural = "Avaliações"
+
+    def __str__(self):
+        return f"{self.nome} ({self.estrelas}⭐)"
+
+
+class ImagemSobre(models.Model):
+    imagem = models.ImageField(upload_to="sobre/")
+    ordem = models.PositiveIntegerField(default=0)
+    ativo = models.BooleanField(default=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criado_em"]
+        verbose_name = "Imagem da Página Sobre"
+        verbose_name_plural = "Imagens da Página Sobre"
+
+    def __str__(self):
+        return f"Imagem Sobre #{self.id}"

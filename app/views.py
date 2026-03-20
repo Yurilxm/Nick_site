@@ -16,8 +16,6 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
 
-
-
 class LoginCustomView(LoginView):
     template_name = "auth/login.html"
 
@@ -128,10 +126,6 @@ def cadernetas_view(request):
     return render(request, 'pages/cadernetas.html')
 
 
-def sobre_view(request):
-    return render(request, 'pages/sobre.html')
-
-
 def contato_view(request):
     return render(request, 'pages/contato.html')
 
@@ -155,7 +149,6 @@ def send_login_code_view(request):
         code = login_code()
         LoginCode.create_code(email=email, code=code)
 
-        # Renderiza templates
         contexto = {'code': code}
         mensagem_texto = render_to_string('emails/login_code_email.txt', contexto)
         mensagem_html = render_to_string('emails/login_code_email.html', contexto)
@@ -266,8 +259,6 @@ class PasswordResetCompleteCustomView(PasswordResetCompleteView):
     template_name = 'auth/password_reset_complete.html'
 
 
-
-
 @require_GET
 def search_products_view(request):
     query = request.GET.get('q', '').strip()
@@ -292,8 +283,3 @@ def search_products_view(request):
     ]
 
     return JsonResponse({'results': results})
-
-
-
-def sobre_view(request):
-    return render(request, 'marketing/sobre.html')

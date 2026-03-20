@@ -4,7 +4,7 @@ from django.utils.html import format_html
 from django.forms.models import BaseInlineFormSet
 from django.core.exceptions import ValidationError
 from django.urls import reverse
-from .models import Produto, Categoria, ProdutoImagem, GrupoOpcao, Opcao
+from .models import Produto, Categoria, ProdutoImagem, GrupoOpcao, Opcao, Avaliacao, ImagemSobre, ConfiguracaoSobre
 from adminsortable2.admin import SortableAdminBase, SortableAdminMixin
 
 
@@ -195,6 +195,8 @@ class ProdutoAdmin(admin.ModelAdmin):
         js = ("admin/js/produto_admin.js",)
 
 
+
+# CATEGORIA
 @admin.register(Categoria)
 class CategoriaAdmin(SortableAdminMixin, SortableAdminBase, admin.ModelAdmin):
 
@@ -213,6 +215,7 @@ class CategoriaAdmin(SortableAdminMixin, SortableAdminBase, admin.ModelAdmin):
     acoes.short_description = "Ações"
 
 
+# GRUPO OPÇÔES
 @admin.register(GrupoOpcao)
 class GrupoOpcaoAdmin(admin.ModelAdmin):
 
@@ -238,3 +241,117 @@ class GrupoOpcaoAdmin(admin.ModelAdmin):
             "all": ("admin/css/custom_admin.css",)
         }
         js = ("admin/js/produto_admin.js",)
+
+
+
+@admin.register(ConfiguracaoSobre)
+class ConfiguracaoSobreAdmin(admin.ModelAdmin):
+    readonly_fields = ("foto_preview",)
+
+    fieldsets = (
+        ("📸 Foto da Equipe / Loja", {
+            "fields": ("foto_equipe", "foto_preview"),
+            "description": "Aparece na seção 'Nossa história' da página Sobre."
+        }),
+    )
+
+    def foto_preview(self, obj):
+        if obj.foto_equipe:
+            return format_html(
+                '<img src="{}" class="imagem-sobre-thumb" />',
+                obj.foto_equipe.url
+            )
+        return "Nenhuma foto cadastrada"
+    foto_preview.short_description = "Preview"
+
+    def has_add_permission(self, request):
+        # Impede criar mais de um registro
+        return not ConfiguracaoSobre.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    class Media:
+        css = {"all": ("admin/css/custom_admin.css",)}
+        js = ("admin/js/avaliacao_admin.js",)
+
+        
+
+# AVALIAÇÕES
+@admin.register(Avaliacao)
+class AvaliacaoAdmin(admin.ModelAdmin):
+
+    list_display = ("foto_thumb", "nome", "estrelas", "aprovado", "criado_em")
+    list_filter = ("aprovado", "estrelas")
+    search_fields = ("nome", "comentario")
+    ordering = ("-criado_em",)
+    readonly_fields = ("foto_preview",)
+
+    fieldsets = (
+        ("✍️ Avaliação", {
+            "fields": ("nome", "comentario", "estrelas", "aprovado")
+        }),
+        ("📷 Foto", {
+            "fields": ("foto", "foto_preview")
+        }),
+    )
+
+    def foto_thumb(self, obj):
+        if obj.foto:
+            return format_html('<img src="{}" style="height:50px;border-radius:6px;" />', obj.foto.url)
+        return "—"
+    foto_thumb.short_description = "Foto"
+
+    def foto_preview(self, obj):
+        if obj.foto:
+            return format_html(
+                '<img src="{}" class="avaliacao-foto-preview" />',
+                obj.foto.url
+            )
+        return "Nenhuma foto cadastrada"
+    foto_preview.short_description = "Preview"
+
+    class Media:
+        css = {"all": ("admin/css/custom_admin.css",)}
+        js = ("admin/js/avaliacao_admin.js",)
+
+
+@admin.register(ImagemSobre)
+class ImagemSobreAdmin(SortableAdminMixin, SortableAdminBase, admin.ModelAdmin):
+
+    list_display = ("imagem_thumb", "ordem", "ativo", "acoes")
+    ordering = ("ordem",)
+    sortable_field_name = "ordem"
+    readonly_fields = ("imagem_preview",)
+
+    fieldsets = (
+        ("🖼️ Imagem", {
+            "fields": ("imagem", "imagem_preview", "ordem", "ativo")
+        }),
+    )
+
+    def imagem_thumb(self, obj):
+        if obj.imagem:
+            return format_html(
+                '<img src="{}" class="admin-list-img" />',
+                obj.imagem.url
+            )
+        return "—"
+    imagem_thumb.short_description = "Imagem"
+
+    def imagem_preview(self, obj):
+        if obj.imagem:
+            return format_html(
+                '<img src="{}" class="imagem-sobre-thumb" />',
+                obj.imagem.url
+            )
+        return "Nenhuma imagem cadastrada"
+    imagem_preview.short_description = "Preview"
+
+    def acoes(self, obj):
+        return action_buttons(obj, "produtos", "imagemsobre")
+    acoes.short_description = "Ações"
+
+    class Media:
+        css = {"all": ("admin/css/custom_admin.css",)}
+        js = ("admin/js/avaliacao_admin.js",)

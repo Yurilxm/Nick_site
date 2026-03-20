@@ -14,11 +14,12 @@ from app.views import (
     PasswordResetConfirmCustomView,
     PasswordResetCompleteCustomView,
 )
+from produtos.views import sobre
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view, name='home'),
-    path('sobre/', views.sobre_view, name='sobre'),
+    path('sobre/', sobre, name='sobre'),
     path('contato/', views.contato_view, name='contato'),
     path('login/', LoginCustomView.as_view(), name='login'),
     path('logout/', logout_view, name='logout'),

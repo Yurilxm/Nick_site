@@ -6,4 +6,3 @@ urlpatterns = [
     path('categoria/<slug:slug>/', produtos_por_categoria, name='produtos_por_categoria'),
     path('<int:id>/<slug:slug>/', detalhe_produto, name='detalhe_produto'),
 ]
-
