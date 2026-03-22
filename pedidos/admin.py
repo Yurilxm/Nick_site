@@ -8,7 +8,6 @@ from django.utils.safestring import mark_safe
 
 
 class PedidoItemInline(admin.TabularInline):
-
     model = PedidoItem
     extra = 0
 
@@ -20,13 +19,7 @@ class PedidoItemInline(admin.TabularInline):
         "mostrar_personalizacao",
     )
 
-    fields = (
-        "produto",
-        "quantidade",
-        "preco_unitario",
-        "subtotal",
-        "mostrar_personalizacao",
-    )
+    fields = readonly_fields
 
     def mostrar_personalizacao(self, obj):
         if not obj.opcoes:
@@ -45,7 +38,6 @@ class PedidoItemInline(admin.TabularInline):
 
 
 class CategoriaPedidoFilter(SimpleListFilter):
-
     title = "Categoria do Produto"
     parameter_name = "categoria"
 
@@ -54,12 +46,10 @@ class CategoriaPedidoFilter(SimpleListFilter):
         return [(c.id, c.nome) for c in categorias]
 
     def queryset(self, request, queryset):
-
         if self.value():
             return queryset.filter(
                 itens__produto__categoria__id=self.value()
             ).distinct()
-
         return queryset
 
 
@@ -99,10 +89,10 @@ class PedidoAdmin(admin.ModelAdmin):
     )
 
     actions = (
-        "avancar_status",
         "marcar_em_producao",
         "marcar_enviado",
         "marcar_entregue",
+        "avancar_status",
     )
 
     inlines = [PedidoItemInline]
@@ -110,10 +100,7 @@ class PedidoAdmin(admin.ModelAdmin):
     def cliente(self, obj):
         return obj.usuario.username if obj.usuario else "Cliente anônimo"
 
-    cliente.short_description = "Cliente"
-
     def status_colorido(self, obj):
-
         cores = {
             "criado": "gray",
             "aguardando_pagamento": "orange",
@@ -133,14 +120,8 @@ class PedidoAdmin(admin.ModelAdmin):
             obj.get_status_display()
         )
 
-    status_colorido.short_description = "Status"
-
     def produtos(self, obj):
-        return ", ".join(
-            item.produto.nome for item in obj.itens.all()
-        )
-
-    produtos.short_description = "Produtos"
+        return ", ".join(item.produto.nome for item in obj.itens.all())
 
     def ficha_producao(self, obj):
         cliente = obj.usuario.username if obj.usuario else "Cliente anônimo"
@@ -157,64 +138,48 @@ class PedidoAdmin(admin.ModelAdmin):
 
         for item in obj.itens.all():
             linhas.append(f"<b>Produto:</b> {item.produto.nome}<br>")
-            linhas.append(f"<b>Quantidade:</b> {item.quantidade}<br>")
-
-            if item.opcoes:
-                linhas.append("<b>Personalização:</b><br>")
-                for chave, valor in item.opcoes.items():
-                    try:
-                        opcao = Opcao.objects.get(id=valor)
-                        valor_final = opcao.nome
-                    except:
-                        valor_final = valor
-                    linhas.append(f"{chave.capitalize()}: {valor_final}<br>")
-
-            linhas.append("<br>")
+            linhas.append(f"<b>Quantidade:</b> {item.quantidade}<br><br>")
 
         return mark_safe("".join(linhas))
 
-    ficha_producao.short_description = "Ficha de Produção"
-
     def gerar_pdf(self, obj):
-
         url = reverse("pedidos:pedido_pdf", args=[obj.id])
-
         return format_html(
             '<a class="button" href="{}" target="_blank">Gerar PDF</a>',
             url
         )
 
-    gerar_pdf.short_description = "Ficha PDF"
+    # ✅ ACTIONS SEGURAS (COM SAVE)
 
     def marcar_em_producao(self, request, queryset):
-        queryset.update(status="em_producao")
+        for pedido in queryset:
+            pedido.status = "em_producao"
+            pedido.save()
 
     def marcar_enviado(self, request, queryset):
-        queryset.update(status="enviado")
+        for pedido in queryset:
+            pedido.status = "enviado"
+            pedido.save()
 
     def marcar_entregue(self, request, queryset):
-        queryset.update(status="entregue")
+        for pedido in queryset:
+            pedido.status = "entregue"
+            pedido.save()
 
     def avancar_status(self, request, queryset):
-
         for pedido in queryset:
-
             if pedido.status == "pago":
                 pedido.status = "em_producao"
-
             elif pedido.status == "em_producao":
                 pedido.status = "enviado"
-
             elif pedido.status == "enviado":
                 pedido.status = "entregue"
-
             else:
                 continue
 
             pedido.save()
 
     def changelist_view(self, request, extra_context=None):
-
         total = Pedido.objects.count()
         aguardando = Pedido.objects.filter(status="aguardando_pagamento").count()
         pagos = Pedido.objects.filter(status="pago").count()
@@ -222,7 +187,6 @@ class PedidoAdmin(admin.ModelAdmin):
         enviados = Pedido.objects.filter(status="enviado").count()
 
         extra_context = extra_context or {}
-
         extra_context["dashboard"] = {
             "total": total,
             "aguardando": aguardando,

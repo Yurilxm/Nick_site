@@ -3,14 +3,15 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.http import JsonResponse
-from django.core.exceptions import ValidationError  # ✅ ADICIONE ISSO
+from django.core.exceptions import ValidationError
 from carrinho.services import obter_carrinho
 from .models import Pedido
 from pedidos.services.pedido_service import criar_pedido
 from pedidos.services.pagamento_service import (criar_pagamento_pix, criar_pagamento_boleto, criar_pagamento_cartao,)
 from pedidos.services.antifraude_service import validar_pedido
 from pedidos.services.parcelamento_service import obter_parcelas
-from pedidos.services.email_service import enviar_email_pedido_confirmado
+from django.db.models import Prefetch
+from pedidos.services.email_service import (enviar_email_pedido_confirmado, enviar_email_pedido_enviado,)
 
 
 @login_required
@@ -157,7 +158,36 @@ def parcelas_cartao(request):
 
 @login_required
 def meus_pedidos(request):
-    pedidos = Pedido.objects.filter(
-        usuario=request.user
-    ).order_by("-criado_em")
+    pedidos = (
+        Pedido.objects
+        .filter(usuario=request.user)
+        .order_by("-criado_em")
+        .prefetch_related(
+            "itens",
+            "itens__produto",
+            "itens__produto__imagens"
+        )
+    )
+
     return render(request, "pedidos/meus_pedidos.html", {"pedidos": pedidos})
+
+
+@login_required
+def pedido_detalhe(request, pedido_id):
+    pedido = get_object_or_404(
+        Pedido,
+        id=pedido_id,
+        usuario=request.user
+    )
+
+    return render(request, "pedidos/pedido_detalhe.html", {
+        "pedido": pedido
+    })
+
+
+def pedido_enviado(request, pedido_id):
+    pedido = get_object_or_404(Pedido, id=pedido_id, usuario=request.user)
+
+    return render(request, "pedidos/pedido_enviado.html", {
+        "pedido": pedido
+    })

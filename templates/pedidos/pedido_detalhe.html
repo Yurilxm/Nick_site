@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Pedido #{{ pedido.id }} — Mimos Nick{% endblock %}
+
+{% block content %}
+<div class="pedido-detail-page">
+
+  <h1>Pedido #{{ pedido.id }}</h1>
+
+  <!-- Status -->
+  <div class="pedido-status-box">
+    <strong>Status:</strong>
+
+    {% if pedido.status == "pago" %}✅ Pago
+    {% elif pedido.status == "enviado" %}📦 Enviado
+    {% elif pedido.status == "entregue" %}🎉 Entregue
+    {% elif pedido.status == "aguardando_pagamento" %}⏳ Aguardando Pagamento
+    {% elif pedido.status == "cancelado" %}❌ Cancelado
+    {% else %}{{ pedido.status }}
+    {% endif %}
+  </div>
+
+  <!-- Endereço -->
+  <div class="pedido-endereco-box">
+    <h3>Endereço de entrega</h3>
+
+    <p>
+      {{ pedido.rua }}, {{ pedido.numero }}
+      {% if pedido.complemento %}- {{ pedido.complemento }}{% endif %}
+      <br>
+      {{ pedido.bairro }}, {{ pedido.cidade }}/{{ pedido.estado }}
+      <br>
+      CEP: {{ pedido.cep_entrega }}
+    </p>
+  </div>
+
+  <!-- Itens -->
+  <div class="pedido-itens-box">
+    <h3>Itens do pedido</h3>
+
+    {% for item in pedido.itens.all %}
+      <div class="pedido-item-detail">
+        <span>{{ item.quantidade }}x {{ item.produto.nome }}</span>
+        <span>R$ {{ item.preco_unitario|floatformat:2 }}</span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Totais -->
+  <div class="pedido-total-box">
+    <p>Subtotal produtos: R$ {{ pedido.total_produtos|floatformat:2 }}</p>
+    <p>Frete: R$ {{ pedido.valor_frete|floatformat:2 }}</p>
+    <h3>Total: R$ {{ pedido.total_geral|floatformat:2 }}</h3>
+  </div>
+
+  <!-- Rastreamento (base futura) -->
+  <div class="pedido-timeline">
+    <h3>Rastreamento do pedido</h3>
+
+    <ul>
+      <li {% if pedido.status != "criado" %}class="done"{% endif %}>
+        Pedido criado
+      </li>
+
+      <li {% if pedido.status in "aguardando_pagamento pago em_producao enviado entregue" %}class="done"{% endif %}>
+        Pagamento confirmado
+      </li>
+
+      <li {% if pedido.status in "em_producao enviado entregue" %}class="done"{% endif %}>
+        Em produção
+      </li>
+
+      <li {% if pedido.status in "enviado entregue" %}class="done"{% endif %}>
+        Enviado
+      </li>
+
+      <li {% if pedido.status == "entregue" %}class="done"{% endif %}>
+        Entregue
+      </li>
+    </ul>
+  </div>
+
+</div>
+{% endblock %}

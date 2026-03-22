@@ -19,51 +19,21 @@ class Pedido(models.Model):
     ]
 
     usuario = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
 
-    total = models.DecimalField(
-        max_digits=10,
-        decimal_places=2
-    )
+    total = models.DecimalField(max_digits=10, decimal_places=2)
 
-    cep_entrega = models.CharField(
-        max_length=9,
-        blank=True
-    )
-
-    rua = models.CharField(
-        max_length=200,
-        blank=True
-    )
-
-    numero = models.CharField(
-        max_length=20,
-        blank=True
-    )
-
-    bairro = models.CharField(
-        max_length=100,
-        blank=True
-    )
-
-    cidade = models.CharField(
-        max_length=100,
-        blank=True
-    )
-
-    estado = models.CharField(
-        max_length=2,
-        blank=True
-    )
-
-    complemento = models.CharField(
-        max_length=200,
-        blank=True
-    )
+    cep_entrega = models.CharField(max_length=9, blank=True)
+    rua = models.CharField(max_length=200, blank=True)
+    numero = models.CharField(max_length=20, blank=True)
+    bairro = models.CharField(max_length=100, blank=True)
+    cidade = models.CharField(max_length=100, blank=True)
+    estado = models.CharField(max_length=2, blank=True)
+    complemento = models.CharField(max_length=200, blank=True)
 
     status = models.CharField(
         max_length=30,
@@ -71,9 +41,32 @@ class Pedido(models.Model):
         default="criado"
     )
 
-    criado_em = models.DateTimeField(
-        auto_now_add=True
-    )
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        from pedidos.services.email_service import (
+            enviar_email_pedido_confirmado,
+            enviar_email_pedido_enviado
+        )
+
+        is_update = self.pk is not None
+
+        if is_update:
+            old = Pedido.objects.filter(pk=self.pk).first()
+
+            if old and old.status != self.status:
+
+                # Pedido pago → envia email de confirmação
+                if self.status == "pago":
+                    if self.usuario and self.usuario.email:
+                        enviar_email_pedido_confirmado(self)
+
+                # Pedido enviado → envia email de envio
+                if self.status == "enviado":
+                    if self.usuario and self.usuario.email:
+                        enviar_email_pedido_enviado(self)
+
+        super().save(*args, **kwargs)
 
     @property
     def total_produtos(self):
@@ -170,9 +163,7 @@ class Pagamento(models.Model):
     )
 
     qr_code = models.TextField(blank=True)
-
     qr_code_base64 = models.TextField(blank=True)
-
     boleto_url = models.URLField(blank=True)
 
     criado_em = models.DateTimeField(auto_now_add=True)
