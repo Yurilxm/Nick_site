@@ -40,3 +40,37 @@
     font-size: 22px;
     margin-bottom: 10px;
 }
+
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+
+.page-link {
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    color: #333;
+    transition: 0.2s;
+}
+
+.page-link:hover {
+    background: #f5f5f5;
+}
+
+.page-link.active {
+    background: #333;
+    color: #fff;
+    border-color: #333;
+}
+
+.page-link.dots {
+    border: none;
+    cursor: default;
+}

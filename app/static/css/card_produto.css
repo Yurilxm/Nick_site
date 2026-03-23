@@ -242,6 +242,28 @@
     display: block;
 }
 
+.card-categorias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 6px;
+}
+
+.card-categorias .card-categoria {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--lilac-mid);
+    background: rgba(205, 180, 219, 0.15);
+    border: 1px solid rgba(205, 180, 219, 0.3);
+    white-space: nowrap;
+}
+
 .card-nome {
     font-size: 14px;
     font-weight: 700;
@@ -266,7 +288,7 @@
 }
 
 .estrelas {
-    font-size: 14px;
+    font-size: 16px;
     letter-spacing: 2px;
     background: linear-gradient(135deg, var(--baby-pink), var(--lilac-mid));
     -webkit-background-clip: text;

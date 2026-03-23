@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load moeda %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'carrinho/css/carrinho.css' %}">
@@ -13,7 +14,6 @@
   {% if itens %}
   <div class="carrinho-layout">
 
-    <!-- LISTA -->
     <div class="carrinho-lista">
       <ul>
         {% for item in itens %}
@@ -48,7 +48,7 @@
 
             <div class="subtotal-box">
               Subtotal: R$
-              <span id="subtotal-{{ item.id }}">{{ item.subtotal }}</span>
+              <span id="subtotal-{{ item.id }}">{{ item.subtotal|moeda }}</span>
             </div>
           </div>
 
@@ -63,16 +63,14 @@
       </ul>
     </div>
 
-    <!-- RESUMO -->
     <div class="carrinho-resumo">
       <h3>Resumo do pedido</h3>
 
       <p>
         Subtotal: R$
-        <span id="subtotal-geral">{{ total_produtos }}</span>
+        <span id="subtotal-geral">{{ total_produtos|moeda }}</span>
       </p>
 
-      <!-- FRETE -->
       <div class="frete-box">
         <p><strong>Entrega</strong></p>
         <p class="frete-info">Digite seu CEP para ver as opções de entrega</p>
@@ -85,12 +83,11 @@
         {% if frete %}
         <div id="frete-resultado" style="display:block">
             <strong>{{ frete.transportadora }} — {{ frete.tipo }}</strong><br>
-            <span style="font-size:11px;color:var(--text-light);">{{ frete.prazo }} dia(s) úteis</span><br>
-            R$ <span id="frete-valor">{{ frete.valor }}</span>
+            R$ <span id="frete-valor">{{ frete.valor|moeda }}</span>
         </div>
         {% else %}
         <div id="frete-resultado" style="display:none">
-            <span id="frete-valor">0.00</span>
+            <span id="frete-valor">0,00</span>
         </div>
         {% endif %}
       </div>
@@ -99,7 +96,7 @@
 
       <p class="total-final">
         Total: R$
-        <span id="total-geral">{{ total_geral }}</span>
+        <span id="total-geral">{{ total_geral|moeda }}</span>
       </p>
 
       <a href="{% url 'finalizar_compra' %}" class="btn-finalizar">

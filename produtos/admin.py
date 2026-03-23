@@ -158,8 +158,8 @@ class ProdutoAdmin(admin.ModelAdmin):
     list_display = (
         "imagem_preview",
         "nome",
+        "categorias",
         "selo",
-        "categoria",
         "preco",
         "ativo",
         "acoes",
@@ -171,7 +171,12 @@ class ProdutoAdmin(admin.ModelAdmin):
     search_fields = ("nome",)
     ordering = ("-criado_em",)
 
+    filter_horizontal = ("categoria",)
+
     inlines = [ProdutoImagemInline, GrupoOpcaoInline]
+
+    def categorias(self, obj):
+        return ", ".join([c.nome for c in obj.categoria.all()])
 
     def imagem_preview(self, obj):
         if obj.imagem:

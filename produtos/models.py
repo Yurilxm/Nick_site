@@ -56,16 +56,16 @@ class Produto(models.Model):
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
 
-    categoria = models.ForeignKey(
+    categoria = models.ManyToManyField(
         "Categoria",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
         related_name="produtos",
+        blank=True,
     )
 
     class Meta:
         ordering = ["-criado_em"]
+        verbose_name = "Cadastrar produtos"
+        verbose_name_plural = "Cadastrar produtos"
 
     def __str__(self):
         return self.nome
@@ -199,8 +199,8 @@ class ConfiguracaoSobre(models.Model):
     )
 
     class Meta:
-        verbose_name = "Configuração da Página Sobre"
-        verbose_name_plural = "Configuração da Página Sobre"
+        verbose_name = "Imagem da equipe/loja no Sobre"
+        verbose_name_plural = "Imagem da equipe/loja no Sobre"
 
     def __str__(self):
         return "Configuração da Página Sobre"
@@ -244,8 +244,8 @@ class ImagemSobre(models.Model):
 
     class Meta:
         ordering = ["-criado_em"]
-        verbose_name = "Imagem da Página Sobre"
-        verbose_name_plural = "Imagens da Página Sobre"
+        verbose_name = "Imagem dos prdutos na mão dos clientes na página Sobre"
+        verbose_name_plural = "Imagem dos prdutos na mão dos clientes na página Sobre"
 
     def __str__(self):
         return f"Imagem Sobre #{self.id}"

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load moeda %}
 
 {% block title %}Meus Pedidos — Mimos da Nick{% endblock %}
 
@@ -32,7 +33,7 @@
               {% else %}{{ pedido.status }}
               {% endif %}
             </span>
-            <span class="pedido-total">R$ {{ pedido.total|floatformat:2 }}</span>
+            <span class="pedido-total">R$ {{ pedido.total|moeda }}</span>
           </div>
         </div>
 
@@ -63,7 +64,7 @@
             </div>
 
             <div class="item-preco">
-              R$ {{ item.preco_unitario|floatformat:2 }}
+              R$ {{ item.preco_unitario|moeda }}
             </div>
           </div>
           {% endfor %}
@@ -82,7 +83,7 @@
           {% endif %}
 
           <span class="pedido-total-final">
-            Total: <strong>R$ {{ pedido.total|floatformat:2 }}</strong>
+            Total: <strong>R$ {{ pedido.total|moeda }}</strong>
           </span>
 
           <div class="pedido-acoes">

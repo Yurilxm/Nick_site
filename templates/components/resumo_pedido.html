@@ -1,4 +1,6 @@
 {% load static %}
+{% load moeda %}
+
 <link rel="stylesheet" href="{% static 'css/components/resumo_pedido.css' %}">
 
 <div class="checkout-resumo">
@@ -7,21 +9,21 @@
 
         <div class="checkout-linha">
             <span>Subtotal</span>
-            <span>R$ {{ total_produtos }}</span>
+            <span>R$ {{ total_produtos|moeda }}</span>
         </div>
 
         {% if frete %}
-        <!-- Frete já calculado — mostra com opção de alterar -->
+        <!-- Frete já calculado -->
         <div class="checkout-linha" id="linha-frete-atual">
             <span>Frete ({{ frete.tipo }})</span>
-            <span>R$ {{ frete.valor }}</span>
+            <span>R$ {{ frete.valor|moeda }}</span>
         </div>
+
         <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
             <button type="button" class="btn-alterar-frete" id="btn-alterar-frete">
                 Alterar frete
             </button>
 
-            <!-- Bloco de recálculo — oculto por padrão -->
             <div id="frete-box-checkout" class="frete-box-checkout" style="display:none">
                 <div class="frete-form-checkout">
                     <input type="text" id="cep-input-checkout"
@@ -32,9 +34,9 @@
                 <div id="frete-resultado-checkout" style="display:none"></div>
             </div>
         </div>
-        
+
         {% else %}
-        <!-- Frete ainda não calculado -->
+        <!-- Frete não calculado -->
         <div class="checkout-linha frete-pendente" id="linha-frete-pendente">
             <span>Frete</span>
             <span>A calcular</span>
@@ -57,7 +59,7 @@
 
         <div class="checkout-linha total" id="linha-total">
             <span>Total</span>
-            <span id="total-geral-checkout">R$ {{ total_geral }}</span>
+            <span id="total-geral-checkout">R$ {{ total_geral|moeda }}</span>
         </div>
 
         {% if btn_confirmar %}
@@ -68,6 +70,7 @@
                 Confirmar pedido
             </button>
         </form>
+
         <a href="{% url 'ver_carrinho' %}" class="btn-voltar-carrinho">
             ← Voltar ao carrinho
         </a>

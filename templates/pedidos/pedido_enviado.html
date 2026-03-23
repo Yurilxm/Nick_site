@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load moeda %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'pedidos/css/pedido_enviado.css' %}">
@@ -59,7 +60,7 @@
                         </div>
 
                         <div class="confirmado-item-preco">
-                            R$ {{ item.subtotal }}
+                            R$ {{ item.subtotal|moeda }}
                         </div>
 
                     </li>
@@ -75,19 +76,19 @@
 
                 <div class="confirmado-linha">
                     <span>Subtotal</span>
-                    <span>R$ {{ pedido.total_produtos }}</span>
+                    <span>R$ {{ pedido.total_produtos|moeda }}</span>
                 </div>
 
                 <div class="confirmado-linha">
                     <span>Frete</span>
-                    <span>R$ {{ pedido.valor_frete }}</span>
+                    <span>R$ {{ pedido.valor_frete|moeda }}</span>
                 </div>
 
                 <div class="confirmado-divider"></div>
 
                 <div class="confirmado-linha total">
                     <span>Total</span>
-                    <span>R$ {{ pedido.total_geral }}</span>
+                    <span>R$ {{ pedido.total_geral|moeda }}</span>
                 </div>
 
                 {% if pedido.cep_entrega %}

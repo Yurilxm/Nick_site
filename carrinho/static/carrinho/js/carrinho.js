@@ -1,14 +1,24 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-  const subtotalGeralEl  = document.getElementById("subtotal-geral");
-  const totalGeralEl     = document.getElementById("total-geral");
-  const freteValorEl     = document.getElementById("frete-valor");
+  const subtotalGeralEl = document.getElementById("subtotal-geral");
+  const totalGeralEl = document.getElementById("total-geral");
+  const freteValorEl = document.getElementById("frete-valor");
   const freteResultadoEl = document.getElementById("frete-resultado");
-  const cepInput         = document.getElementById("cep-input");
+  const cepInput = document.getElementById("cep-input");
   const btnCalcularFrete = document.getElementById("btn-calcular-frete");
 
   let subtotalProdutos = parseFloat(subtotalGeralEl?.innerText.replace(",", ".")) || 0;
-  let valorFrete       = parseFloat(freteValorEl?.innerText.replace(",", "."))    || 0;
+  let valorFrete = parseFloat(freteValorEl?.innerText.replace(",", ".")) || 0;
+
+  /* =========================
+     FORMATAR MOEDA
+  ========================= */
+  function formatarMoeda(valor) {
+    return valor
+      .toFixed(2)
+      .replace(".", ",")
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  }
 
   function getCSRFToken() {
     return document.querySelector("[name=csrfmiddlewaretoken]")?.value || "";
@@ -16,8 +26,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function atualizarTotal() {
     const total = subtotalProdutos + valorFrete;
-    if (subtotalGeralEl) subtotalGeralEl.innerText = subtotalProdutos.toFixed(2);
-    if (totalGeralEl)    totalGeralEl.innerText    = total.toFixed(2);
+
+    if (subtotalGeralEl) {
+      subtotalGeralEl.innerText = formatarMoeda(subtotalProdutos);
+    }
+
+    if (totalGeralEl) {
+      totalGeralEl.innerText = formatarMoeda(total);
+    }
   }
 
   function postJSON(url, callback) {
@@ -53,7 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
         sessionStorage.removeItem('cep_digitado');
         if (freteResultadoEl) freteResultadoEl.style.display = "none";
         valorFrete = 0;
-        if (freteValorEl) freteValorEl.innerText = "0.00";
+        if (freteValorEl) freteValorEl.innerText = "0,00";
         atualizarTotal();
 
         fetch("/carrinho/frete/limpar/", {
@@ -99,8 +115,8 @@ document.addEventListener("DOMContentLoaded", function () {
   function calcularFrete(cep, idSelecionadoAntes) {
     if (!btnCalcularFrete || !cep || cep.length !== 8) return;
 
-    btnCalcularFrete.disabled     = true;
-    btnCalcularFrete.textContent  = "Calculando...";
+    btnCalcularFrete.disabled = true;
+    btnCalcularFrete.textContent = "Calculando...";
 
     fetch("/carrinho/frete/calcular/", {
       method: "POST",
@@ -113,18 +129,17 @@ document.addEventListener("DOMContentLoaded", function () {
     })
       .then(r => r.json())
       .then(data => {
-        btnCalcularFrete.disabled    = false;
+        btnCalcularFrete.disabled = false;
         btnCalcularFrete.textContent = "Calcular";
 
         if (data.status === "erro") {
           if (freteResultadoEl) {
-            freteResultadoEl.innerHTML     = `<p class="frete-erro">${data.mensagem}</p>`;
+            freteResultadoEl.innerHTML = `<p class="frete-erro">${data.mensagem}</p>`;
             freteResultadoEl.style.display = "block";
           }
           return;
         }
 
-        // Mantém seleção anterior se possível, senão usa a primeira
         const idSalvo = idSelecionadoAntes || sessionStorage.getItem('frete_selecionado_id');
 
         let html = '<div class="frete-opcoes">';
@@ -132,6 +147,7 @@ document.addEventListener("DOMContentLoaded", function () {
           const selecionada = idSalvo
             ? String(opcao.id) === String(idSalvo)
             : index === 0;
+
           html += `
             <label class="frete-opcao ${selecionada ? 'selecionada' : ''}">
               <input type="radio" name="frete-opcao" value="${opcao.id}"
@@ -142,26 +158,28 @@ document.addEventListener("DOMContentLoaded", function () {
                 <span class="frete-opcao-nome">${opcao.transportadora} — ${opcao.nome}</span>
                 <span class="frete-opcao-prazo">${opcao.prazo} dia(s) úteis</span>
               </div>
-              <span class="frete-opcao-preco">R$ ${parseFloat(opcao.preco).toFixed(2).replace(".", ",")}</span>
+              <span class="frete-opcao-preco">R$ ${formatarMoeda(parseFloat(opcao.preco))}</span>
             </label>`;
         });
         html += '</div>';
 
         if (freteResultadoEl) {
-          freteResultadoEl.innerHTML     = html;
+          freteResultadoEl.innerHTML = html;
           freteResultadoEl.style.display = "block";
         }
 
-        // Aplica opção selecionada
         const opcaoSelecionada = idSalvo
           ? data.opcoes.find(o => String(o.id) === String(idSalvo)) || data.opcoes[0]
           : data.opcoes[0];
 
         valorFrete = parseFloat(opcaoSelecionada.preco) || 0;
-        if (freteValorEl) freteValorEl.innerText = valorFrete.toFixed(2).replace(".", ",");
+
+        if (freteValorEl) {
+          freteValorEl.innerText = formatarMoeda(valorFrete);
+        }
+
         atualizarTotal();
 
-        // Salva opção selecionada na sessão Django
         fetch("/carrinho/frete/selecionar/", {
           method: "POST",
           headers: {
@@ -179,14 +197,19 @@ document.addEventListener("DOMContentLoaded", function () {
           })
         });
 
-        // Listeners de troca de opção
         document.querySelectorAll('input[name="frete-opcao"]').forEach(radio => {
           radio.addEventListener("change", function () {
             document.querySelectorAll(".frete-opcao").forEach(el => el.classList.remove("selecionada"));
             this.closest(".frete-opcao").classList.add("selecionada");
+
             sessionStorage.setItem('frete_selecionado_id', this.value);
+
             valorFrete = parseFloat(this.dataset.valor) || 0;
-            if (freteValorEl) freteValorEl.innerText = valorFrete.toFixed(2).replace(".", ",");
+
+            if (freteValorEl) {
+              freteValorEl.innerText = formatarMoeda(valorFrete);
+            }
+
             atualizarTotal();
 
             fetch("/carrinho/frete/selecionar/", {
@@ -210,7 +233,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-  // Botão manual
   btnCalcularFrete?.addEventListener("click", function () {
     const cep = cepInput.value.replace(/\D/g, "");
     if (cep.length !== 8) { alert("CEP inválido"); return; }
@@ -218,16 +240,18 @@ document.addEventListener("DOMContentLoaded", function () {
     calcularFrete(cep, null);
   });
 
-  // ==========================
-  // AUTO-RECALCULA ao carregar
-  // (quando quantidade muda e página recarrega, recalcula com CEP já salvo)
-  // ==========================
   const cepParaRecalcular = sessionStorage.getItem('cep_digitado');
   if (cepParaRecalcular && cepParaRecalcular.length === 8 && btnCalcularFrete) {
     if (cepInput) {
       cepInput.value = cepParaRecalcular.slice(0, 5) + "-" + cepParaRecalcular.slice(5);
     }
-    // Recalcula mantendo a opção que a pessoa tinha selecionado
-    setTimeout(() => calcularFrete(cepParaRecalcular, sessionStorage.getItem('frete_selecionado_id')), 300);
+
+    setTimeout(() =>
+      calcularFrete(
+        cepParaRecalcular,
+        sessionStorage.getItem('frete_selecionado_id')
+      ),
+      300
+    );
   }
 });

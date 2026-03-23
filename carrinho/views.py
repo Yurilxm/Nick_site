@@ -37,10 +37,14 @@ def traduzir_opcoes(itens):
                 continue
             try:
                 grupo = GrupoOpcao.objects.get(id=int(chave))
-                opcoes = Opcao.objects.filter(id__in=valor)
+                if isinstance(valor, list):
+                    opcoes = Opcao.objects.filter(id__in=valor)
+                    nomes = [op.nome for op in opcoes]
+                else:
+                    nomes = [valor]
                 opcoes_traduzidas.append({
                     "grupo": grupo.nome,
-                    "valores": [op.nome for op in opcoes]
+                    "valores": nomes
                 })
             except (GrupoOpcao.DoesNotExist, ValueError):
                 continue
@@ -65,9 +69,22 @@ def adicionar_ao_carrinho(request, produto_id):
     for key in request.POST:
         if key.startswith("grupo_"):
             grupo_id = key.replace("grupo_", "")
+
             valores = request.POST.getlist(key)
-            if valores:
-                opcoes_escolhidas[grupo_id] = valores
+
+            if len(valores) == 1:
+                valor = valores[0].strip()
+
+                # 👉 verifica se é número (ID de opção)
+                if valor.isdigit():
+                    opcoes_escolhidas[grupo_id] = [valor]  # mantém como lista
+                else:
+                    # texto digitado
+                    if valor:
+                        opcoes_escolhidas[grupo_id] = valor
+            else:
+                if valores:
+                    opcoes_escolhidas[grupo_id] = valores
 
     if personalizacao:
         opcoes_escolhidas["personalizacao"] = personalizacao

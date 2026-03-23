@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load moeda %}
 
 {% block title %}Pedido #{{ pedido.id }} — Mimos da Nick{% endblock %}
 
@@ -42,16 +43,16 @@
     {% for item in pedido.itens.all %}
       <div class="pedido-item-detail">
         <span>{{ item.quantidade }}x {{ item.produto.nome }}</span>
-        <span>R$ {{ item.preco_unitario|floatformat:2 }}</span>
+        <span>R$ {{ item.preco_unitario|moeda }}</span>
       </div>
     {% endfor %}
   </div>
 
   <!-- Totais -->
   <div class="pedido-total-box">
-    <p>Subtotal produtos: R$ {{ pedido.total_produtos|floatformat:2 }}</p>
-    <p>Frete: R$ {{ pedido.valor_frete|floatformat:2 }}</p>
-    <h3>Total: R$ {{ pedido.total_geral|floatformat:2 }}</h3>
+    <p>Subtotal produtos: R$ {{ pedido.total_produtos|moeda }}</p>
+    <p>Frete: R$ {{ pedido.valor_frete|moeda }}</p>
+    <h3>Total: R$ {{ pedido.total_geral|moeda }}</h3>
   </div>
 
   <!-- Rastreamento (base futura) -->

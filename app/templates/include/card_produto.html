@@ -30,8 +30,12 @@
 
   <div class="produto-info">
 
-    {% if produto.categoria %}
-    <span class="card-categoria">{{ produto.categoria }}</span>
+    {% if produto.categoria.all %}
+      <div class="card-categorias">
+        {% for categoria in produto.categoria.all %}
+          <span class="card-categoria">{{ categoria.nome }}</span>
+        {% endfor %}
+      </div>
     {% endif %}
 
     <h3 class="card-nome">{{ produto.nome }}</h3>

@@ -33,6 +33,16 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* =========================
+   FUNÇÃO FORMATAR MOEDA
+========================= */
+function formatarMoeda(valor) {
+  return valor
+    .toFixed(2)
+    .replace(".", ",")
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+/* =========================
    CSRF TOKEN
 ========================= */
 const csrfToken = document
@@ -87,7 +97,7 @@ function atualizarMiniCarrinho() {
           <div class="item-carrinho-info">
             <strong>${item.nome}</strong>
             ${item.opcao ? `<div class="mini-opcao">${item.opcao}</div>` : ""}
-            <span>${item.quantidade} x R$ ${item.preco.toFixed(2)}</span>
+            <span>${item.quantidade} x R$ ${formatarMoeda(item.preco)}</span>
           </div>
           <button class="btn-remover-mini" data-item-id="${item.id}" aria-label="Remover item">×</button>
         `;
@@ -95,62 +105,31 @@ function atualizarMiniCarrinho() {
         lista.appendChild(li);
       });
 
-      totalEl.innerText = data.total.toFixed(2);
+      totalEl.innerText = formatarMoeda(data.total);
     })
     .catch((err) => console.error("Erro mini carrinho:", err));
 }
 
 /* =========================
-   ATUALIZA PÁGINA CARRINHO VIA AJAX
-   (sem recarregar, sem fechar o lateral)
+   ATUALIZA PÁGINA CARRINHO
 ========================= */
 function atualizarPaginaCarrinho(data) {
-  // Atualiza subtotal geral
   const subtotalGeralEl = document.getElementById("subtotal-geral");
   if (subtotalGeralEl) {
-    subtotalGeralEl.innerText = data.total.toFixed(2);
+    subtotalGeralEl.innerText = formatarMoeda(data.total);
   }
 
-  // Atualiza total geral (soma frete se existir)
   const totalGeralEl = document.getElementById("total-geral");
   const freteValorEl = document.getElementById("frete-valor");
+
   if (totalGeralEl) {
     const frete = parseFloat(freteValorEl?.innerText?.replace(",", ".")) || 0;
-    totalGeralEl.innerText = (data.total + frete).toFixed(2);
-  }
-
-  // Remove o item da lista visualmente
-  data.itens_removidos?.forEach((itemId) => {
-    const li = document.querySelector(`.carrinho-lista li[data-item-id="${itemId}"]`);
-    if (li) {
-      li.style.transition = "opacity 0.25s ease, transform 0.25s ease";
-      li.style.opacity = "0";
-      li.style.transform = "translateX(16px)";
-      setTimeout(() => li.remove(), 250);
-    }
-  });
-
-  // Se carrinho ficou vazio, mostra mensagem
-  if (data.carrinho_vazio) {
-    setTimeout(() => {
-      const lista = document.querySelector(".carrinho-lista");
-      const resumo = document.querySelector(".carrinho-resumo");
-      const layout = document.querySelector(".carrinho-layout");
-      const wrapper = document.querySelector(".carrinho-wrapper");
-
-      if (layout) layout.remove();
-
-      if (wrapper) {
-        const vazio = document.createElement("p");
-        vazio.textContent = "Seu carrinho está vazio.";
-        wrapper.appendChild(vazio);
-      }
-    }, 280);
+    totalGeralEl.innerText = formatarMoeda(data.total + frete);
   }
 }
 
 /* =========================
-   REMOVER ITEM (DELEGAÇÃO)
+   REMOVER ITEM
 ========================= */
 document.addEventListener("click", function (e) {
   const btn = e.target.closest(".btn-remover-mini");
@@ -168,11 +147,8 @@ document.addEventListener("click", function (e) {
     .then((res) => res.json())
     .then((data) => {
       atualizarBadge(data.quantidade_total ?? 0);
-
-      // Atualiza mini carrinho lateral
       atualizarMiniCarrinho();
 
-      // Se estiver na página do carrinho, atualiza sem recarregar
       if (window.location.pathname.includes("/carrinho")) {
         atualizarPaginaCarrinho({
           total: data.total,
