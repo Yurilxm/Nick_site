@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Sobre — Mimos da Nick Personalizados{% endblock %}
+{% block title %}Sobre — Mimos da Nick{% endblock %}
 
 {% block content %}
 <div class="sobre-page">
@@ -12,10 +12,10 @@
     <div class="hero-bolha hero-bolha-2"></div>
     <div class="hero-bolha hero-bolha-3"></div>
     <div class="hero-content">
-      <h1 class="hero-titulo">Feito com carinho,<br>entregue com amor 🎀</h1>
+      <h1 class="hero-titulo">Feito com carinho!<br>Entregue com amor!</h1>
       <p class="hero-texto">
-        A Nick Brindes nasceu da vontade de tornar cada presente especial.
-        Aqui você encontra brindes personalizados, embalagens lindas e um atendimento que parece de amiga.
+        A Mimos da Nick Personalizados nasceu da vontade de tornar cada presente especial.
+        Aqui você encontra mimos, presentes e brindes personalizados.
       </p>
     </div>
   </section>
@@ -24,15 +24,14 @@
   <section class="sobre-historia reveal">
     <div class="historia-inner">
       <div class="historia-texto">
-        <h2 class="secao-titulo">Nossa história</h2>
+        <h2 class="secao-titulo">Minha história...</h2>
         <p>
-          Tudo começou com uma ideia simples: presentear de verdade. Sem aquele presente genérico,
-          sem aquela embalagem sem graça. A gente acredita que cada detalhe conta — desde o laço
-          até o bilhetinho escrito à mão.
-        </p>
-        <p>
-          Cada pedido é preparado com atenção e cuidado, como se fosse para alguém da nossa família.
-          Porque no final, é isso que faz a diferença.
+          Minha história com a papelaria começou muito antes de eu imaginar que isso se tornaria um trabalho.
+          Ainda na infância, de forma totalmente espontânea, eu já criava meus próprios bloquinhos e vendia para as colegas na sala de aula. Sempre fui encantada por papéis, canetas, tesouras e tudo que envolvesse o universo da papelaria — era mais que uma brincadeira, era algo que já fazia parte de mim.
+          Com o tempo, segui trabalhando na área de papelaria e gráfica, aprofundando ainda mais esse amor e adquirindo experiência.
+          Depois que me tornei mãe, senti a necessidade de estar mais presente em casa e acompanhar de perto o crescimento dos meus filhos. Foi então que decidi transformar essa paixão em profissão e comecei a trabalhar com personalizados no conforto do meu lar.
+          Hoje, cada peça que produzo carrega não só dedicação e cuidado, mas também um pouco da minha história. Mais do que produtos, eu crio itens únicos, feitos com carinho, pensados especialmente para tornar momentos ainda mais especiais.
+          Se você valoriza detalhes, exclusividade e quer algo feito especialmente para você ou para presentear alguém, será um prazer fazer parte do seu momento.
         </p>
 
         <div class="historia-numeros">
@@ -45,7 +44,9 @@
             <span class="numero-label">Feito com amor</span>
           </div>
           <div class="numero-item">
-            <span class="numero-valor">⭐ 5.0</span>
+            <span class="numero-valor">
+              <i class="bi bi-star-fill estrela"></i> 5.0
+            </span>
             <span class="numero-label">Avaliação média</span>
           </div>
         </div>
@@ -68,8 +69,8 @@
 
   <!-- FOTOS DE ENTREGAS -->
   <section class="sobre-fotos reveal">
-    <h2 class="secao-titulo text-center">Cada entrega, uma alegria 📦</h2>
-    <p class="secao-sub text-center">Olha como chegam os pedidos dos nossos clientes</p>
+    <h2 class="secao-titulo text-center">🩷 Cada entrega, uma alegria... 🩷</h2>
+    <p class="secao-sub text-center">Vejam como chegam os pedidos dos nossos clientes.</p>
 
     {% if imagens_sobre %}
       <div class="carrossel-wrapper">
@@ -102,8 +103,8 @@
 
   <!-- DEPOIMENTOS (layout reformulado) -->
   <section class="sobre-depoimentos reveal">
-    <h2 class="secao-titulo text-center">O que nossos clientes dizem 💬</h2>
-    <p class="secao-sub text-center">Nada melhor do que a opinião de quem já recebeu em casa</p>
+    <h2 class="secao-titulo text-center">💜 O que nossos clientes dizem... 💜</h2>
+    <p class="secao-sub text-center">Nada melhor do que a opinião de quem já recebeu.</p>
 
     {% if avaliacoes %}
       <div class="carrossel-wrapper">
@@ -153,7 +154,7 @@
   <section class="avaliacao-form reveal">
     <div class="avaliacao-form-inner">
 
-      <h2 class="secao-titulo text-center">Deixe sua avaliação 💬</h2>
+      <h2 class="secao-titulo text-center">Deixe sua avaliação:</h2>
 
       {% if messages %}
         {% for message in messages %}
@@ -225,31 +226,49 @@
   <section class="sobre-contato reveal">
     <div class="contato-inner">
       <h2 class="secao-titulo text-center">Fale com a gente 💌</h2>
-      <p class="secao-sub text-center">Estamos por aqui para te ajudar a encontrar o presente perfeito</p>
+      <p class="secao-sub text-center">Estamos aqui para te ajudar a encontrar o presente perfeito!</p>
 
       <div class="contato-cards">
 
-        <a href="https://wa.me/55SEUNUMERO" target="_blank" class="contato-card contato-wpp">
-          <div class="contato-icone">📱</div>
+        <!-- WhatsApp -->
+        <a href="{{ SOCIAL_LINKS.whatsapp }}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="contato-card contato-wpp">
+          <div class="contato-icone">
+            <i class="bi bi-whatsapp"></i>
+          </div>
           <div class="contato-info">
             <span class="contato-label">WhatsApp</span>
-            <span class="contato-valor">(XX) XXXXX-XXXX</span>
+            <span class="contato-valor">(21) 99253-6502</span>
           </div>
         </a>
 
-        <a href="https://instagram.com/SEUPERFIL" target="_blank" class="contato-card contato-insta">
-          <div class="contato-icone">📷</div>
+        <!-- Instagram -->
+        <a href="{{ SOCIAL_LINKS.instagram }}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="contato-card contato-insta">
+          <div class="contato-icone">
+            <i class="bi bi-instagram"></i>
+          </div>
           <div class="contato-info">
             <span class="contato-label">Instagram</span>
-            <span class="contato-valor">@nickbrindes</span>
+            <span class="contato-valor">@mimosdanickpersonalizados</span>
           </div>
         </a>
 
-        <a href="mailto:contato@nickbrindes.com" class="contato-card contato-email">
-          <div class="contato-icone">✉️</div>
+        <!-- Email (GMAIL DIRETO) -->
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ SOCIAL_LINKS.email }}&su=Contato pelo site&body=Olá, vim pelo site e gostaria de mais informações."
+          target="_blank"
+          rel="noopener noreferrer"
+          class="contato-card contato-email">
+          <div class="contato-icone">
+            <i class="bi bi-envelope-fill"></i>
+          </div>
           <div class="contato-info">
             <span class="contato-label">E-mail</span>
-            <span class="contato-valor">contato@nickbrindes.com</span>
+            <span class="contato-valor">{{ SOCIAL_LINKS.email }}</span>
           </div>
         </a>
 

@@ -45,8 +45,8 @@ def home(request):
 
 
 def sobre(request):
-    imagens_sobre = ImagemSobre.objects.filter(ativo=True).order_by('-id')[:8]
-    avaliacoes    = Avaliacao.objects.filter(aprovado=True)[:8]
+    imagens_sobre = ImagemSobre.objects.filter(ativo=True).order_by('-id')[:12]
+    avaliacoes    = Avaliacao.objects.filter(aprovado=True)[:12]
     config        = ConfiguracaoSobre.get()
 
     if request.method == "POST":

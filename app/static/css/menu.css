@@ -28,14 +28,15 @@
   align-items: flex-end;
   position: relative;
   z-index: 2;
-  margin-bottom: -36px;
+  margin-bottom: -52px;
 }
 
 .topbar-logo img {
-  height: 130px;
+  height: 155px;
   width: auto;
   object-fit: contain;
   transition: transform 0.2s;
+  transform-origin: bottom center;
   filter: drop-shadow(0 4px 8px rgba(74,63,92,0.10));
 }
 
@@ -341,6 +342,7 @@
 
 .menu-link {
   color: #4a3f5c;
+  font-family: 'Calibri';
   text-decoration: none;
   padding: 10px 20px;
   border-radius: 24px;
@@ -402,9 +404,9 @@
   color: #4a3f5c;
   text-decoration: none;
   font-size: 0.92rem;
-  font-weight: 600;
+  font-weight: 700;
   transition: background 0.15s;
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Calibri';
 }
 
 .dropdown-item-link:hover {

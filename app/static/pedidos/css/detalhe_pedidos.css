@@ -1,0 +1,188 @@
+.pedido-detail-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+/* ── Título ── */
+.pedido-detail-page h1 {
+  font-family: 'Calibri';
+  font-size: 2.4rem;
+  color: var(--text-dark);
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+/* ── Boxes genéricos ── */
+.pedido-status-box,
+.pedido-endereco-box,
+.pedido-itens-box,
+.pedido-total-box,
+.pedido-timeline {
+  background: var(--bg-card);
+  border-radius: 20px;
+  border: 1.5px solid #f0e0f5;
+  box-shadow: 0 4px 18px rgba(180, 130, 200, 0.08);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+
+/* ── Títulos internos ── */
+.pedido-endereco-box h3,
+.pedido-itens-box h3,
+.pedido-total-box h3,
+.pedido-timeline h3 {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--text-dark);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid #f0e0f5;
+}
+
+/* ── Status box ── */
+.pedido-status-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #fff0f8 0%, #f5f0ff 100%);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  padding: 16px 24px;
+}
+
+.pedido-status-box strong {
+  color: var(--text-mid);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-right: 4px;
+}
+
+/* ── Endereço ── */
+.pedido-endereco-box p {
+  font-size: 0.9rem;
+  color: var(--text-mid);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ── Itens ── */
+.pedido-item-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f5eef8;
+  font-size: 0.92rem;
+}
+
+.pedido-item-detail:last-child {
+  border-bottom: none;
+}
+
+.pedido-item-detail span:first-child {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.pedido-item-detail span:last-child {
+  color: var(--text-mid);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ── Totais ── */
+.pedido-total-box {
+  background: #fdf8ff;
+}
+
+.pedido-total-box p {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  color: var(--text-mid);
+  margin: 0 0 6px;
+}
+
+.pedido-total-box h3 {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1.5px solid #f0e0f5;
+  border-bottom: none;
+  padding-bottom: 0;
+  padding-top: 12px;
+  margin-top: 8px;
+  margin-bottom: 0;
+  font-size: 1.05rem;
+  color: var(--pink-mid);
+}
+
+/* ── Timeline de rastreamento ── */
+.pedido-timeline ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+.pedido-timeline ul::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: #f0e0f5;
+  border-radius: 2px;
+}
+
+.pedido-timeline li {
+  position: relative;
+  padding: 6px 0 6px 34px;
+  font-size: 0.88rem;
+  color: var(--text-mid);
+  font-weight: 600;
+}
+
+.pedido-timeline li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #dcc8ea;
+  background: var(--bg-card);
+  z-index: 1;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.pedido-timeline li.done {
+  color: var(--text-dark);
+}
+
+.pedido-timeline li.done::before {
+  background: linear-gradient(135deg, var(--baby-pink), var(--baby-lilac));
+  border-color: transparent;
+}
+
+/* ── Responsivo ── */
+@media (max-width: 600px) {
+  .pedido-detail-page h1 {
+    font-size: 1.6rem;
+  }
+
+  .pedido-status-box,
+  .pedido-endereco-box,
+  .pedido-itens-box,
+  .pedido-total-box,
+  .pedido-timeline {
+    padding: 14px 16px;
+  }
+}

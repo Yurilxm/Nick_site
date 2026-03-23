@@ -10,9 +10,10 @@
     margin: 40px 0 30px;
 }
 
-.categoria-header h1 {
+.produtos-section .categoria-header h1 {
     font-size: 28px;
-    color: #421e01;
+    color: #421e01af;
+    font-family: 'Calibri';
     font-weight: 600;
     margin-bottom: 6px;
 }

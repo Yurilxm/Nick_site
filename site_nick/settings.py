@@ -60,6 +60,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'carrinho.context_processors.carrinho_context',
                 'produtos.context_processors.categorias_menu',
+                'pedidos.context_processors.social_links',
             ],
         },
     },
@@ -144,4 +145,12 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool, default=True)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
-DEFAULT_FROM_EMAIL = 'Nick Brindes <noreply@nickbrindes.com>'
+DEFAULT_FROM_EMAIL = 'Mimos da Nick Personalizados <mimosdanickpersonalizados@gmail.com>'
+
+
+SOCIAL_LINKS = {
+    "facebook": "https://www.facebook.com/people/Mimos-da-Nick-Personalizados/61557583673989/?rdid=czuOSwCRiSq5nO7C&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F14YgUSQvCeY%2F",
+    "instagram": "https://instagram.com/mimosdanickpersonalizados",
+    "whatsapp": "https://wa.me/5521992536502?text=Olá%2C%20vim%20pelo%20site%20e%20gostaria%20de%20mais%20informações",
+    "email": "mimosdanickpersonalizados@gmail.com",
+}

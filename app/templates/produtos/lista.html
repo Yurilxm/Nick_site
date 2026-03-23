@@ -3,16 +3,9 @@
 
 {% block body_class %}pagina-produtos{% endblock %}
 
-{% block css %}
-    <link rel="stylesheet" href="{% static 'css/fundo_produtos.css' %}">
-{% endblock %}
-
-
 {% block content %}
 
 <section class="produtos-section">
-
-{% include "include/fundo_produtos.html" %}
 
     <div class="categoria-header">
         {% if categoria %}
@@ -22,7 +15,7 @@
                 disponível{{ produtos|length|pluralize }}
             </p>
         {% else %}
-            <h1>Todos os Produtos</h1>
+            <h1>TODOS OS PRODUTOS</h1>
             <p class="categoria-info">
                 {{ produtos|length }} produto{{ produtos|length|pluralize }}
                 disponível{{ produtos|length|pluralize }}
@@ -44,9 +37,5 @@
     {% endif %}
 
 </section>
-
-{% block scripts %}
-<script src="{% static 'js/fundo_produtos.js' %}"></script>
-{% endblock %}
 
 {% endblock %}

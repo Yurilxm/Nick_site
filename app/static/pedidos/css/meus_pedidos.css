@@ -10,7 +10,7 @@
 }
 
 .mp-titulo {
-  font-family: 'Pacifico', cursive;
+  font-family: 'Calibri';
   font-size: 2.4rem;
   color: var(--text-dark);
   margin-bottom: 6px;
@@ -203,6 +203,53 @@
 
 .pedido-total-final strong {
   color: var(--pink-mid);
+}
+
+.pedido-acoes {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-detalhes {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 22px;
+  border-radius: 30px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-decoration: none;
+  color: #c0607a;
+  background: #ffe4ef;
+  border: 1.5px solid #f9c8d8;
+  transition: box-shadow 0.2s, transform 0.2s;
+  white-space: nowrap;
+}
+
+.btn-detalhes::after {
+  content: '→';
+  font-size: 0.9rem;
+  transition: transform 0.2s;
+}
+
+.btn-detalhes:hover {
+  background: #ffd6e7;
+  border-color: #f5b0c8;
+  box-shadow: 0 6px 18px rgba(220, 130, 160, 0.22);
+  transform: translateY(-2px);
+  text-decoration: none;
+  color: #c0607a;
+}
+
+.btn-detalhes:hover::after {
+  transform: translateX(4px);
+}
+
+.btn-detalhes:active {
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 /* Estado vazio */

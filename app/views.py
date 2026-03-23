@@ -113,12 +113,12 @@ def logout_view(request):
 def home_view(request):
     canecas = Produto.objects.filter(categoria__slug='canecas').order_by('-id')[:8]
     agendas = Produto.objects.filter(categoria__slug='agendas').order_by('-id')[:8]
-    cadernetas = Produto.objects.filter(categoria__slug='cadernetas').order_by('-id')[:8]
+    sublimacao = Produto.objects.filter(categoria__slug='sublimacao').order_by('-id')[:8]
 
     return render(request, 'pages/home.html', {
         'canecas': canecas,
         'agendas': agendas,
-        'cadernetas': cadernetas,
+        'sublimacao': sublimacao,
     })
 
 

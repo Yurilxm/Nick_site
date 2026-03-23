@@ -6,7 +6,7 @@
   <div class="footer-newsletter">
     <div class="footer-newsletter-inner">
       <div class="footer-newsletter-texto">
-        <span class="footer-newsletter-titulo">💌 Fique por dentro das novidades!</span>
+        <span class="footer-newsletter-titulo">📩 Fique por dentro das novidades!</span>
         <span class="footer-newsletter-descricao">Cadastre seu e-mail e receba ofertas exclusivas em primeira mão.</span>
       </div>
       <form class="footer-newsletter-form" method="POST" action="{% url 'cadastrar_email_marketing' %}">
@@ -27,12 +27,12 @@
     <div class="footer-col footer-col-sobre">
       <img src="{% static 'imagens/Nick_sem_fundo.png' %}" alt="Nick Brindes" class="footer-logo">
       <p class="footer-descricao">
-        Criando momentos especiais com produtos artesanais únicos, feitos com muito carinho para sua família. 🎀
+        Produtos personalizados únicos, feitos com dedicação, qualidade, carinho e atenção aos detalhes!
       </p>
       <div class="footer-social-icons">
-        <a href="#" class="footer-social-btn" title="Facebook"><i class="bi bi-facebook"></i></a>
-        <a href="#" class="footer-social-btn" title="Instagram"><i class="bi bi-instagram"></i></a>
-        <a href="#" class="footer-social-btn" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+        <a href="{{ SOCIAL_LINKS.whatsapp }}" target="_blank" class="footer-social-btn" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+        <a href="{{ SOCIAL_LINKS.instagram }}" target="_blank" class="footer-social-btn" title="Instagram"><i class="bi bi-instagram"></i></a>
+        <a href="{{ SOCIAL_LINKS.facebook }}" target="_blank" class="footer-social-btn" title="Facebook"><i class="bi bi-facebook"></i></a>
       </div>
     </div>
 
@@ -71,7 +71,7 @@
           <i class="bi bi-qr-code"></i>
           <div>
             <strong>Pix</strong>
-            <span>5% de desconto à vista</span>
+            <span>5% de desconto</span>
           </div>
         </div>
       </div>
@@ -81,8 +81,8 @@
 
   <!-- RODAPÉ -->
   <div class="footer-bottom">
-    <span>© {% now "Y" %} Nick Brindes — Todos os direitos reservados</span>
-    <span class="footer-credit">Desenvolvido por Yuri Lima</span>
+    <span>© {% now "Y" %} Mimos da Nick Personalizados — Todos os direitos reservados</span>
+    <span class="footer-credit">Desenvolvido por Yuri L X Miranda</span>
   </div>
 
 </footer>
