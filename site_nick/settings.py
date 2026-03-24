@@ -13,10 +13,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', cast=bool, default=False)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'dauntlessly-postillioned-bobby.ngrok-free.dev']
-CSRF_TRUSTED_ORIGINS = ['https://dauntlessly-postillioned-bobby.ngrok-free.dev']
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='localhost',
+    cast=lambda v: [s.strip() for s in v.split(',')]
+)
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='',
+    cast=lambda v: [s.strip() for s in v.split(',')] if v else []
+)
 
 # Application definition
 
@@ -74,8 +82,12 @@ WSGI_APPLICATION = 'site_nick.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT', cast=int),
     }
 }
 
@@ -154,3 +166,28 @@ SOCIAL_LINKS = {
     "whatsapp": "https://wa.me/5521992536502?text=Olá%2C%20vim%20pelo%20site%20e%20gostaria%20de%20mais%20informações",
     "email": "mimosdanickpersonalizados@gmail.com",
 }
+
+
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+
+CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_HTTPONLY = True
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+
+    X_FRAME_OPTIONS = 'DENY'
+
+    SECURE_SSL_REDIRECT = True
+
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+    SECURE_HSTS_SECONDS = 3600  # 1 hora
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+    SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"

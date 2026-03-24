@@ -1,10 +1,26 @@
 document.addEventListener("DOMContentLoaded", () => {
   const botaoCarrinho = document.getElementById("btn-carrinho");
-  const carrinho = document.getElementById("carrinho");
-  const botaoFechar = document.getElementById("fechar-carrinho");
-  const overlay = document.getElementById("overlay-carrinho");
+  const carrinho      = document.getElementById("carrinho");
+  const botaoFechar   = document.getElementById("fechar-carrinho");
+  const overlay       = document.getElementById("overlay-carrinho");
 
+  const etapa = window.CHECKOUT_ETAPA || 0;
+
+  // ── Etapa 3 e 4: some tudo, registra no-ops e sai ──────────────────────────
+  if (etapa === 3 || etapa === 4) {
+    if (carrinho)      carrinho.style.display      = "none";
+    if (botaoCarrinho) botaoCarrinho.style.display  = "none";
+    window.abrirCarrinho        = () => {};
+    window.atualizarMiniCarrinho = () => {};
+    return;
+  }
+
+  // ── Funções de abrir/fechar ─────────────────────────────────────────────────
   function abrirCarrinho() {
+    if (etapa === 2) {
+      window.location.href = "/carrinho/";
+      return;
+    }
     carrinho.classList.add("aberto");
     overlay.classList.add("ativo");
     document.body.classList.add("no-scroll");
@@ -16,7 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.classList.remove("no-scroll");
   }
 
-  window.abrirCarrinho = abrirCarrinho;
+  // Expõe globalmente (usado por toast_produtos.js, etc.)
+  window.abrirCarrinho        = abrirCarrinho;
   window.atualizarMiniCarrinho = atualizarMiniCarrinho;
 
   if (botaoCarrinho && carrinho && botaoFechar && overlay) {
@@ -24,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       abrirCarrinho();
     });
-
     botaoFechar.addEventListener("click", fecharCarrinho);
     overlay.addEventListener("click", fecharCarrinho);
   }
@@ -32,9 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
   atualizarMiniCarrinho();
 });
 
-/* =========================
-   FUNÇÃO FORMATAR MOEDA
-========================= */
+/* ========================= */
 function formatarMoeda(valor) {
   return valor
     .toFixed(2)
@@ -42,16 +56,12 @@ function formatarMoeda(valor) {
     .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
-/* =========================
-   CSRF TOKEN
-========================= */
+/* ========================= */
 const csrfToken = document
   .querySelector('meta[name="csrf-token"]')
   ?.getAttribute("content");
 
-/* =========================
-   BADGE
-========================= */
+/* ========================= */
 function atualizarBadge(qtd) {
   const badge = document.getElementById("badge-carrinho");
   if (!badge) return;
@@ -60,18 +70,18 @@ function atualizarBadge(qtd) {
   badge.style.display = qtd > 0 ? "flex" : "none";
 }
 
-/* =========================
-   MINI CARRINHO
-========================= */
+/* ========================= */
 function atualizarMiniCarrinho() {
+  const etapa = window.CHECKOUT_ETAPA || 0;
+
   return fetch("/carrinho/mini/")
-    .then((response) => response.json())
+    .then((r) => r.json())
     .then((data) => {
       atualizarBadge(data.quantidade_total);
 
-      const lista = document.getElementById("mini-carrinho-lista");
+      const lista   = document.getElementById("mini-carrinho-lista");
       const totalEl = document.getElementById("mini-carrinho-total");
-      const finais = document.querySelector(".btn-finais");
+      const finais  = document.querySelector(".btn-finais");
 
       if (!lista || !totalEl) return;
 
@@ -90,7 +100,7 @@ function atualizarMiniCarrinho() {
         const li = document.createElement("li");
         li.className = "item-carrinho clicavel";
         li.dataset.itemId = item.id;
-        li.dataset.url = item.url;
+        li.dataset.url    = item.url;
 
         li.innerHTML = `
           ${item.imagem ? `<img src="${item.imagem}" class="item-carrinho-img" alt="${item.nome}">` : ""}
@@ -99,7 +109,7 @@ function atualizarMiniCarrinho() {
             ${item.opcao ? `<div class="mini-opcao">${item.opcao}</div>` : ""}
             <span>${item.quantidade} x R$ ${formatarMoeda(item.preco)}</span>
           </div>
-          <button class="btn-remover-mini" data-item-id="${item.id}" aria-label="Remover item">×</button>
+          ${etapa !== 2 ? `<button class="btn-remover-mini" data-item-id="${item.id}" aria-label="Remover item">×</button>` : ""}
         `;
 
         lista.appendChild(li);
@@ -110,30 +120,28 @@ function atualizarMiniCarrinho() {
     .catch((err) => console.error("Erro mini carrinho:", err));
 }
 
-/* =========================
-   ATUALIZA PÁGINA CARRINHO
-========================= */
+/* ========================= */
 function atualizarPaginaCarrinho(data) {
   const subtotalGeralEl = document.getElementById("subtotal-geral");
-  if (subtotalGeralEl) {
-    subtotalGeralEl.innerText = formatarMoeda(data.total);
-  }
+  if (subtotalGeralEl) subtotalGeralEl.innerText = formatarMoeda(data.total);
 
   const totalGeralEl = document.getElementById("total-geral");
   const freteValorEl = document.getElementById("frete-valor");
-
   if (totalGeralEl) {
     const frete = parseFloat(freteValorEl?.innerText?.replace(",", ".")) || 0;
     totalGeralEl.innerText = formatarMoeda(data.total + frete);
   }
 }
 
-/* =========================
-   REMOVER ITEM
-========================= */
+/* ========================= */
 document.addEventListener("click", function (e) {
   const btn = e.target.closest(".btn-remover-mini");
   if (!btn) return;
+
+  if ((window.CHECKOUT_ETAPA || 0) === 2) {
+    alert("Finalize ou volte ao carrinho para alterar os itens.");
+    return;
+  }
 
   const itemId = btn.dataset.itemId;
 
@@ -150,19 +158,13 @@ document.addEventListener("click", function (e) {
       atualizarMiniCarrinho();
 
       if (window.location.pathname.includes("/carrinho")) {
-        atualizarPaginaCarrinho({
-          total: data.total,
-          carrinho_vazio: data.carrinho_vazio,
-          itens_removidos: [itemId],
-        });
+        atualizarPaginaCarrinho({ total: data.total });
       }
     })
     .catch((err) => console.error("Erro ao remover item:", err));
 });
 
-/* =========================
-   CLICK NO ITEM -> PRODUTO
-========================= */
+/* ========================= */
 document.addEventListener("click", function (e) {
   const item = e.target.closest(".item-carrinho.clicavel");
   if (!item) return;

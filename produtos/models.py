@@ -47,7 +47,7 @@ class Produto(models.Model):
         help_text="Comprimento em cm"
     )
 
-    imagem = models.ImageField(upload_to="produtos/", blank=True)
+    imagem = models.ImageField(upload_to="produtos/")
 
     permite_personalizacao = models.BooleanField(default=False)
 

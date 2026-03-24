@@ -1,14 +1,29 @@
-# Configuração de e-mail
+DEBUG=False
+
+SECRET_KEY=xxxxxxxx
+
+ALLOWED_HOSTS=seudominio.com,.onrender.com
+CSRF_TRUSTED_ORIGINS=https://seudominio.com,https://*.onrender.com
+
+# Banco
+DB_NAME=xxxx
+DB_USER=xxxx
+DB_PASSWORD=xxxx
+DB_HOST=xxxx
+DB_PORT=5432
+
+# Mercado Pago
+MERCADO_PAGO_ACCESS_TOKEN=PRODUCAO_AQUI
+MERCADO_PAGO_PUBLIC_KEY=PRODUCAO_AQUI
+SITE_URL=https://seudominio.com
+
+# Email
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
-EMAIL_HOST_USER=seu_email_aqui
-EMAIL_HOST_PASSWORD=sua_senha_aqui
+EMAIL_HOST_USER=xxxx
+EMAIL_HOST_PASSWORD=xxxx
 
-# Configuração Mercado Pago
-MERCADO_PAGO_ACCESS_TOKEN=seu_access_token_aqui
-MERCADO_PAGO_PUBLIC_KEY=seu_public_key_aqui
-
-# Melhor envio
-MELHOR_ENVIO_TOKEN=seu_token_aqui
-CEP_LOJA=CEP_AQUI
+# Frete
+MELHOR_ENVIO_TOKEN=xxxx
+CEP_LOJA=xxxx

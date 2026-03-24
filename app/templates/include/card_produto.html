@@ -12,7 +12,11 @@
     <span class="badge-desconto">-{{ produto.desconto }}%</span>
     {% endif %}
 
-    <img class="img-principal" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
+    {% if produto.imagem %}
+      <img class="img-principal" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
+    {% else %}
+      <img class="img-principal" src="{% static 'img/placeholder.png' %}" alt="Produto sem imagem">
+    {% endif %}
 
     {% with produto.imagens_hover|first as img_hover %}
       {% if img_hover %}
@@ -30,7 +34,7 @@
 
   <div class="produto-info">
 
-    {% if produto.categoria.all %}
+    {% if produto.categoria.all.exists %}
       <div class="card-categorias">
         {% for categoria in produto.categoria.all %}
           <span class="card-categoria">{{ categoria.nome }}</span>

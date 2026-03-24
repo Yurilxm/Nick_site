@@ -328,3 +328,11 @@
         width: 100vw;
     }
 }
+
+
+.checkout-etapa-3 #btn-carrinho,
+.checkout-etapa-3 #carrinho,
+.checkout-etapa-4 #btn-carrinho,
+.checkout-etapa-4 #carrinho {
+  display: none !important;
+}

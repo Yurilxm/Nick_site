@@ -331,4 +331,5 @@ def finalizar_compra(request):
         "frete":          frete,
         "total_geral":    total_geral,
         "endereco":       endereco,
+        "etapa":          2,
     })
