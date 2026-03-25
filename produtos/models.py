@@ -47,7 +47,7 @@ class Produto(models.Model):
         help_text="Comprimento em cm"
     )
 
-    imagem = models.ImageField(upload_to="produtos/")
+    imagem = models.ImageField(upload_to="produtos/", max_length=500)
 
     permite_personalizacao = models.BooleanField(default=False)
 
@@ -169,7 +169,7 @@ class ProdutoImagem(models.Model):
         Produto, on_delete=models.CASCADE, related_name="imagens"
     )
 
-    imagem = models.ImageField(upload_to="produtos/galeria/")
+    imagem = models.ImageField(upload_to="produtos/galeria/", max_length=500)
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, default="detalhe")
     ordem = models.PositiveIntegerField(default=0)
 
@@ -195,6 +195,7 @@ class ConfiguracaoSobre(models.Model):
         upload_to="sobre/",
         blank=True,
         null=True,
+        max_length=500,
         help_text="Foto da equipe/loja exibida na seção 'Nossa história'"
     )
 
@@ -222,7 +223,7 @@ class Avaliacao(models.Model):
     comentario = models.TextField()
     estrelas = models.PositiveIntegerField(default=5)
 
-    foto = models.ImageField(upload_to="avaliacoes/", blank=True, null=True)
+    foto = models.ImageField(upload_to="avaliacoes/", blank=True, null=True, max_length=500)
 
     aprovado = models.BooleanField(default=False)
     criado_em = models.DateTimeField(auto_now_add=True)
@@ -237,7 +238,7 @@ class Avaliacao(models.Model):
 
 
 class ImagemSobre(models.Model):
-    imagem = models.ImageField(upload_to="sobre/")
+    imagem = models.ImageField(upload_to="sobre/", max_length=500)
     ordem = models.PositiveIntegerField(default=0)
     ativo = models.BooleanField(default=True)
     criado_em = models.DateTimeField(auto_now_add=True)
