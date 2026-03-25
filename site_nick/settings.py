@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'cloudinary',
-    'storages',
     'app',
     'produtos',
     'carrinho',
@@ -182,7 +181,7 @@ cloudinary.config(
 
 STORAGES = {
     "default": {
-        "BACKEND": "storages.backends.cloudinary.CloudinaryStorage",
+        "BACKEND": "cloudinary.storage.CloudinaryMediaStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
