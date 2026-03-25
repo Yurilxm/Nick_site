@@ -1,15 +1,18 @@
 import requests
+import logging
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 
 def calcular_frete_melhor_envio(cep_destino, itens):
-    url = "https://sandbox.melhorenvio.com.br/api/v2/me/shipment/calculate"
+    url = "https://api.melhorenvio.com.br/v2/me/shipment/calculate"
 
     headers = {
         "Authorization": f"Bearer {settings.MELHOR_ENVIO_TOKEN}",
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "User-Agent": "MimosNick contato@mimosnick.com.br",
+        "User-Agent": "MimosNick mimosdanickpersonalizados@gmail.com",
     }
 
     produtos = []
@@ -37,8 +40,10 @@ def calcular_frete_melhor_envio(cep_destino, itens):
 
     try:
         response = requests.post(url, json=payload, headers=headers, timeout=10)
+        response.raise_for_status()
         data = response.json()
     except Exception as e:
+        logger.error(f"Erro ao calcular frete: {e}")
         return []
 
     opcoes = []
