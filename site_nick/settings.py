@@ -181,7 +181,7 @@ cloudinary.config(
 
 STORAGES = {
     "default": {
-        "BACKEND": "cloudinary.storage.CloudinaryMediaStorage",
+        "BACKEND": "site_nick.storage.CloudinaryMediaStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
