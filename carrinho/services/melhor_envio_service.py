@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 def calcular_frete_melhor_envio(cep_destino, itens):
-    url = "https://api.melhorenvio.com.br/v2/me/shipment/calculate"
+    url = "https://melhorenvio.com.br/api/v2/me/shipment/calculate"
 
     headers = {
         "Authorization": f"Bearer {settings.MELHOR_ENVIO_TOKEN}",

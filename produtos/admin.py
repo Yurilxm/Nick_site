@@ -145,6 +145,9 @@ class ProdutoAdmin(admin.ModelAdmin):
         ("🛍️ Informações do Produto", {
             "fields": ("nome", "categoria", "selo", "descricao", "preco", "imagem")
         }),
+        ("📦 Dimensões e Frete", {
+            "fields": ("peso", "altura", "largura", "comprimento")
+        }),
         ("⚙️ Controle", {
             "fields": ("ativo", "permite_personalizacao")
         }),

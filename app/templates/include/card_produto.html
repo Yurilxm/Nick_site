@@ -5,11 +5,7 @@
   <div class="produto-imagem">
 
     {% if produto.selo %}
-    <span class="selo-produto {{ produto.selo|slugify }}">{{ produto.selo }}</span>
-    {% endif %}
-
-    {% if produto.desconto %}
-    <span class="badge-desconto">-{{ produto.desconto }}%</span>
+      <span class="selo-produto">{{ produto.selo }}</span>
     {% endif %}
 
     {% if produto.imagem %}
@@ -23,12 +19,6 @@
         <img class="img-hover" src="{{ img_hover.imagem.url }}" alt="{{ produto.nome }} hover">
       {% endif %}
     {% endwith %}
-
-    <div class="card-overlay">
-      <a href="{% url 'detalhe_produto' produto.id produto.slug %}" class="btn-ver-rapido">
-        🔍 Ver produto
-      </a>
-    </div>
 
   </div>
 
@@ -45,22 +35,19 @@
     <h3 class="card-nome">{{ produto.nome }}</h3>
 
     <div class="card-footer">
-
-      <!-- Estrelas acima do preço/botão -->
       <div class="card-estrelas">
         <span class="estrelas">★★★★★</span>
       </div>
-
-      <!-- Preço e botão na mesma linha -->
       <div class="card-preco-botao">
         <p class="card-preco">R$ {{ produto.preco }}</p>
-        <a href="{% url 'detalhe_produto' produto.id produto.slug %}" class="card-botao">
-          Ver produto
-        </a>
+        <span class="card-botao">Ver produto</span>
       </div>
-
     </div>
 
   </div>
+
+  <a href="{% url 'detalhe_produto' produto.id produto.slug %}"
+     class="card-link-total"
+     aria-label="Ver {{ produto.nome }}"></a>
 
 </div>

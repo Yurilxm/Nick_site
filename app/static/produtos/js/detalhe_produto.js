@@ -45,9 +45,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const miniaturas = document.querySelectorAll(".miniaturas img");
 
-        if(!modal || miniaturas.length === 0 || !imagemPrincipal) return;
+        if (!modal || !imagemPrincipal) return;
 
-        const imagens = Array.from(miniaturas).map(img => img.src);
+        const imagens = miniaturas.length > 0
+        ? Array.from(miniaturas).map(img => img.src)
+        : [imagemPrincipal.src];
 
         let indiceAtual = 0;
 

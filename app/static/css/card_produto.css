@@ -143,49 +143,6 @@
 }
 
 /* =============================================
-   OVERLAY
-   ============================================= */
-
-.card-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(74, 63, 92, 0.35);
-    backdrop-filter: blur(2px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 5;
-}
-
-.produto-card:hover .card-overlay {
-    opacity: 1;
-}
-
-.btn-ver-rapido {
-    background: rgba(255, 255, 255, 0.95);
-    color: var(--lilac-mid);
-    font-size: 13px;
-    font-weight: 800;
-    padding: 9px 18px;
-    border-radius: 40px;
-    text-decoration: none;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
-    transition: transform 0.2s, background 0.2s;
-    transform: translateY(5px);
-}
-
-.produto-card:hover .btn-ver-rapido {
-    transform: translateY(0);
-}
-
-.btn-ver-rapido:hover {
-    background: var(--baby-pink);
-    color: white;
-}
-
-/* =============================================
    SELOS
    ============================================= */
 
@@ -380,9 +337,14 @@
     font-size: 14px;
 }
 
-/* =============================================
-   RESPONSIVO
-   ============================================= */
+
+.card-link-total {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    border-radius: var(--radius-card);
+}
+
 
 @media (max-width: 900px) {
 
@@ -421,10 +383,6 @@
     .card-botao {
         font-size: 11px;
         padding: 7px 10px;
-    }
-
-    .card-overlay {
-        display: none;
     }
 
 }
