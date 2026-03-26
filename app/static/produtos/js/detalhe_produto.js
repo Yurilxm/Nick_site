@@ -51,6 +51,12 @@ document.addEventListener('DOMContentLoaded', function () {
         ? Array.from(miniaturas).map(img => img.src)
         : [imagemPrincipal.src];
 
+        // Esconde setas se tiver só uma imagem
+        if (imagens.length <= 1) {
+            if (setaEsq) setaEsq.style.display = "none";
+            if (setaDir) setaDir.style.display = "none";
+        }
+
         let indiceAtual = 0;
 
         let startX = 0;

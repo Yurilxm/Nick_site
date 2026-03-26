@@ -38,7 +38,7 @@ def pagamento(request):
         endereco = request.session.get("endereco", {})
 
         if not endereco or not endereco.get("cep") or not endereco.get("rua"):
-            return redirect("carrinho:checkout")
+            return redirect("carrinho:finalizar_compra")
         
         from carrinho.services.endereco_service import validar_endereco
         eh_valido, erros = validar_endereco(endereco)
