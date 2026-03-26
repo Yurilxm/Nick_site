@@ -56,7 +56,7 @@
 
       <!-- FORM COMEÇA AQUI -->
       <form id="form-carrinho"
-            action="{% url 'adicionar_ao_carrinho' produto.id %}"
+            action="{% url 'carrinho:adicionar_ao_carrinho' produto.id %}"
             method="post">
 
         {% csrf_token %}
@@ -159,7 +159,7 @@
       <button type="button"
               id="btn-comprar-agora"
               class="btn-comprar-agora"
-              data-finalizar-url="{% url 'finalizar_compra' %}">
+              data-finalizar-url="{% url 'carrinho:finalizar_compra' %}">
         Comprar Agora
       </button>
 

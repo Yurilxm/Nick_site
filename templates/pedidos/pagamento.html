@@ -124,7 +124,7 @@
         <!-- RESUMO -->
         <div class="pagamento-resumo">
             {% include "components/resumo_pedido.html" %}
-            <a href="{% url 'finalizar_compra' %}" class="btn-voltar-pagamento">
+            <a href="{% url 'carrinho:finalizar_compra' %}" class="btn-voltar-pagamento">
                 ← Voltar ao pedido
             </a>
         </div>

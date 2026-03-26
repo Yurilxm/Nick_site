@@ -52,7 +52,7 @@
             </div>
           </div>
 
-          <form action="{% url 'remover_do_carrinho' item.id %}"
+          <form action="{% url 'carrinho:remover_do_carrinho' item.id %}"
                 method="post"
                 class="form-remover">
             {% csrf_token %}
@@ -99,7 +99,7 @@
         <span id="total-geral">{{ total_geral|moeda }}</span>
       </p>
 
-      <a href="{% url 'finalizar_compra' %}" class="btn-finalizar">
+      <a href="{% url 'carrinho:finalizar_compra' %}" class="btn-finalizar">
         Finalizar compra
       </a>
     </div>

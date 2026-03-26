@@ -7,7 +7,7 @@
         <!-- ETAPA 1: Carrinho -->
         <div class="etapa {% if etapa > 1 %}concluida{% elif etapa == 1 %}ativa{% endif %}">
             {% if etapa > 1 %}
-            <a href="{% url 'ver_carrinho' %}" class="etapa-link" title="Voltar ao carrinho">
+            <a href="{% url 'carrinho:ver_carrinho' %}" class="etapa-link" title="Voltar ao carrinho">
             {% endif %}
                 <div class="etapa-circulo">
                     {% if etapa > 1 %}<span class="etapa-check">✓</span>{% else %}1{% endif %}
@@ -25,7 +25,7 @@
         <!-- ETAPA 2: Confirmar -->
         <div class="etapa {% if etapa > 2 %}concluida{% elif etapa == 2 %}ativa{% endif %}">
             {% if etapa > 2 %}
-            <a href="{% url 'finalizar_compra' %}" class="etapa-link" title="Voltar ao checkout">
+            <a href="{% url 'carrinho:finalizar_compra' %}" class="etapa-link" title="Voltar ao checkout">
             {% endif %}
                 <div class="etapa-circulo">
                     {% if etapa > 2 %}<span class="etapa-check">✓</span>{% else %}2{% endif %}
