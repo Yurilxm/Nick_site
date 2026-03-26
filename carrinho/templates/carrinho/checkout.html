@@ -69,9 +69,9 @@
                             <div class="endereco-campo">
                                 <label>CEP *</label>
                                 <div class="cep-grupo">
-                                    <input type="text" name="cep_entrega"
-                                           placeholder="00000-000" maxlength="9"
-                                           value="{{ endereco.cep|default:'' }}">
+                                    <input type="text" name="cep_entrega" id="endereco-cep"
+                                        placeholder="00000-000" maxlength="9"
+                                        value="{{ endereco.cep|default:'' }}">
                                     <button type="button" id="btn-buscar-cep">Buscar</button>
                                 </div>
                             </div>
@@ -80,42 +80,42 @@
                         <div class="endereco-linha">
                             <div class="endereco-campo flex-3">
                                 <label>Rua *</label>
-                                <input type="text" name="rua"
-                                       value="{{ endereco.rua|default:'' }}">
+                                <input type="text" name="rua" id="endereco-rua"
+                                    value="{{ endereco.rua|default:'' }}">
                             </div>
 
                             <div class="endereco-campo flex-1">
                                 <label>Número *</label>
-                                <input type="text" name="numero"
-                                       value="{{ endereco.numero|default:'' }}">
+                                <input type="text" name="numero" id="endereco-numero"
+                                    value="{{ endereco.numero|default:'' }}">
                             </div>
                         </div>
 
                         <div class="endereco-linha">
                             <div class="endereco-campo">
                                 <label>Complemento</label>
-                                <input type="text" name="complemento"
-                                       value="{{ endereco.complemento|default:'' }}">
+                                <input type="text" name="complemento" id="endereco-complemento"
+                                    value="{{ endereco.complemento|default:'' }}">
                             </div>
 
                             <div class="endereco-campo">
                                 <label>Bairro *</label>
-                                <input type="text" name="bairro"
-                                       value="{{ endereco.bairro|default:'' }}">
+                                <input type="text" name="bairro" id="endereco-bairro"
+                                    value="{{ endereco.bairro|default:'' }}">
                             </div>
                         </div>
 
                         <div class="endereco-linha">
                             <div class="endereco-campo flex-3">
                                 <label>Cidade *</label>
-                                <input type="text" name="cidade"
-                                       value="{{ endereco.cidade|default:'' }}">
+                                <input type="text" name="cidade" id="endereco-cidade"
+                                    value="{{ endereco.cidade|default:'' }}">
                             </div>
 
                             <div class="endereco-campo flex-1">
                                 <label>Estado *</label>
-                                <input type="text" name="estado" maxlength="2"
-                                       value="{{ endereco.estado|default:'' }}">
+                                <input type="text" name="estado" maxlength="2" id="endereco-estado"
+                                    value="{{ endereco.estado|default:'' }}">
                             </div>
                         </div>
 
