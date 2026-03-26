@@ -63,9 +63,13 @@
         </div>
 
         {% if btn_confirmar %}
-        <button type="submit" class="btn-confirmar" id="btn-confirmar">
-            Confirmar pedido
-        </button>
+        <form method="post" id="form-confirmar">
+            {% csrf_token %}
+            <button type="submit" id="btn-confirmar" class="btn-confirmar"
+                {% if not frete %}disabled style="opacity:0.5;cursor:not-allowed;"{% endif %}>
+                Confirmar pedido
+            </button>
+        </form>
 
         <a href="{% url 'carrinho:ver_carrinho' %}" class="btn-voltar-carrinho">
             ← Voltar ao carrinho

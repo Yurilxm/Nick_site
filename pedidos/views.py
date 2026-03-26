@@ -108,6 +108,7 @@ def pagamento(request):
         "total_geral": total_geral,
         "mp_public_key": settings.MERCADO_PAGO_PUBLIC_KEY,
         "etapa": 3,
+        "btn_confirmar": True,
     })
 
 
