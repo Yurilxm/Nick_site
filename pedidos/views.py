@@ -8,7 +8,7 @@ from carrinho.services import obter_carrinho
 from .models import Pedido
 from pedidos.services.pedido_service import criar_pedido
 from pedidos.services.pagamento_service import (criar_pagamento_pix, criar_pagamento_boleto, criar_pagamento_cartao,)
-from pedidos.services.antifraude_service import validar_pedido
+from pedidos.services.antifraude_service import validar_pedido, validar_pedido_com_motivo
 from pedidos.services.parcelamento_service import obter_parcelas
 from django.db.models import Prefetch
 from pedidos.services.email_service import (enviar_email_pedido_confirmado, enviar_email_pedido_enviado,)
@@ -50,11 +50,17 @@ def pagamento(request):
             pedido.status = "aguardando_pagamento"
             pedido.save()
 
-            if not validar_pedido(pedido):
+            # 🔍 Validação de antifraude com motivo detalhado
+            valido, motivo = validar_pedido_com_motivo(pedido)
+            
+            if not valido:
                 pedido.status = "cancelado"
                 pedido.save()
                 request.session.pop("resumo_checkout", None)
-                return JsonResponse({"status": "erro", "mensagem": "Pedido não passou na validação de antifraude"}, status=400)
+                return JsonResponse({
+                    "status": "erro", 
+                    "mensagem": f"Pedido não passou na validação de antifraude. Motivo: {motivo}"
+                }, status=400)
 
             if metodo == "pix":
                 pagamento_obj = criar_pagamento_pix(pedido)
