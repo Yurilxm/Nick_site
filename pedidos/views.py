@@ -12,6 +12,9 @@ from pedidos.services.antifraude_service import validar_pedido, validar_pedido_c
 from pedidos.services.parcelamento_service import obter_parcelas
 from django.db.models import Prefetch
 from pedidos.services.email_service import (enviar_email_pedido_confirmado, enviar_email_pedido_enviado,)
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -37,23 +40,33 @@ def pagamento(request):
         frete_sessao = request.session.get("frete") or {}
         endereco = request.session.get("endereco", {})
 
+        print(f"🔵 MÉTODO DE PAGAMENTO: {metodo}")
+        print(f"🔵 TOTAL DO PEDIDO: {total_geral}")
+        print(f"🔵 ENDEREÇO: {endereco}")
+
         if not endereco or not endereco.get("cep") or not endereco.get("rua"):
+            print("❌ Endereço incompleto, redirecionando para finalizar compra")
             return redirect("carrinho:finalizar_compra")
         
         from carrinho.services.endereco_service import validar_endereco
         eh_valido, erros = validar_endereco(endereco)
         if not eh_valido:
+            print(f"❌ Endereço inválido: {erros}")
             return JsonResponse({"status": "erro", "mensagens": erros}, status=400)
 
         try:
+            print("🔵 Criando pedido...")
             pedido = criar_pedido(request.user, carrinho, frete_sessao, endereco)
             pedido.status = "aguardando_pagamento"
             pedido.save()
+            print(f"✅ Pedido criado: ID {pedido.id}, Total: R$ {pedido.total}")
 
             # 🔍 Validação de antifraude com motivo detalhado
+            print("🔵 Validando antifraude...")
             valido, motivo = validar_pedido_com_motivo(pedido)
             
             if not valido:
+                print(f"❌ Pedido bloqueado pelo antifraude: {motivo}")
                 pedido.status = "cancelado"
                 pedido.save()
                 request.session.pop("resumo_checkout", None)
@@ -61,8 +74,11 @@ def pagamento(request):
                     "status": "erro", 
                     "mensagem": f"Pedido não passou na validação de antifraude. Motivo: {motivo}"
                 }, status=400)
+            
+            print("✅ Antifraude aprovado")
 
             if metodo == "pix":
+                print("🔵 Processando pagamento PIX...")
                 pagamento_obj = criar_pagamento_pix(pedido)
                 request.session.pop("resumo_checkout", None)
                 request.session.pop("frete", None)
@@ -73,7 +89,9 @@ def pagamento(request):
                 })
 
             if metodo == "boleto":
+                print("🔵 Processando pagamento BOLETO...")
                 pagamento_obj = criar_pagamento_boleto(pedido)
+                print(f"✅ Boleto gerado: {pagamento_obj.boleto_url}")
                 request.session.pop("resumo_checkout", None)
                 request.session.pop("frete", None)
                 return redirect(pagamento_obj.boleto_url)
@@ -82,31 +100,50 @@ def pagamento(request):
                 token = request.POST.get("card_token")
                 parcelas = request.POST.get("parcelas", "1")
                 bandeira = request.POST.get("card_bandeira", "visa")
-
+                
+                print(f"🔵 Processando pagamento CARTÃO")
+                print(f"   Token: {token}")
+                print(f"   Parcelas: {parcelas}")
+                print(f"   Bandeira: {bandeira}")
+                print(f"   Valor total: R$ {pedido.total}")
+                
                 pagamento_obj = criar_pagamento_cartao(pedido, token, parcelas, bandeira)
-
+                
+                print(f"🔵 Status do pagamento: {pagamento_obj.status}")
+                print(f"🔵 ID da transação: {pagamento_obj.transaction_id}")
+                
                 if pagamento_obj.status in ("aprovado", "approved"):
+                    print("✅ PAGAMENTO APROVADO!")
                     if pedido.status != "pago":
                         pedido.status = "pago"
                         pedido.save()
                         enviar_email_pedido_confirmado(pedido)
+                        print("✅ Email de confirmação enviado")
 
                     carrinho.itens.all().delete()
                     request.session.pop("resumo_checkout", None)
                     request.session.pop("frete", None)
+                    print("🔵 Redirecionando para pedido confirmado")
                     return redirect("pedidos:pedido_confirmado", pedido_id=pedido.id)
-
-                pedido.status = "aguardando_pagamento"
-                pedido.save()
-                return redirect("pedidos:pagamento")
+                else:
+                    print(f"❌ PAGAMENTO RECUSADO! Status: {pagamento_obj.status}")
+                    pedido.status = "aguardando_pagamento"
+                    pedido.save()
+                    print("🔵 Redirecionando de volta para página de pagamento")
+                    return redirect("pedidos:pagamento")
 
         except ValidationError as e:
+            print(f"❌ ValidationError: {str(e)}")
             return JsonResponse({"status": "erro", "mensagem": str(e)}, status=400)
         
         except Exception as e:
             import traceback
+            print("❌ ERRO INESPERADO:")
             traceback.print_exc()
-            return JsonResponse({"status": "erro", "mensagem": "Erro ao processar pedido. Tente novamente."}, status=500)
+            return JsonResponse({
+                "status": "erro", 
+                "mensagem": f"Erro ao processar pedido: {str(e)}"
+            }, status=500)
 
     return render(request, "pedidos/pagamento.html", {
         "total_produtos": total_produtos,

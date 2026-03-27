@@ -164,7 +164,7 @@ class Pagamento(models.Model):
 
     qr_code = models.TextField(blank=True)
     qr_code_base64 = models.TextField(blank=True)
-    boleto_url = models.URLField(blank=True)
+    boleto_url = models.TextField(blank=True)
 
     criado_em = models.DateTimeField(auto_now_add=True)
 
