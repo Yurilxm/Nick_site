@@ -311,6 +311,7 @@ def finalizar_compra(request):
 
     if request.method == "POST":
         request.session["endereco"] = {
+            "nome":        request.POST.get("nome", ""),
             "cep":         request.POST.get("cep_entrega", ""),
             "rua":         request.POST.get("rua", ""),
             "numero":      request.POST.get("numero", ""),

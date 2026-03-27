@@ -66,12 +66,17 @@
                     <div class="endereco-form">
 
                         <div class="endereco-linha">
+                            <div class="endereco-campo flex-3">
+                                <label>Nome completo *</label>
+                                <input type="text" name="nome" id="endereco-nome" value="{{ endereco.nome|default:'' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="endereco-linha">
                             <div class="endereco-campo">
                                 <label>CEP *</label>
                                 <div class="cep-grupo">
-                                    <input type="text" name="cep_entrega" id="endereco-cep"
-                                        placeholder="00000-000" maxlength="9"
-                                        value="{{ endereco.cep|default:'' }}">
+                                    <input type="text" name="cep_entrega" id="endereco-cep" placeholder="00000-000" maxlength="9" value="{{ endereco.cep|default:'' }}">
                                     <button type="button" id="btn-buscar-cep">Buscar</button>
                                 </div>
                             </div>

@@ -35,6 +35,7 @@ class Pedido(models.Model):
     estado = models.CharField(max_length=2, blank=True)
     complemento = models.CharField(max_length=200, blank=True)
     cpf = models.CharField(max_length=14, blank=True, null=True)
+    nome_cliente = models.CharField(max_length=200, blank=True, verbose_name="Nome completo")
 
     status = models.CharField(
         max_length=30,

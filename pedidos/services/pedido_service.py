@@ -43,6 +43,7 @@ def criar_pedido(usuario, carrinho, frete, endereco, cpf=None):
     # ✅ CRIA O PEDIDO
     pedido = Pedido.objects.create(
         usuario=usuario,
+        nome_cliente=endereco.get("nome", ""),
         total=total,
         cep_entrega=endereco.get("cep", ""),
         rua=endereco.get("rua", ""),

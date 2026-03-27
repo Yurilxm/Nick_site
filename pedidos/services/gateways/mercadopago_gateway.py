@@ -6,16 +6,19 @@ logger = logging.getLogger(__name__)
 
 sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
 
-
-def _cpf_numerico(cpf):
-    """Remove pontuação do CPF."""
-    return (cpf or "").replace(".", "").replace("-", "").strip()
-
-
 def _extrair_nome(pedido):
-    """Extrai nome e sobrenome corretamente."""
+    """Extrai nome e sobrenome. Prioriza o campo nome_cliente do pedido."""
+    
+    # 1. Usa o nome salvo no pedido
+    if pedido.nome_cliente:
+        nome = pedido.nome_cliente.strip()
+        partes = nome.split()
+        first_name = partes[0]
+        last_name = " ".join(partes[1:]) if len(partes) > 1 else ""
+        return first_name, last_name or "Cliente"
+    
+    # 2. Fallback: nome do usuário logado
     nome = pedido.usuario.get_full_name().strip()
-
     if nome:
         partes = nome.split()
         first_name = partes[0]
@@ -23,8 +26,12 @@ def _extrair_nome(pedido):
     else:
         first_name = "Cliente"
         last_name = "Cliente"
-
+    
     return first_name, last_name
+
+def _cpf_numerico(cpf):
+    """Remove pontuação do CPF."""
+    return (cpf or "").replace(".", "").replace("-", "").strip()
 
 
 class MercadoPagoGateway:

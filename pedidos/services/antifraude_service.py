@@ -42,15 +42,12 @@ def validar_pedido_com_motivo(pedido):
     Valida um pedido contra critérios de antifraude.
     Retorna (True, None) se válido, ou (False, motivo) caso contrário.
     """
-    # 0. Validação de CPF
-    if not pedido.cpf:
-        motivo = "CPF não informado"
-        logger.warning(f"Pedido {pedido.id} bloqueado: {motivo}")
-        return False, motivo
-    if not validar_cpf(pedido.cpf):
-        motivo = f"CPF inválido: {pedido.cpf}"
-        logger.warning(f"Pedido {pedido.id} bloqueado: {motivo}")
-        return False, motivo
+    # 0. Validação de CPF (opcional para Pix)
+    if pedido.cpf:
+        if not validar_cpf(pedido.cpf):
+            motivo = f"CPF inválido: {pedido.cpf}"
+            logger.warning(f"Pedido {pedido.id} bloqueado: {motivo}")
+            return False, motivo
 
     # 1. Pedido com valor muito alto
     if pedido.total > 10000:
