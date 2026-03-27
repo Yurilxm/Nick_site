@@ -60,8 +60,23 @@ def pagamento(request):
             or ""
         ).strip()
 
-        if not cpf or len(cpf.replace(".", "").replace("-", "")) != 11:
-            return JsonResponse({"status": "erro", "mensagem": "CPF inválido."}, status=400)
+        metodo = request.POST.get("metodo")
+
+        cpf = (
+            request.POST.get("cpf")
+            or request.POST.get("cpf-boleto")
+            or ""
+        ).strip()
+
+        # CPF só é obrigatório para cartão e boleto
+        if metodo in ["cartao", "boleto"]:
+            if not cpf or len(cpf.replace(".", "").replace("-", "")) != 11:
+                return JsonResponse(
+                    {"status": "erro", "mensagem": "CPF inválido."},
+                    status=400
+                )
+        else:
+            cpf = None  # PIX não precisa
 
         try:
             # Cria o pedido UMA ÚNICA VEZ com todos os dados, incluindo CPF

@@ -36,10 +36,21 @@
                     <div class="pix-destaque">
                         <div class="pix-badge">⚡ Aprovação imediata + 5% OFF</div>
                         <p class="pix-desc">Pague com Pix e ganhe 5% de desconto! Válido por <strong>30 minutos</strong>.</p>
-                        <div class="valores">
-                            <span class="valor-original">R$ {{ total_geral|moeda }}</span>
-                            <span class="desconto">- R$ {{ desconto_pix|moeda }}</span>
-                            <span class="valor-final">R$ {{ total_com_desconto|moeda }}</span>
+                        <div class="pix-valores">
+                            <div class="linha">
+                                <span>Subtotal</span>
+                                <strong>R$ {{ total_geral|moeda }}</strong>
+                            </div>
+
+                            <div class="linha desconto">
+                                <span>Desconto Pix (5%)</span>
+                                <strong>- R$ {{ desconto_pix|moeda }}</strong>
+                            </div>
+
+                            <div class="linha total">
+                                <span>Total com desconto</span>
+                                <strong>R$ {{ total_com_desconto|moeda }}</strong>
+                            </div>
                         </div>
                     </div>
                     <form method="post">
@@ -65,7 +76,6 @@
                             <label class="campo-label">CPF do titular *</label>
                             <input type="text" name="cpf" id="cpf" class="campo-input"
                                    placeholder="000.000.000-00" maxlength="14" required>
-                            <small>Obrigatório para pagamento com boleto e cartão</small>
                         </div>
 
                         <!-- Campos do cartão -->
@@ -107,7 +117,7 @@
 
                         <div class="cartao-erro" id="cartao-erro"></div>
 
-                        <button type="submit" class="btn-pagar btn-cartao" id="btn-pagar-cartao">
+                        <button type="submit" class="btn-pagar btn-cartao" id="btn-pagar-cartao" disabled>
                             Pagar com cartão
                         </button>
                     </form>
@@ -132,7 +142,9 @@
                             <input type="text" name="cpf" id="cpf-boleto" class="campo-input"
                                    placeholder="000.000.000-00" maxlength="14" required>
                         </div>
-                        <button type="submit" class="btn-pagar btn-boleto">Gerar boleto</button>
+                        <button type="submit" class="btn-pagar btn-boleto" id="btn-boleto" disabled>
+                            Gerar boleto
+                        </button>
                     </form>
                 </div>
             </div>

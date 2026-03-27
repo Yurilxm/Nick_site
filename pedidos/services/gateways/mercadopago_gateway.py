@@ -12,28 +12,44 @@ def _cpf_numerico(cpf):
     return (cpf or "").replace(".", "").replace("-", "").strip()
 
 
+def _extrair_nome(pedido):
+    """Extrai nome e sobrenome corretamente."""
+    nome = pedido.usuario.get_full_name().strip()
+
+    if nome:
+        partes = nome.split()
+        first_name = partes[0]
+        last_name = " ".join(partes[1:]) if len(partes) > 1 else "Cliente"
+    else:
+        first_name = "Cliente"
+        last_name = "Cliente"
+
+    return first_name, last_name
+
+
 class MercadoPagoGateway:
 
     def criar_pix(self, pedido, valor=None):
-        """
-        Cria pagamento PIX.
-        Aceita valor customizado (ex: com desconto de 5%).
-        """
         if valor is None:
             valor = float(pedido.total)
+
+        payer = {
+            "email": pedido.usuario.email,
+        }
+
+        # CPF opcional no PIX
+        if pedido.cpf:
+            payer["identification"] = {
+                "type": "CPF",
+                "number": _cpf_numerico(pedido.cpf),
+            }
 
         payment_data = {
             "transaction_amount": float(valor),
             "payment_method_id": "pix",
             "description": f"Pedido {pedido.id}",
             "notification_url": f"{settings.SITE_URL}/pedidos/webhook/mercadopago/",
-            "payer": {
-                "email": pedido.usuario.email,
-                "identification": {
-                    "type": "CPF",
-                    "number": _cpf_numerico(pedido.cpf),
-                },
-            },
+            "payer": payer,
         }
 
         try:
@@ -67,14 +83,16 @@ class MercadoPagoGateway:
             return {}
 
     def criar_boleto(self, pedido):
+        first_name, last_name = _extrair_nome(pedido)
+
         payment_data = {
             "transaction_amount": float(pedido.total),
             "payment_method_id": "bolbradesco",
             "description": f"Pedido {pedido.id}",
             "payer": {
                 "email": pedido.usuario.email,
-                "first_name": pedido.usuario.first_name or "Cliente",
-                "last_name": pedido.usuario.last_name or "Cliente",
+                "first_name": first_name,
+                "last_name": last_name,
                 "identification": {
                     "type": "CPF",
                     "number": _cpf_numerico(pedido.cpf),

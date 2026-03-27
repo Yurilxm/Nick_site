@@ -323,6 +323,53 @@
 .btn-voltar-pagamento:hover { color: var(--lilac-mid); }
 
 
+/* PIX valores bonitos */
+.pix-valores {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pix-valores .linha {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-mid);
+}
+
+.pix-valores .linha.total {
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-dark);
+}
+
+.pix-valores .desconto strong {
+    color: #32bcad;
+}
+
+/* botão desativado */
+.btn-pagar:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* espaço boleto */
+#form-boleto .campo-grupo {
+    margin-bottom: 14px;
+}
+
+.btn-boleto {
+    margin-top: 10px;
+}
+
+
 @media (max-width: 768px) {
     .pagamento-layout { flex-direction: column; }
     .pagamento-resumo { position: static; width: 100%; min-width: unset; }

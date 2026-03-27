@@ -189,3 +189,26 @@ document.getElementById('form-boleto')?.addEventListener('submit', function(e) {
         alert('CPF inválido. Digite um CPF válido para gerar o boleto.');
     }
 });
+
+
+// =============================================
+// BOTÕES - ATIVAR COM CPF (CARTÃO + BOLETO)
+// =============================================
+const cpfCartao = document.getElementById("cpf");
+const btnCartao = document.getElementById("btn-pagar-cartao");
+
+const cpfBoleto = document.getElementById("cpf-boleto");
+const btnBoleto = document.getElementById("btn-boleto");
+
+function validarCPFInput(input, button) {
+    if (!input || !button) return;
+
+    input.addEventListener("input", () => {
+        const cpfLimpo = input.value.replace(/\D/g, "");
+        button.disabled = cpfLimpo.length !== 11;
+    });
+}
+
+// aplica nos dois
+validarCPFInput(cpfCartao, btnCartao);
+validarCPFInput(cpfBoleto, btnBoleto);
