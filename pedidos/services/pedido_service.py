@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from pedidos.models import Pedido, PedidoItem
 
 
-def criar_pedido(usuario, carrinho, frete, endereco):
+def criar_pedido(usuario, carrinho, frete, endereco, cpf=None):
     """
     Cria um pedido validando todos os itens do carrinho.
     """
@@ -51,6 +51,8 @@ def criar_pedido(usuario, carrinho, frete, endereco):
         bairro=endereco.get("bairro", ""),
         cidade=endereco.get("cidade", ""),
         estado=endereco.get("estado", ""),
+        cpf=cpf,
+        status="criado"
     )
 
     for item in itens:

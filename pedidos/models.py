@@ -34,6 +34,7 @@ class Pedido(models.Model):
     cidade = models.CharField(max_length=100, blank=True)
     estado = models.CharField(max_length=2, blank=True)
     complemento = models.CharField(max_length=200, blank=True)
+    cpf = models.CharField(max_length=14, blank=True, null=True)
 
     status = models.CharField(
         max_length=30,

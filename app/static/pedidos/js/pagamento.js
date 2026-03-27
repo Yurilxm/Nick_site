@@ -8,7 +8,28 @@ document.querySelectorAll('.metodo-aba').forEach(aba => {
 });
 
 // =============================================
-// MÁSCARAS
+// MÁSCARA DE CPF
+// =============================================
+function mascaraCPF(input) {
+    let value = input.value.replace(/\D/g, '');
+    if (value.length > 11) value = value.slice(0, 11);
+    if (value.length > 9) {
+        value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+    } else if (value.length > 6) {
+        value = value.replace(/^(\d{3})(\d{3})(\d{0,3})$/, '$1.$2.$3');
+    } else if (value.length > 3) {
+        value = value.replace(/^(\d{3})(\d{0,3})$/, '$1.$2');
+    }
+    input.value = value;
+}
+
+const cpfInputs = document.querySelectorAll('#cpf, #cpf-boleto');
+cpfInputs.forEach(input => {
+    input.addEventListener('input', e => mascaraCPF(e.target));
+});
+
+// =============================================
+// MÁSCARAS DO CARTÃO
 // =============================================
 const campoNumero = document.getElementById('card-number');
 const campoValidade = document.getElementById('card-expiry');
@@ -65,17 +86,22 @@ function carregarParcelas() {
                 sel.innerHTML = '';
                 data.forEach(p => {
                     const opt = document.createElement('option');
-                    opt.value = p.numero;   // chave correta do service
+                    opt.value = p.numero;
                     const parcela = Number(p.valor_parcela).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
                     const total = Number(p.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-                    opt.textContent = `${p.numero}x de R$ ${parcela} (total R$ ${total})`;
+
+                    if (p.sem_juros) {
+                        opt.textContent = `${p.numero}x de R$ ${parcela} sem juros`;
+                    } else {
+                        opt.textContent = `${p.numero}x de R$ ${parcela} (total R$ ${total})`;
+                    }
+
                     sel.appendChild(opt);
                 });
 
                 sel.onchange = () => {
                     document.getElementById('parcelas-hidden').value = sel.value;
                 };
-                // Dispara onchange para setar o valor inicial
                 sel.dispatchEvent(new Event('change'));
             })
             .catch(() => { });
@@ -83,7 +109,7 @@ function carregarParcelas() {
 }
 
 // =============================================
-// MERCADO PAGO — TOKENIZAÇÃO
+// MERCADO PAGO — TOKENIZAÇÃO (CARTÃO)
 // =============================================
 let mp;
 if (window.MP_PUBLIC_KEY) {
@@ -98,6 +124,15 @@ document.getElementById('form-cartao')?.addEventListener('submit', async functio
     erroEl.textContent = '';
     btn.disabled = true;
     btn.textContent = 'Processando...';
+
+    // Valida CPF
+    const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
+    if (!cpf || cpf.length !== 11) {
+        erroEl.textContent = 'CPF inválido. Digite um CPF válido.';
+        btn.disabled = false;
+        btn.textContent = 'Pagar com cartão';
+        return;
+    }
 
     const numero = document.getElementById('card-number').value.replace(/\s/g, '');
     const nome = document.getElementById('card-name').value;
@@ -136,12 +171,21 @@ document.getElementById('form-cartao')?.addEventListener('submit', async functio
         this.submit();
 
     } catch (err) {
-        console.log('ERRO COMPLETO:', JSON.stringify(err));
-        console.log('CAUSA:', err?.cause);
         const msg = err?.cause?.[0]?.description
             || 'Erro ao processar cartão. Verifique os dados e tente novamente.';
         erroEl.textContent = msg;
         btn.disabled = false;
         btn.textContent = 'Pagar com cartão';
+    }
+});
+
+// =============================================
+// BOLETO – garante envio do CPF
+// =============================================
+document.getElementById('form-boleto')?.addEventListener('submit', function(e) {
+    const cpf = document.getElementById('cpf-boleto').value.replace(/\D/g, '');
+    if (!cpf || cpf.length !== 11) {
+        e.preventDefault();
+        alert('CPF inválido. Digite um CPF válido para gerar o boleto.');
     }
 });

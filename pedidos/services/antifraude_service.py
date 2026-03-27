@@ -1,8 +1,34 @@
+import re
 from django.utils import timezone
 from datetime import timedelta
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def validar_cpf(cpf):
+    """Valida CPF: formato e dígitos verificadores."""
+    # Remove caracteres não numéricos
+    cpf = re.sub(r'[^0-9]', '', cpf)
+    if len(cpf) != 11:
+        return False
+    # Verifica se todos os dígitos são iguais (ex: 111.111.111-11)
+    if cpf == cpf[0] * 11:
+        return False
+    # Cálculo dos dígitos verificadores
+    def calcular_digito(cpf, pos):
+        soma = 0
+        for i in range(pos):
+            soma += int(cpf[i]) * (pos + 1 - i)
+        digito = 11 - (soma % 11)
+        return digito if digito < 10 else 0
+    # Primeiro dígito
+    if int(cpf[9]) != calcular_digito(cpf, 9):
+        return False
+    # Segundo dígito
+    if int(cpf[10]) != calcular_digito(cpf, 10):
+        return False
+    return True
 
 
 def validar_pedido(pedido):
@@ -16,6 +42,16 @@ def validar_pedido_com_motivo(pedido):
     Valida um pedido contra critérios de antifraude.
     Retorna (True, None) se válido, ou (False, motivo) caso contrário.
     """
+    # 0. Validação de CPF
+    if not pedido.cpf:
+        motivo = "CPF não informado"
+        logger.warning(f"Pedido {pedido.id} bloqueado: {motivo}")
+        return False, motivo
+    if not validar_cpf(pedido.cpf):
+        motivo = f"CPF inválido: {pedido.cpf}"
+        logger.warning(f"Pedido {pedido.id} bloqueado: {motivo}")
+        return False, motivo
+
     # 1. Pedido com valor muito alto
     if pedido.total > 10000:
         motivo = f"valor total R$ {pedido.total} é maior que R$ 10.000,00"

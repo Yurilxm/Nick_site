@@ -271,6 +271,65 @@
 }
 
 /* =============================================
+   PREÇOS: PIX E PARCELAMENTO NO CARD
+   ============================================= */
+
+.card-precos {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 8px;
+}
+
+.card-pix-preco {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-mid);
+}
+
+.card-pix-preco em {
+    font-style: normal;
+    font-size: 10px;
+    font-weight: 800;
+    color: #2fa84f;
+    background: rgba(47, 168, 79, 0.10);
+    padding: 1px 5px;
+    border-radius: 20px;
+}
+
+.pix-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #32bcad, #1a9e8f);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.card-parcelas {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-mid);
+}
+
+@media (max-width: 600px) {
+    .card-pix-preco {
+        font-size: 11px;
+    }
+    .card-parcelas {
+        font-size: 10px;
+    }
+}
+
+/* =============================================
    BOTÃO
    ============================================= */
 

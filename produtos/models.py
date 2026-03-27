@@ -79,6 +79,16 @@ class Produto(models.Model):
     def imagens_detalhe(self):
         return self.imagens.filter(tipo="detalhe")
 
+    @property
+    def preco_pix(self):
+        from decimal import Decimal
+        return round(self.preco * Decimal("0.95"), 2)
+
+    @property
+    def preco_parcela_2x(self):
+        from decimal import Decimal
+        return round(self.preco / 2, 2)
+
     def save(self, *args, **kwargs):
         if not self.slug:
             slug_base = slugify(self.nome)

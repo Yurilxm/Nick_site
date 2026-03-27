@@ -38,8 +38,21 @@
       <div class="card-estrelas">
         <span class="estrelas">★★★★★</span>
       </div>
-      <div class="card-preco-botao">
+
+      <div class="card-precos">
         <p class="card-preco">R$ {{ produto.preco }}</p>
+
+        <span class="card-pix-preco">
+          <span class="pix-badge">PIX</span>
+          R$ {{ produto.preco_pix }} <em>5% off</em>
+        </span>
+
+        <span class="card-parcelas">
+          ou 2x R$ {{ produto.preco_parcela_2x }} sem juros
+        </span>
+      </div>
+
+      <div class="card-preco-botao">
         <span class="card-botao">Ver produto</span>
       </div>
     </div>

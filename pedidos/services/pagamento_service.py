@@ -9,17 +9,25 @@ def pedido_ja_tem_pagamento_pendente(pedido):
         status="pendente"
     ).exists()
 
-def criar_pagamento_pix(pedido):
+def criar_pagamento_pix(pedido, valor=None):
+    """
+    Cria pagamento PIX.
+    Se 'valor' for passado, usa esse valor; caso contrário, usa pedido.total.
+    """
     if pedido_ja_tem_pagamento_pendente(pedido):
         return Pagamento.objects.filter(
             pedido=pedido,
             status="pendente"
         ).first()
 
-    response = gateway.criar_pix(pedido)
+    # Se valor não foi informado, usa o total do pedido
+    if valor is None:
+        valor = pedido.total
+
+    # Cria o pagamento no gateway com o valor (que já pode ter desconto)
+    response = gateway.criar_pix(pedido, valor=float(valor))  # supondo que o gateway aceite um parâmetro valor
 
     payment_id = response.get("id")
-    # Alguns campos podem estar dentro de point_of_interaction ou transaction_data
     qr_code = response.get("point_of_interaction", {}).get("transaction_data", {}).get("qr_code")
     qr_code_base64 = response.get("point_of_interaction", {}).get("transaction_data", {}).get("qr_code_base64")
 

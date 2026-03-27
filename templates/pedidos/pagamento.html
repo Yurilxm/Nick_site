@@ -20,7 +20,7 @@
 
             <div class="metodo-abas">
                 <button type="button" class="metodo-aba ativa" data-metodo="pix">
-                    <span class="aba-icone">⚡</span><span>Pix</span>
+                    <span class="aba-icone">⚡</span><span>Pix (5% desconto)</span>
                 </button>
                 <button type="button" class="metodo-aba" data-metodo="cartao">
                     <span class="aba-icone">💳</span><span>Cartão</span>
@@ -34,8 +34,13 @@
             <div class="metodo-painel ativo" id="painel-pix">
                 <div class="pagamento-card">
                     <div class="pix-destaque">
-                        <div class="pix-badge">⚡ Aprovação imediata</div>
-                        <p class="pix-desc">Pague com Pix e tenha seu pedido confirmado na hora. Válido por <strong>30 minutos</strong>.</p>
+                        <div class="pix-badge">⚡ Aprovação imediata + 5% OFF</div>
+                        <p class="pix-desc">Pague com Pix e ganhe 5% de desconto! Válido por <strong>30 minutos</strong>.</p>
+                        <div class="valores">
+                            <span class="valor-original">R$ {{ total_geral|moeda }}</span>
+                            <span class="desconto">- R$ {{ desconto_pix|moeda }}</span>
+                            <span class="valor-final">R$ {{ total_com_desconto|moeda }}</span>
+                        </div>
                     </div>
                     <form method="post">
                         {% csrf_token %}
@@ -55,7 +60,15 @@
                         <input type="hidden" name="parcelas" id="parcelas-hidden" value="1">
                         <input type="hidden" name="card_bandeira" id="card-bandeira" value="">
 
-                        <!-- Campos lidos pelo SDK MercadoPago — não vão ao servidor -->
+                        <!-- Campo CPF (obrigatório para cartão e boleto) -->
+                        <div class="campo-grupo">
+                            <label class="campo-label">CPF do titular *</label>
+                            <input type="text" name="cpf" id="cpf" class="campo-input"
+                                   placeholder="000.000.000-00" maxlength="14" required>
+                            <small>Obrigatório para pagamento com boleto e cartão</small>
+                        </div>
+
+                        <!-- Campos do cartão -->
                         <div class="campo-grupo">
                             <label class="campo-label">Número do cartão</label>
                             <input type="text" id="card-number" class="campo-input"
@@ -111,9 +124,14 @@
                             <p>Prazo de compensação: <strong>1 a 3 dias úteis</strong>. Válido por <strong>3 dias</strong>.</p>
                         </div>
                     </div>
-                    <form method="post">
+                    <form method="post" id="form-boleto">
                         {% csrf_token %}
                         <input type="hidden" name="metodo" value="boleto">
+                        <div class="campo-grupo">
+                            <label class="campo-label">CPF do titular *</label>
+                            <input type="text" name="cpf" id="cpf-boleto" class="campo-input"
+                                   placeholder="000.000.000-00" maxlength="14" required>
+                        </div>
                         <button type="submit" class="btn-pagar btn-boleto">Gerar boleto</button>
                     </form>
                 </div>
