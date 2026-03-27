@@ -1,23 +1,23 @@
 import mercadopago
 import logging
 from django.conf import settings
+from decimal import Decimal, ROUND_HALF_UP
 
 logger = logging.getLogger(__name__)
 
 sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
 
+
 def _extrair_nome(pedido):
     """Extrai nome e sobrenome. Prioriza o campo nome_cliente do pedido."""
-    
-    # 1. Usa o nome salvo no pedido
+
     if pedido.nome_cliente:
         nome = pedido.nome_cliente.strip()
         partes = nome.split()
         first_name = partes[0]
-        last_name = " ".join(partes[1:]) if len(partes) > 1 else ""
-        return first_name, last_name or "Cliente"
-    
-    # 2. Fallback: nome do usuário logado
+        last_name = " ".join(partes[1:]) if len(partes) > 1 else "Cliente"
+        return first_name, last_name
+
     nome = pedido.usuario.get_full_name().strip()
     if nome:
         partes = nome.split()
@@ -26,19 +26,28 @@ def _extrair_nome(pedido):
     else:
         first_name = "Cliente"
         last_name = "Cliente"
-    
+
     return first_name, last_name
 
+
 def _cpf_numerico(cpf):
-    """Remove pontuação do CPF."""
     return (cpf or "").replace(".", "").replace("-", "").strip()
 
 
 class MercadoPagoGateway:
 
+    def _formatar_valor(self, valor):
+        """Garante valor com 2 casas decimais (padrão seguro)"""
+        return Decimal(valor).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    # =====================================
+    # PIX
+    # =====================================
     def criar_pix(self, pedido, valor=None):
         if valor is None:
-            valor = float(pedido.total)
+            valor = pedido.total
+
+        valor = self._formatar_valor(valor)
 
         payer = {
             "email": pedido.usuario.email,
@@ -59,6 +68,8 @@ class MercadoPagoGateway:
             "payer": payer,
         }
 
+        print("VALOR FINAL PIX:", valor)
+
         try:
             payment = sdk.payment().create(payment_data)
             return payment.get("response", {})
@@ -66,9 +77,14 @@ class MercadoPagoGateway:
             logger.error(f"Erro ao criar PIX para pedido {pedido.id}: {e}")
             return {}
 
+    # =====================================
+    # CARTÃO
+    # =====================================
     def criar_cartao(self, pedido, token, parcelas, payment_method_id):
+        valor = self._formatar_valor(pedido.total)
+
         payment_data = {
-            "transaction_amount": float(pedido.total),
+            "transaction_amount": float(valor),
             "token": token,
             "installments": int(parcelas),
             "payment_method_id": payment_method_id,
@@ -89,11 +105,15 @@ class MercadoPagoGateway:
             logger.error(f"Erro ao criar pagamento com cartão para pedido {pedido.id}: {e}")
             return {}
 
+    # =====================================
+    # BOLETO
+    # =====================================
     def criar_boleto(self, pedido):
         first_name, last_name = _extrair_nome(pedido)
+        valor = self._formatar_valor(pedido.total)
 
         payment_data = {
-            "transaction_amount": float(pedido.total),
+            "transaction_amount": float(valor),
             "payment_method_id": "bolbradesco",
             "description": f"Pedido {pedido.id}",
             "payer": {

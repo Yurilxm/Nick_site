@@ -25,7 +25,11 @@ def criar_pagamento_pix(pedido, valor=None):
         valor = pedido.total
 
     # Cria o pagamento no gateway com o valor (que já pode ter desconto)
-    response = gateway.criar_pix(pedido, valor=float(valor))  # supondo que o gateway aceite um parâmetro valor
+    from decimal import Decimal, ROUND_HALF_UP
+
+    valor = Decimal(valor).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    response = gateway.criar_pix(pedido, valor=valor)
 
     payment_id = response.get("id")
     qr_code = response.get("point_of_interaction", {}).get("transaction_data", {}).get("qr_code")
