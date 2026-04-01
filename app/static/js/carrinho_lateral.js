@@ -32,7 +32,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.classList.remove("no-scroll");
   }
 
-  // Expõe globalmente (usado por toast_produtos.js, etc.)
   window.abrirCarrinho        = abrirCarrinho;
   window.atualizarMiniCarrinho = atualizarMiniCarrinho;
 
@@ -71,6 +70,18 @@ function atualizarBadge(qtd) {
 }
 
 /* ========================= */
+// Valida que a URL é interna (mesma origem) antes de navegar
+function urlSegura(url) {
+  try {
+    const parsed = new URL(url, window.location.origin);
+    if (parsed.origin === window.location.origin) {
+      return parsed.pathname + parsed.search + parsed.hash;
+    }
+  } catch (_) { /* URL inválida */ }
+  return null;
+}
+
+/* ========================= */
 function atualizarMiniCarrinho() {
   const etapa = window.CHECKOUT_ETAPA || 0;
 
@@ -88,7 +99,9 @@ function atualizarMiniCarrinho() {
       lista.innerHTML = "";
 
       if (data.itens.length === 0) {
-        lista.innerHTML = "<p>Seu carrinho está vazio.</p>";
+        const vazio = document.createElement("p");
+        vazio.textContent = "Seu carrinho está vazio.";
+        lista.appendChild(vazio);
         totalEl.innerText = "0,00";
         if (finais) finais.style.display = "none";
         return;
@@ -100,17 +113,48 @@ function atualizarMiniCarrinho() {
         const li = document.createElement("li");
         li.className = "item-carrinho clicavel";
         li.dataset.itemId = item.id;
-        li.dataset.url    = item.url;
+        // Armazena apenas o path validado, nunca URL externa
+        li.dataset.url = urlSegura(item.url) || "";
 
-        li.innerHTML = `
-          ${item.imagem ? `<img src="${item.imagem}" class="item-carrinho-img" alt="${item.nome}">` : ""}
-          <div class="item-carrinho-info">
-            <strong>${item.nome}</strong>
-            ${item.opcao ? `<div class="mini-opcao">${item.opcao}</div>` : ""}
-            <span>${item.quantidade} x R$ ${formatarMoeda(item.preco)}</span>
-          </div>
-          ${etapa !== 2 ? `<button class="btn-remover-mini" data-item-id="${item.id}" aria-label="Remover item">×</button>` : ""}
-        `;
+        // Imagem
+        if (item.imagem) {
+          const img = document.createElement("img");
+          img.src       = item.imagem;
+          img.className = "item-carrinho-img";
+          img.alt       = item.nome;
+          li.appendChild(img);
+        }
+
+        // Info
+        const info = document.createElement("div");
+        info.className = "item-carrinho-info";
+
+        const strong = document.createElement("strong");
+        strong.textContent = item.nome;
+        info.appendChild(strong);
+
+        if (item.opcao) {
+          const opcaoDiv = document.createElement("div");
+          opcaoDiv.className   = "mini-opcao";
+          opcaoDiv.textContent = item.opcao;
+          info.appendChild(opcaoDiv);
+        }
+
+        const span = document.createElement("span");
+        span.textContent = `${item.quantidade} x R$ ${formatarMoeda(item.preco)}`;
+        info.appendChild(span);
+
+        li.appendChild(info);
+
+        // Botão remover
+        if (etapa !== 2) {
+          const btn = document.createElement("button");
+          btn.className        = "btn-remover-mini";
+          btn.dataset.itemId   = item.id;
+          btn.setAttribute("aria-label", "Remover item");
+          btn.textContent      = "×";
+          li.appendChild(btn);
+        }
 
         lista.appendChild(li);
       });
@@ -145,7 +189,7 @@ document.addEventListener("click", function (e) {
 
   const itemId = btn.dataset.itemId;
 
-  fetch(`/carrinho/remover/${itemId}/`, {
+  fetch(`/carrinho/remover/${encodeURIComponent(itemId)}/`, {
     method: "POST",
     headers: {
       "X-CSRFToken": csrfToken,
@@ -171,5 +215,7 @@ document.addEventListener("click", function (e) {
   if (e.target.closest(".btn-remover-mini")) return;
 
   const url = item.dataset.url;
-  if (url) window.location.href = url;
+  // urlSegura() já foi aplicada ao armazenar no dataset, mas validamos de novo por segurança
+  const destino = urlSegura(url);
+  if (destino) window.location.href = destino;
 });

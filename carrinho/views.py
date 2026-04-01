@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
+from app.models import UserProfile
 from produtos.models import Produto, GrupoOpcao, Opcao
 from .models import ItemCarrinho
 from .services import obter_carrinho
@@ -139,6 +140,12 @@ def ver_carrinho(request):
 
     if not itens.exists():
         request.session.pop("frete", None)
+
+    # 🔥 LIMPA FRETE SE NÃO TEM CEP SALVO
+    frete = request.session.get("frete")
+    if frete and not frete.get("cep"):
+        request.session.pop("frete", None)
+        frete = None
 
     traduzir_opcoes(itens)
 
@@ -311,7 +318,7 @@ def finalizar_compra(request):
 
     if request.method == "POST":
         request.session["endereco"] = {
-            "nome":        request.POST.get("nome", ""),
+            "nome_completo":        request.POST.get("nome_completo", ""),
             "cep":         request.POST.get("cep_entrega", ""),
             "rua":         request.POST.get("rua", ""),
             "numero":      request.POST.get("numero", ""),
@@ -322,9 +329,52 @@ def finalizar_compra(request):
         }
         return redirect("pedidos:pagamento")
 
-    endereco = request.session.get("endereco", {})
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
+    endereco_sessao = request.session.get("endereco")
+
+    endereco_profile = {
+        "nome_completo": profile.nome_completo,
+        "cep": profile.cep,
+        "rua": profile.rua,
+        "numero": profile.numero,
+        "complemento": profile.complemento,
+        "bairro": profile.bairro,
+        "cidade": profile.cidade,
+        "estado": profile.estado,
+    }
+
+    # 👉 Se o profile estiver vazio, limpa sessão
+    if not any(endereco_profile.values()):
+        request.session.pop("endereco", None)
+        endereco = {}
+    else:
+        # 👉 Se tiver sessão, usa sessão (prioridade)
+        if endereco_sessao:
+            endereco = {**endereco_profile, **endereco_sessao}
+        else:
+            endereco = endereco_profile
+
+    # segurança extra
     if not isinstance(endereco, dict):
         endereco = {}
+
+    # 🔥 se não tem CEP válido → limpa frete
+    if not endereco.get("cep"):
+        request.session.pop("frete", None)
+
+    if endereco.get("cep") and not request.session.get("frete"):
+        opcoes = calcular_frete_melhor_envio(endereco["cep"], itens)
+
+        if opcoes:
+            melhor = opcoes[0]
+            request.session["frete"] = {
+                "cep": endereco["cep"],
+                "valor": str(melhor["preco"]),
+                "tipo": melhor["nome"],
+                "prazo": melhor["prazo"],
+                "transportadora": melhor["transportadora"],
+            }
 
     return render(request, "carrinho/checkout.html", {
         "itens":          itens,

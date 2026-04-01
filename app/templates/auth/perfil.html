@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="perfil-container">
+    <h2>Meu Perfil</h2>
+
+    <form method="post" id="perfil-form">
+        {% csrf_token %}
+
+        <div class="perfil-grid">
+            <!-- Card: Dados Pessoais -->
+            <div class="perfil-card">
+                <div class="perfil-card-header">
+                    <i class="ri-user-star-line"></i>
+                    <h3>Dados Pessoais</h3>
+                </div>
+
+                <div class="perfil-form-group">
+                    <label>
+                        <i class="ri-user-line"></i>
+                        <span>Nome completo</span>
+                    </label>
+                    <input type="text" name="nome_completo" 
+                           placeholder="Digite seu nome completo" 
+                           value="{{ profile.nome_completo|default:'' }}">
+                </div>
+
+                <div class="perfil-form-group">
+                    <label>
+                        <i class="ri-id-card-line"></i>
+                        <span>CPF</span>
+                    </label>
+                    <input type="text" name="cpf" 
+                           placeholder="000.000.000-00" 
+                           value="{{ profile.cpf|default:'' }}">
+                </div>
+            </div>
+
+            <!-- Card: Endereço -->
+            <div class="perfil-card">
+                <div class="perfil-card-header">
+                    <i class="ri-map-pin-user-line"></i>
+                    <h3>Endereço de entrega</h3>
+                </div>
+
+                <div class="perfil-form-group">
+                    <label>
+                        <i class="ri-mail-line"></i>
+                        <span>CEP</span>
+                    </label>
+                    <input type="text" id="cep" name="cep" 
+                           placeholder="00000-000" 
+                           value="{{ profile.cep|default:'' }}">
+                    <div class="perfil-cep-hint">
+                        <i class="ri-information-line"></i>
+                        <span>Digite o CEP para preenchimento automático</span>
+                    </div>
+                </div>
+
+                <div class="perfil-form-group">
+                    <label>
+                        <i class="ri-road-map-line"></i>
+                        <span>Rua</span>
+                    </label>
+                    <input type="text" id="rua" name="rua" 
+                           placeholder="Digite sua rua" 
+                           value="{{ profile.rua|default:'' }}">
+                </div>
+
+                <div class="perfil-inline-grid">
+                    <div class="perfil-form-group">
+                        <label>
+                            <i class="ri-hashtag"></i>
+                            <span>Número</span>
+                        </label>
+                        <input type="text" id="numero" name="numero" 
+                               placeholder="Número" 
+                               value="{{ profile.numero|default:'' }}">
+                    </div>
+
+                    <div class="perfil-form-group">
+                        <label>
+                            <i class="ri-home-office-line"></i>
+                            <span>Complemento</span>
+                        </label>
+                        <input type="text" id="complemento" name="complemento" 
+                               placeholder="Apto, Bloco, etc" 
+                               value="{{ profile.complemento|default:'' }}">
+                    </div>
+                </div>
+
+                <div class="perfil-form-group">
+                    <label>
+                        <i class="ri-community-line"></i>
+                        <span>Bairro</span>
+                    </label>
+                    <input type="text" id="bairro" name="bairro" 
+                           placeholder="Digite seu bairro" 
+                           value="{{ profile.bairro|default:'' }}">
+                </div>
+
+                <div class="perfil-inline-grid">
+                    <div class="perfil-form-group">
+                        <label>
+                            <i class="ri-building-line"></i>
+                            <span>Cidade</span>
+                        </label>
+                        <input type="text" id="cidade" name="cidade" 
+                               placeholder="Cidade" 
+                               value="{{ profile.cidade|default:'' }}">
+                    </div>
+
+                    <div class="perfil-form-group">
+                        <label>
+                            <i class="ri-map-2-line"></i>
+                            <span>Estado</span>
+                        </label>
+                        <input type="text" id="estado" name="estado" 
+                               placeholder="UF" 
+                               value="{{ profile.estado|default:'' }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="perfil-btn-salvar">
+            <i class="ri-save-line"></i>
+            <span>Salvar alterações</span>
+        </button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,215 @@
+/* ========== PERFIL PAGE - DESIGN MODERNO ========== */
+
+.perfil-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+/* Título principal */
+.perfil-container>h2 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 32px;
+    background: linear-gradient(135deg, #FF8CAA, #C5A3D9, #8BB8E8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+    position: relative;
+    display: inline-block;
+}
+
+.perfil-container>h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #FFB0CC, #CDB4DB);
+    border-radius: 3px;
+}
+
+/* Grid 2 colunas */
+.perfil-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-bottom: 32px;
+}
+
+/* Cards */
+.perfil-card {
+    background: white;
+    border-radius: 24px;
+    border: 1px solid rgba(205, 180, 219, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: box-shadow 0.3s;
+}
+
+.perfil-card:hover {
+    box-shadow: 0 16px 40px rgba(255, 133, 161, 0.12);
+}
+
+/* Header do card */
+.perfil-card-header {
+    padding: 20px 24px 16px 24px;
+    border-bottom: 2px solid rgba(255, 175, 204, 0.3);
+    background: linear-gradient(135deg, rgba(255, 175, 204, 0.08), rgba(205, 180, 219, 0.05));
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.perfil-card-header i {
+    font-size: 22px;
+    color: #FF8CAA;
+}
+
+.perfil-card-header h3 {
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(135deg, #FF8CAA, #C5A3D9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.5px;
+}
+
+/* Form groups - estilo normal com label em cima */
+.perfil-form-group {
+    margin: 20px 24px;
+}
+
+.perfil-form-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #666;
+    margin-bottom: 8px;
+    letter-spacing: 0.3px;
+}
+
+.perfil-form-group label i {
+    font-size: 16px;
+    color: #C5A3D9;
+}
+
+.perfil-form-group input {
+    width: 100%;
+    padding: 12px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    background: white;
+    border: 1.5px solid rgba(205, 180, 219, 0.4);
+    border-radius: 12px;
+    outline: none;
+    transition: all 0.25s ease;
+    box-sizing: border-box;
+}
+
+.perfil-form-group input:focus {
+    border-color: #FF8CAA;
+    box-shadow: 0 0 0 3px rgba(255, 175, 204, 0.15);
+}
+
+.perfil-form-group input::placeholder {
+    color: #bbb;
+    font-weight: 500;
+}
+
+/* Grid inline para dois campos lado a lado */
+.perfil-inline-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 0 24px;
+}
+
+.perfil-inline-grid .perfil-form-group {
+    margin: 20px 0;
+}
+
+/* Dica de CEP */
+.perfil-cep-hint {
+    font-size: 11px;
+    color: #999;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.perfil-cep-hint i {
+    font-size: 13px;
+    color: #C5A3D9;
+}
+
+/* Botão salvar */
+.perfil-btn-salvar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto 16px;
+    padding: 16px 32px;
+    border: none;
+    border-radius: 60px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #FF8CAA, #E8A5C4, #C5A3D9);
+    background-size: 200% auto;
+    color: white;
+    box-shadow: 0 8px 24px rgba(255, 133, 161, 0.35);
+    transition: all 0.3s ease;
+}
+
+.perfil-btn-salvar:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 32px rgba(255, 133, 161, 0.45);
+    background-position: right center;
+}
+
+.perfil-btn-salvar:active {
+    transform: translateY(1px);
+}
+
+.perfil-btn-salvar i {
+    font-size: 18px;
+    color: white;
+}
+
+/* Responsivo */
+@media (max-width: 900px) {
+    .perfil-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .perfil-container {
+        padding: 20px 16px;
+    }
+}
+
+@media (max-width: 500px) {
+    .perfil-inline-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .perfil-form-group {
+        margin: 16px 20px;
+    }
+}

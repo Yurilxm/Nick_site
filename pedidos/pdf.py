@@ -37,21 +37,17 @@ def gerar_ficha_pdf(request, pedido_id):
     # ==========================================
     header_height = 4.5 * cm
 
-    # Fundo do header
     c.setFillColor(BABY_PINK)
     c.rect(0, height - header_height, width, header_height, fill=1, stroke=0)
 
-    # Faixa lilás decorativa
     c.setFillColor(BABY_LILAC)
     c.rect(0, height - header_height, width * 0.4, header_height, fill=1, stroke=0)
 
-    # Círculo decorativo
     c.setFillColor(HexColor('#ffd6e7'))
     c.circle(width - 3 * cm, height - header_height / 2, 2.5 * cm, fill=1, stroke=0)
     c.setFillColor(HexColor('#e8c8f0'))
     c.circle(width - 3 * cm, height - header_height / 2, 1.8 * cm, fill=1, stroke=0)
 
-    # Nome da loja
     c.setFillColor(WHITE)
     c.setFont("Helvetica-Bold", 22)
     c.drawString(1.5 * cm, height - 2 * cm, "Nick Brindes")
@@ -60,7 +56,6 @@ def gerar_ficha_pdf(request, pedido_id):
     c.setFillColor(HexColor('#ffe0ec'))
     c.drawString(1.5 * cm, height - 2.8 * cm, "Ficha de Producao")
 
-    # Número do pedido (canto direito)
     c.setFillColor(WHITE)
     c.setFont("Helvetica-Bold", 14)
     c.drawRightString(width - 1.5 * cm, height - 1.8 * cm, f"PEDIDO #{pedido.id}")
@@ -70,7 +65,6 @@ def gerar_ficha_pdf(request, pedido_id):
     data_criacao = pedido.criado_em.strftime("%d/%m/%Y %H:%M") if pedido.criado_em else ""
     c.drawRightString(width - 1.5 * cm, height - 2.5 * cm, data_criacao)
 
-    # Status badge
     status_cores = {
         "pago": (HexColor('#d4f7e0'), HexColor('#2d7a4f')),
         "em_producao": (HexColor('#dde8ff'), HexColor('#2d4a9b')),
@@ -93,13 +87,11 @@ def gerar_ficha_pdf(request, pedido_id):
     y = height - header_height - 1 * cm
 
     def secao_titulo(titulo, y_pos):
-        # Linha decorativa
         c.setFillColor(BABY_PINK)
         c.rect(1.5 * cm, y_pos - 0.1 * cm, 0.3 * cm, 0.8 * cm, fill=1, stroke=0)
         c.setFillColor(TEXT_DARK)
         c.setFont("Helvetica-Bold", 12)
         c.drawString(2.2 * cm, y_pos + 0.1 * cm, titulo)
-        # Linha separadora
         c.setStrokeColor(BORDER)
         c.setLineWidth(0.5)
         c.line(1.5 * cm, y_pos - 0.3 * cm, width - 1.5 * cm, y_pos - 0.3 * cm)
@@ -154,25 +146,23 @@ def gerar_ficha_pdf(request, pedido_id):
     y -= 0.3 * cm
 
     for i, item in enumerate(pedido.itens.all()):
-        # Verifica se precisa de nova página
         if y < 5 * cm:
             c.showPage()
             y = height - 2 * cm
 
-        # Card do item
         card_height = 2.5 * cm
-
-        # Verifica personalizações para calcular altura
         opcoes_formatadas = []
+
         if item.opcoes:
             for chave, valor in item.opcoes.items():
                 if chave == "personalizacao":
                     opcoes_formatadas.append(("Personalizacao", str(valor)))
                     continue
+
                 try:
                     grupo = GrupoOpcao.objects.get(id=int(chave))
                     nome_grupo = grupo.nome
-                except:
+                except (GrupoOpcao.DoesNotExist, ValueError, TypeError):
                     nome_grupo = chave.capitalize()
 
                 if isinstance(valor, list):
@@ -181,40 +171,35 @@ def gerar_ficha_pdf(request, pedido_id):
                         try:
                             opcao = Opcao.objects.get(id=int(v))
                             nomes.append(opcao.nome)
-                        except:
+                        except (Opcao.DoesNotExist, ValueError, TypeError):
                             nomes.append(str(v))
                     valor_final = ", ".join(nomes)
                 else:
                     try:
                         opcao = Opcao.objects.get(id=int(valor))
                         valor_final = opcao.nome
-                    except:
+                    except (Opcao.DoesNotExist, ValueError, TypeError):
                         valor_final = str(valor)
 
                 opcoes_formatadas.append((nome_grupo, valor_final))
 
         card_height = max(2.5 * cm, 1.8 * cm + len(opcoes_formatadas) * 0.5 * cm)
 
-        # Fundo alternado
         bg = HexColor('#fdf6fa') if i % 2 == 0 else WHITE
         c.setFillColor(bg)
         c.roundRect(1.5 * cm, y - card_height, width - 3 * cm, card_height, 8, fill=1, stroke=0)
 
-        # Borda esquerda colorida
         c.setFillColor(BABY_PINK if i % 2 == 0 else BABY_LILAC)
         c.rect(1.5 * cm, y - card_height, 0.25 * cm, card_height, fill=1, stroke=0)
 
-        # Número do item
         c.setFillColor(LILAC)
         c.setFont("Helvetica-Bold", 9)
         c.drawString(2.2 * cm, y - 0.5 * cm, f"#{i+1}")
 
-        # Nome do produto
         c.setFillColor(TEXT_DARK)
         c.setFont("Helvetica-Bold", 11)
         c.drawString(3 * cm, y - 0.5 * cm, item.produto.nome)
 
-        # Quantidade e preço
         c.setFillColor(PINK)
         c.setFont("Helvetica-Bold", 10)
         c.drawRightString(width - 2 * cm, y - 0.5 * cm, f"R$ {item.subtotal:.2f}")
@@ -223,7 +208,6 @@ def gerar_ficha_pdf(request, pedido_id):
         c.setFont("Helvetica", 9)
         c.drawRightString(width - 2 * cm, y - 1 * cm, f"Qtd: {item.quantidade} x R$ {item.preco_unitario:.2f}")
 
-        # Opções/personalizações
         op_y = y - 1.3 * cm
         for nome_grupo, valor_final in opcoes_formatadas:
             c.setFillColor(LILAC)
@@ -245,7 +229,6 @@ def gerar_ficha_pdf(request, pedido_id):
 
     y -= 0.3 * cm
 
-    # Caixa de totais
     total_box_height = 3.5 * cm
     c.setFillColor(HexColor('#fdf0f6'))
     c.roundRect(width - 9 * cm, y - total_box_height, 7.5 * cm, total_box_height, 8, fill=1, stroke=0)
@@ -272,7 +255,6 @@ def gerar_ficha_pdf(request, pedido_id):
     c.setFont("Helvetica-Bold", 10)
     c.drawRightString(width - 2 * cm, ty, f"R$ {valor_frete:.2f}" if valor_frete > 0 else "A calcular")
 
-    # Linha divisória
     ty -= 0.4 * cm
     c.setStrokeColor(BORDER)
     c.line(width - 8.5 * cm, ty, width - 2 * cm, ty)

@@ -8,6 +8,26 @@ document.querySelectorAll('.metodo-aba').forEach(aba => {
 });
 
 // =============================================
+// FUNÇÕES AUXILIARES
+// =============================================
+function limparCPF(cpf) {
+    return cpf.replace(/\D/g, '');
+}
+
+function formatarCPF(cpf) {
+    cpf = cpf.replace(/\D/g, '');
+    if (cpf.length > 11) cpf = cpf.slice(0, 11);
+    if (cpf.length > 9) {
+        cpf = cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+    } else if (cpf.length > 6) {
+        cpf = cpf.replace(/^(\d{3})(\d{3})(\d{0,3})$/, '$1.$2.$3');
+    } else if (cpf.length > 3) {
+        cpf = cpf.replace(/^(\d{3})(\d{0,3})$/, '$1.$2');
+    }
+    return cpf;
+}
+
+// =============================================
 // MÁSCARA DE CPF
 // =============================================
 function mascaraCPF(input) {
@@ -23,8 +43,36 @@ function mascaraCPF(input) {
     input.value = value;
 }
 
+// =============================================
+// VALIDAÇÃO DO BOTÃO (com execução imediata)
+// =============================================
+function validarCPFInput(input, button) {
+    if (!input || !button) return;
+
+    // Função que valida e atualiza o botão
+    function atualizarBotao() {
+        const cpfLimpo = limparCPF(input.value);
+        button.disabled = cpfLimpo.length !== 11;
+    }
+
+    // Executa a validação imediatamente (para o valor já existente)
+    atualizarBotao();
+
+    // Adiciona o evento para quando o usuário digitar
+    input.addEventListener("input", atualizarBotao);
+}
+
+// =============================================
+// APLICA MÁSCARA E VALIDAÇÃO NOS CPFs
+// =============================================
 const cpfInputs = document.querySelectorAll('#cpf, #cpf-boleto');
 cpfInputs.forEach(input => {
+    // Formata o valor existente
+    if (input.value) {
+        mascaraCPF(input);
+    }
+
+    // Aplica máscara enquanto digita
     input.addEventListener('input', e => mascaraCPF(e.target));
 });
 
@@ -109,6 +157,19 @@ function carregarParcelas() {
 }
 
 // =============================================
+// BOTÕES - ATIVAR COM CPF (CARTÃO + BOLETO)
+// =============================================
+const cpfCartao = document.getElementById("cpf");
+const btnCartao = document.getElementById("btn-pagar-cartao");
+
+const cpfBoleto = document.getElementById("cpf-boleto");
+const btnBoleto = document.getElementById("btn-boleto");
+
+// Aplica validação com execução imediata
+validarCPFInput(cpfCartao, btnCartao);
+validarCPFInput(cpfBoleto, btnBoleto);
+
+// =============================================
 // MERCADO PAGO — TOKENIZAÇÃO (CARTÃO)
 // =============================================
 let mp;
@@ -125,8 +186,8 @@ document.getElementById('form-cartao')?.addEventListener('submit', async functio
     btn.disabled = true;
     btn.textContent = 'Processando...';
 
-    // Valida CPF
-    const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
+    // Valida CPF usando a função auxiliar
+    const cpf = limparCPF(document.getElementById('cpf').value);
     if (!cpf || cpf.length !== 11) {
         erroEl.textContent = 'CPF inválido. Digite um CPF válido.';
         btn.disabled = false;
@@ -168,6 +229,17 @@ document.getElementById('form-cartao')?.addEventListener('submit', async functio
             document.getElementById('select-parcelas').value || '1';
         document.getElementById('card-bandeira').value = detectarBandeira(numero);
 
+        // Adiciona o CPF limpo como campo hidden se necessário
+        let cpfHidden = document.getElementById('cpf-cartao-hidden');
+        if (!cpfHidden) {
+            cpfHidden = document.createElement('input');
+            cpfHidden.type = 'hidden';
+            cpfHidden.id = 'cpf-cartao-hidden';
+            cpfHidden.name = 'cpf';
+            this.appendChild(cpfHidden);
+        }
+        cpfHidden.value = cpf;
+
         this.submit();
 
     } catch (err) {
@@ -182,33 +254,16 @@ document.getElementById('form-cartao')?.addEventListener('submit', async functio
 // =============================================
 // BOLETO – garante envio do CPF
 // =============================================
-document.getElementById('form-boleto')?.addEventListener('submit', function(e) {
-    const cpf = document.getElementById('cpf-boleto').value.replace(/\D/g, '');
+document.getElementById('form-boleto')?.addEventListener('submit', function (e) {
+    const cpfInput = document.getElementById('cpf-boleto');
+    const cpf = limparCPF(cpfInput.value);
+
     if (!cpf || cpf.length !== 11) {
         e.preventDefault();
         alert('CPF inválido. Digite um CPF válido para gerar o boleto.');
+        return;
     }
+
+    // Atualiza o valor do input com CPF limpo (sem formatação)
+    cpfInput.value = cpf;
 });
-
-
-// =============================================
-// BOTÕES - ATIVAR COM CPF (CARTÃO + BOLETO)
-// =============================================
-const cpfCartao = document.getElementById("cpf");
-const btnCartao = document.getElementById("btn-pagar-cartao");
-
-const cpfBoleto = document.getElementById("cpf-boleto");
-const btnBoleto = document.getElementById("btn-boleto");
-
-function validarCPFInput(input, button) {
-    if (!input || !button) return;
-
-    input.addEventListener("input", () => {
-        const cpfLimpo = input.value.replace(/\D/g, "");
-        button.disabled = cpfLimpo.length !== 11;
-    });
-}
-
-// aplica nos dois
-validarCPFInput(cpfCartao, btnCartao);
-validarCPFInput(cpfBoleto, btnBoleto);

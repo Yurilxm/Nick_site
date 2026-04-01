@@ -19,8 +19,22 @@ from pedidos.services.email_service import (
     enviar_email_pedido_enviado,
 )
 import logging
+from django.views.decorators.http import require_POST
+from app.models import UserProfile
+
+
 
 logger = logging.getLogger(__name__)
+
+
+def formatar_cpf_para_exibicao(cpf):
+    """Formata CPF para exibição (XXX.XXX.XXX-XX)"""
+    if not cpf:
+        return ''
+    cpf_limpo = ''.join(filter(str.isdigit, str(cpf)))
+    if len(cpf_limpo) == 11:
+        return f"{cpf_limpo[:3]}.{cpf_limpo[3:6]}.{cpf_limpo[6:9]}-{cpf_limpo[9:]}"
+    return cpf
 
 
 @login_required
@@ -39,6 +53,10 @@ def pagamento(request):
     desconto_pix = total_geral * Decimal("0.05")
     total_com_desconto = total_geral - desconto_pix
 
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    # Formata o CPF para exibição no checkout
+    cpf_formatado = formatar_cpf_para_exibicao(profile.cpf)
+
     if request.method == "POST":
         metodo = request.POST.get("metodo")
         frete_sessao = request.session.get("frete") or {}
@@ -53,30 +71,21 @@ def pagamento(request):
         if not eh_valido:
             return JsonResponse({"status": "erro", "mensagens": erros}, status=400)
 
-        # Validação de CPF — aceita tanto "cpf" (pix/cartão) quanto "cpf-boleto"
-        cpf = (
-            request.POST.get("cpf")
-            or request.POST.get("cpf-boleto")
-            or ""
-        ).strip()
-
         metodo = request.POST.get("metodo")
 
-        cpf = (
-            request.POST.get("cpf")
-            or request.POST.get("cpf-boleto")
-            or ""
-        ).strip()
+        # Obtém CPF e limpa formatação
+        cpf = request.POST.get("cpf") or request.POST.get("cpf-boleto") or ""
+        cpf_limpo = ''.join(filter(str.isdigit, cpf))
 
         # CPF só é obrigatório para cartão e boleto
         if metodo in ["cartao", "boleto"]:
-            if not cpf or len(cpf.replace(".", "").replace("-", "")) != 11:
+            if not cpf_limpo or len(cpf_limpo) != 11:
                 return JsonResponse(
                     {"status": "erro", "mensagem": "CPF inválido."},
                     status=400
                 )
         else:
-            cpf = None  # PIX não precisa
+            cpf_limpo = None  # PIX não precisa
 
         try:
             # Cria o pedido UMA ÚNICA VEZ com todos os dados, incluindo CPF
@@ -85,7 +94,7 @@ def pagamento(request):
                 carrinho=carrinho,
                 frete=frete_sessao,
                 endereco=endereco,
-                cpf=cpf,
+                cpf=cpf_limpo,
             )
             pedido.status = "aguardando_pagamento"
             pedido.save()
@@ -158,6 +167,7 @@ def pagamento(request):
         "mp_public_key": settings.MERCADO_PAGO_PUBLIC_KEY,
         "etapa": 3,
         "btn_confirmar": True,
+        "cpf": cpf_formatado,  # Envia CPF já formatado para o template
     })
 
 
@@ -207,3 +217,21 @@ def pedido_detalhe(request, pedido_id):
 def pedido_enviado(request, pedido_id):
     pedido = get_object_or_404(Pedido, id=pedido_id, usuario=request.user)
     return render(request, "pedidos/pedido_enviado.html", {"pedido": pedido})
+
+
+@require_POST
+def salvar_endereco(request):
+    data = {
+        "nome": request.POST.get("nome"),
+        "cep": request.POST.get("cep_entrega"),
+        "rua": request.POST.get("rua"),
+        "numero": request.POST.get("numero"),
+        "complemento": request.POST.get("complemento"),
+        "bairro": request.POST.get("bairro"),
+        "cidade": request.POST.get("cidade"),
+        "estado": request.POST.get("estado"),
+    }
+
+    request.session["endereco"] = data
+
+    return JsonResponse({"status": "ok"})

@@ -1,4 +1,6 @@
 import json
+import hmac
+import hashlib
 import mercadopago
 from django.http import HttpResponse
 from django.conf import settings
@@ -8,9 +10,50 @@ from pedidos.models import Pagamento
 
 sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
 
+
+def _validar_assinatura(request):
+    """
+    Valida a assinatura do webhook do MercadoPago.
+    Docs: https://www.mercadopago.com.br/developers/pt/docs/your-integrations/notifications/webhooks
+    """
+    secret = getattr(settings, "MERCADO_PAGO_WEBHOOK_SECRET", None)
+    if not secret:
+        return False
+
+    x_signature = request.headers.get("x-signature", "")
+    x_request_id = request.headers.get("x-request-id", "")
+    data_id = request.GET.get("data.id", "")
+
+    # Monta o manifest conforme documentação do MercadoPago
+    manifest = f"id:{data_id};request-id:{x_request_id};"
+
+    expected = hmac.new(
+        secret.encode("utf-8"),
+        manifest.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+
+    # Extrai o hash v1 do header x-signature: "ts=....,v1=...."
+    hash_recebido = ""
+    for parte in x_signature.split(","):
+        parte = parte.strip()
+        if parte.startswith("v1="):
+            hash_recebido = parte[3:]
+            break
+
+    return hmac.compare_digest(expected, hash_recebido)
+
+
 @csrf_exempt
 def webhook_mercadopago(request):
-    data = json.loads(request.body)
+    if not _validar_assinatura(request):
+        return HttpResponse(status=400)
+
+    try:
+        data = json.loads(request.body)
+    except (json.JSONDecodeError, ValueError):
+        return HttpResponse(status=400)
+
     payment_id = data.get("data", {}).get("id")
 
     if not payment_id:

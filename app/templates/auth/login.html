@@ -5,27 +5,46 @@
 
 {% block content %}
 <div class="auth-wrapper">
-
-  <div class="auth-container" id="auth-container">
+  <div class="auth-container" id="auth-container" {% if form_register.errors or active_tab == 'register' %}data-active="register"{% endif %}>
 
     <!-- ===== CADASTRO ===== -->
     <div class="auth-form sign-up">
-      <form method="post" action="{% url 'register' %}">
+      <form method="post" action="{% url 'login' %}" id="register-form" novalidate>
         {% csrf_token %}
+        <input type="hidden" name="register_submit" value="1">
 
         <h1>Criar conta</h1>
 
-        <input type="email" name="email" placeholder="Email" required>
-        <div class="password-field">
-          <input type="password" name="password1" placeholder="Senha" required>
-          <i class="ri-eye-off-fill toggle-password"></i>
+        <!-- Bloco centralizado com TODOS os erros do cadastro -->
+        {% with all_errors=form_register.nome.errors|add:form_register.email.errors|add:form_register.password1.errors|add:form_register.password2.errors|add:form_register.non_field_errors %}
+          {% if all_errors %}
+            <div class="auth-error">
+              {% for error in all_errors %}
+                <div>⚠️ {{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <div class="input-group">
+          <i class="bi bi-person-fill"></i>
+          {{ form_register.nome }}
         </div>
+
+        <div class="input-group">
+          <i class="bi bi-envelope-fill"></i>
+          {{ form_register.email }}
+        </div>
+
         <div class="password-field">
-          <input type="password" name="password2" placeholder="Confirmar senha" required>
+          {{ form_register.password1 }}
           <i class="ri-eye-off-fill toggle-password"></i>
         </div>
 
-
+        <div class="password-field">
+          {{ form_register.password2 }}
+          <i class="ri-eye-off-fill toggle-password"></i>
+        </div>
 
         <button type="submit">Cadastrar</button>
       </form>
@@ -33,23 +52,34 @@
 
     <!-- ===== LOGIN ===== -->
     <div class="auth-form sign-in">
-      <form method="post">
+      <form method="post" action="{% url 'login' %}" id="login-form" novalidate>
         {% csrf_token %}
+        <input type="hidden" name="login_submit" value="1">
+        {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
 
         <h1>Entrar</h1>
 
-        <input type="text" name="username" placeholder="Email" required>
+        <!-- Bloco centralizado com TODOS os erros do login -->
+        {% if form_login.non_field_errors %}
+          <div class="auth-error">
+            {% for error in form_login.non_field_errors %}
+              <div>⚠️ {{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {{ form_login.username }}
+
         <div class="password-field">
-          <input type="password" name="password" placeholder="Senha" required>
+          {{ form_login.password }}
           <i class="ri-eye-off-fill toggle-password"></i>
         </div>
 
         <div class="remember-wrapper">
           <div class="remember">
-              <input type="checkbox" id="remember" name="remember">
-              <label for="remember">Lembre-me</label>
+            {{ form_login.remember }}
+            <label for="id_remember">Lembre-me</label>
           </div>
-
           <a href="{% url 'password_reset' %}">Esqueceu sua senha?</a>
         </div>
 
@@ -59,30 +89,23 @@
           </a>
         </div>
 
-
         <button type="submit">Entrar</button>
-
       </form>
     </div>
 
     <!-- ===== PAINEL DE TROCA ===== -->
     <div class="toggle-container">
       <div class="toggle">
-
-        <!-- Painel esquerdo -->
         <div class="toggle-panel toggle-left">
           <h1>Bem-vinda de volta 💜</h1>
           <p>Já tem uma conta? Faça login para continuar</p>
           <button class="hidden" id="login">Entrar</button>
         </div>
-
-        <!-- Painel direito -->
         <div class="toggle-panel toggle-right">
           <h1>Olá ✨</h1>
           <p>Cadastre-se e aproveite todos os produtos da loja</p>
           <button class="hidden" id="register">Cadastrar</button>
         </div>
-
       </div>
     </div>
 

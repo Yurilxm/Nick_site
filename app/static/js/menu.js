@@ -142,15 +142,24 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // Garante que a URL de destino seja sempre interna (mesma origem)
+  function urlSegura(url) {
+    try {
+      const parsed = new URL(url, window.location.origin);
+      if (parsed.origin === window.location.origin) return parsed.pathname + parsed.search + parsed.hash;
+    } catch (_) { /* ignora URLs inválidas */ }
+    return null;
+  }
+
   function renderizarResultados(data, q) {
     searchResults.innerHTML = '';
-    const produtos = data.results || data; // suporta ambos os formatos
+    const produtos = data.results || data;
 
     if (!produtos.length) {
-      searchResults.innerHTML = `
-        <div class="search-vazio">
-          🌸 Nenhum produto encontrado para "<strong>${q}</strong>"
-        </div>`;
+      const vazio = document.createElement('div');
+      vazio.className = 'search-vazio';
+      vazio.textContent = `🌸 Nenhum produto encontrado para "${q}"`;
+      searchResults.appendChild(vazio);
       searchResults.style.display = 'block';
       return;
     }
@@ -164,39 +173,74 @@ document.addEventListener('DOMContentLoaded', function () {
       const item = document.createElement('div');
       item.className = 'search-item';
 
+      // Imagem ou placeholder — sem innerHTML
+      if (p.imagem) {
+        const img = document.createElement('img');
+        img.src = p.imagem;
+        img.alt = p.nome;
+        item.appendChild(img);
+      } else {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'search-item-img-placeholder';
+        const icon = document.createElement('i');
+        icon.className = 'bi bi-image';
+        placeholder.appendChild(icon);
+        item.appendChild(placeholder);
+      }
+
+      // Info (nome + preço)
+      const info = document.createElement('div');
+      info.className = 'search-item-info';
+
+      const nome = document.createElement('span');
+      nome.className = 'search-item-nome';
+      nome.textContent = p.nome;
+      info.appendChild(nome);
+
+      const preco = document.createElement('span');
+      preco.className = 'search-item-preco';
+      preco.textContent = `R$ ${formatarPreco(p.preco)}`;
+      info.appendChild(preco);
+
+      item.appendChild(info);
+
+      // Selo
       const seloInfo = seloStyle(p.selo);
-      const seloHTML = seloInfo
-        ? `<span class="search-item-selo ${seloInfo.classe}">${seloInfo.emoji} ${p.selo}</span>`
-        : '';
+      if (seloInfo) {
+        const selo = document.createElement('span');
+        selo.className = `search-item-selo ${seloInfo.classe}`;
+        selo.textContent = `${seloInfo.emoji} ${p.selo}`;
+        item.appendChild(selo);
+      }
 
-      const imgHTML = p.imagem
-        ? `<img src="${p.imagem}" alt="${p.nome}">`
-        : `<div class="search-item-img-placeholder"><i class="bi bi-image"></i></div>`;
-
-      item.innerHTML = `
-        ${imgHTML}
-        <div class="search-item-info">
-          <span class="search-item-nome">${p.nome}</span>
-          <span class="search-item-preco">R$ ${formatarPreco(p.preco)}</span>
-        </div>
-        ${seloHTML}
-      `;
-
+      // Navegação segura: valida URL vinda da API antes de usar
       item.addEventListener('click', () => {
-        window.location.href = p.url || `/produtos/${p.id}/${p.slug}/`;
+        const destino = (p.url && urlSegura(p.url))
+          || `/produtos/${encodeURIComponent(p.id)}/${encodeURIComponent(p.slug)}/`;
+        window.location.href = destino;
       });
 
       searchResults.appendChild(item);
     });
 
+    // Footer com link para todos os resultados
     const footer = document.createElement('div');
     footer.className = 'search-footer';
-    footer.innerHTML = `
-      <a href="/buscar-produtos/?q=${encodeURIComponent(q)}">
-        Ver todos os resultados para "<strong>${q}</strong>" →
-      </a>`;
-    searchResults.appendChild(footer);
 
+    const link = document.createElement('a');
+    link.href = `/buscar-produtos/?q=${encodeURIComponent(q)}`;
+
+    const textoAntes = document.createTextNode('Ver todos os resultados para "');
+    const strong = document.createElement('strong');
+    strong.textContent = q;
+    const textoDepois = document.createTextNode('" →');
+
+    link.appendChild(textoAntes);
+    link.appendChild(strong);
+    link.appendChild(textoDepois);
+    footer.appendChild(link);
+
+    searchResults.appendChild(footer);
     searchResults.style.display = 'block';
   }
 

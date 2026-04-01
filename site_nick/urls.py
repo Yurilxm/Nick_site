@@ -4,26 +4,31 @@ from app import views
 from django.conf import settings
 from django.conf.urls.static import static
 from app.views import (
-    LoginCustomView,
+    login_view,
     home_view,
     logout_view,
-    register_view,
     login_code_confirm_view,
     PasswordResetCustomView,
     PasswordResetDoneCustomView,
     PasswordResetConfirmCustomView,
     PasswordResetCompleteCustomView,
+    verify_email_view,
+    verification_sent_view,
+    resend_verification_view, 
 )
 from produtos.views import sobre
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view, name='home'),
+    path('', include('app.urls')),
     path('sobre/', sobre, name='sobre'),
     path('contato/', views.contato_view, name='contato'),
-    path('login/', LoginCustomView.as_view(), name='login'),
+    path('login/', login_view, name='login'),
+    path('verificar-email/<uidb64>/<token>/', verify_email_view, name='verify_email'),
+    path('verificacao-enviada/', verification_sent_view, name='verification_email'),
+    path('reenviar-verificacao/<int:user_id>/', resend_verification_view, name='resend_verification'),
     path('logout/', logout_view, name='logout'),
-    path('cadastro/', register_view, name='register'),
     path('produtos/', include('produtos.urls')),
     path('carrinho/', include('carrinho.urls')),
     path('marketing/', include('marketing.urls')),

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Verifique seu e-mail | Mimos da Nick{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-container single">
+    <div class="auth-form">
+      <h1>📧 Verifique seu e-mail</h1>
+      
+      <p style="text-align: center;">
+        Enviamos um link de confirmação para seu e-mail.<br>
+        Clique no link para ativar sua conta.
+      </p>
+      
+      <div style="background-color: #f1eef9; padding: 15px; border-radius: 10px; margin: 20px 0;">
+        <p style="margin: 0; font-size: 14px; text-align: center;">
+          💡 <strong>Não recebeu o e-mail?</strong><br>
+          Verifique sua caixa de spam ou 
+          <a href="{% url 'resend_verification' user_id %}" style="color: #6b5ca5;">clique aqui para reenviar</a>
+        </p>
+      </div>
+      
+      <a href="{% url 'login' %}" class="auth-link" style="display: inline-block; background-color: #b39ddb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px;">
+        Voltar para o login
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

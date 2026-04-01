@@ -103,7 +103,7 @@ class Produto(models.Model):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse("detalhe_produto", kwargs={"id": self.id, "slug": self.slug})
+        return reverse("detalhe_produto", kwargs={"produto_id": self.id, "slug": self.slug})
     
 
 class GrupoOpcao(models.Model):

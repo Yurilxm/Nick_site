@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const url = form.action;
 
-    const nome = document.querySelector(".produto-titulo")?.innerText;
+    const nome   = document.querySelector(".produto-titulo")?.innerText;
     const imagem = document.getElementById("imagem-principal")?.src;
 
     // Preço unitário
@@ -35,11 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Texto final
     let precoTexto = `R$ ${precoFormatado}`;
-
     if (quantidade > 1) {
       precoTexto = `${quantidade}x R$ ${precoFormatado} = R$ ${totalFormatado}`;
     }
-
 
     fetch(url, {
       method: "POST",
@@ -51,10 +49,8 @@ document.addEventListener("DOMContentLoaded", () => {
     })
       .then(res => res.json())
       .then(() => {
-        // 1. MOSTRA O TOAST
         mostrarToast(nome, precoTexto, imagem);
-        
-        // 2. ATUALIZA O MINI CARRINHO IMEDIATAMENTE
+
         if (typeof window.atualizarMiniCarrinho === "function") {
           window.atualizarMiniCarrinho();
         } else {
@@ -72,30 +68,39 @@ function mostrarToast(nome, precoTexto, imagem) {
 
   const toast = document.createElement("div");
   toast.className = "toast-produto";
-  
-  // 🔥 TORNA CLICÁVEL
   toast.style.cursor = "pointer";
-  toast.setAttribute('role', 'button');
-  toast.setAttribute('aria-label', 'Abrir carrinho');
-  
-  toast.innerHTML = `
-    <img src="${imagem}" alt="${nome}">
-    <div class="toast-info">
-      <strong>${nome}</strong>
-      <span>${precoTexto}</span>
-      <small>Adicionado ao carrinho</small>
-    </div>
-  `;
+  toast.setAttribute("role", "button");
+  toast.setAttribute("aria-label", "Abrir carrinho");
 
-  // 🔥 EVENTO DE CLIQUE
-  toast.addEventListener('click', function(e) {
+  // Imagem
+  const img = document.createElement("img");
+  img.src = imagem;
+  img.alt = nome;
+  toast.appendChild(img);
+
+  // Info
+  const info = document.createElement("div");
+  info.className = "toast-info";
+
+  const strong = document.createElement("strong");
+  strong.textContent = nome;
+  info.appendChild(strong);
+
+  const span = document.createElement("span");
+  span.textContent = precoTexto;
+  info.appendChild(span);
+
+  const small = document.createElement("small");
+  small.textContent = "Adicionado ao carrinho";
+  info.appendChild(small);
+
+  toast.appendChild(info);
+
+  // Evento de clique
+  toast.addEventListener("click", function (e) {
     e.preventDefault();
     e.stopPropagation();
-    
-    // Remove o toast
     this.remove();
-    
-    // Abre o carrinho
     if (typeof window.abrirCarrinho === "function") {
       window.abrirCarrinho();
     }

@@ -32,18 +32,34 @@ const interval = setInterval(() => {
 }, 1000);
 
 // =============================================
+// Valida que a URL é interna (mesma origem)
+// =============================================
+function urlSegura(url) {
+    if (!url) return null;
+    try {
+        const parsed = new URL(url, window.location.origin);
+        if (parsed.origin === window.location.origin) {
+            return parsed.pathname + parsed.search + parsed.hash;
+        }
+    } catch (_) { /* URL inválida */ }
+    return null;
+}
+
+// =============================================
 // POLLING — verifica pagamento a cada 5s
 // =============================================
 const polling = setInterval(() => {
-    if (!window.VERIFICAR_PAGAMENTO_URL) return;
+    const verificarUrl = urlSegura(window.VERIFICAR_PAGAMENTO_URL);
+    if (!verificarUrl) return;
 
-    fetch(window.VERIFICAR_PAGAMENTO_URL)
+    fetch(verificarUrl)
         .then(r => r.json())
         .then(data => {
             if (data.pago) {
                 clearInterval(polling);
                 clearInterval(interval);
-                window.location.href = window.PEDIDO_CONFIRMADO_URL;
+                const destino = urlSegura(window.PEDIDO_CONFIRMADO_URL);
+                if (destino) window.location.href = destino;
             }
         })
         .catch(() => {}); // silencioso

@@ -3,14 +3,27 @@ document.addEventListener("DOMContentLoaded", function () {
     // ── LIGHTBOX ─────────────────────────────────────────────
     function criarLightbox() {
         if (document.getElementById("admin-lightbox")) return;
+
         const lb = document.createElement("div");
         lb.id = "admin-lightbox";
-        lb.innerHTML = `
-      <div id="admin-lightbox-overlay">
-        <button id="admin-lightbox-fechar">✕</button>
-        <img id="admin-lightbox-img" src="" alt="">
-      </div>`;
+
+        const overlay = document.createElement("div");
+        overlay.id = "admin-lightbox-overlay";
+
+        const btnFechar = document.createElement("button");
+        btnFechar.id          = "admin-lightbox-fechar";
+        btnFechar.textContent = "✕";
+
+        const img = document.createElement("img");
+        img.id  = "admin-lightbox-img";
+        img.src = "";
+        img.alt = "";
+
+        overlay.appendChild(btnFechar);
+        overlay.appendChild(img);
+        lb.appendChild(overlay);
         document.body.appendChild(lb);
+
         lb.addEventListener("click", function (e) {
             if (e.target === lb || e.target.id === "admin-lightbox-fechar") fecharLightbox();
         });
@@ -20,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function abrirLightbox(src) {
-        const lb = document.getElementById("admin-lightbox");
+        const lb  = document.getElementById("admin-lightbox");
         const img = document.getElementById("admin-lightbox-img");
         if (!lb || !img) return;
         img.src = src;
@@ -43,7 +56,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // ── PREVIEW AVALIAÇÃO ─────────────────────────────────────
-    // Lightbox nas fotos já salvas — tanto no field-foto quanto no field-foto_preview
     function iniciarPreviewAvaliacao() {
         document.querySelectorAll(".field-foto img, .field-foto_preview img").forEach(img => {
             img.classList.add("avaliacao-foto-preview");
@@ -68,10 +80,20 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function (e) {
-                previewContainer.innerHTML = `
-          <p class="avaliacao-preview-label">Nova foto selecionada:</p>
-          <img src="${e.target.result}" class="avaliacao-foto-preview" alt="Preview">`;
-                aplicarLightbox(previewContainer.querySelector("img"));
+                previewContainer.innerHTML = "";
+
+                const label = document.createElement("p");
+                label.className   = "avaliacao-preview-label";
+                label.textContent = "Nova foto selecionada:";
+
+                const img = document.createElement("img");
+                img.src       = e.target.result; // data URL gerada localmente pelo FileReader
+                img.className = "avaliacao-foto-preview";
+                img.alt       = "Preview";
+
+                previewContainer.appendChild(label);
+                previewContainer.appendChild(img);
+                aplicarLightbox(img);
             };
             reader.readAsDataURL(file);
         });
@@ -108,10 +130,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const reader = new FileReader();
             reader.onload = function (e) {
-                previewContainer.innerHTML = `
-          <p class="avaliacao-preview-label">Nova imagem selecionada:</p>
-          <img src="${e.target.result}" class="imagem-sobre-thumb" alt="Preview">`;
-                aplicarLightbox(previewContainer.querySelector("img"));
+                previewContainer.innerHTML = "";
+
+                const label = document.createElement("p");
+                label.className   = "avaliacao-preview-label";
+                label.textContent = "Nova imagem selecionada:";
+
+                const img = document.createElement("img");
+                img.src       = e.target.result; // data URL gerada localmente pelo FileReader
+                img.className = "imagem-sobre-thumb";
+                img.alt       = "Preview";
+
+                previewContainer.appendChild(label);
+                previewContainer.appendChild(img);
+                aplicarLightbox(img);
             };
             reader.readAsDataURL(file);
         });

@@ -18,10 +18,10 @@ def lista_produtos(request):
     })
 
 
-def detalhe_produto(request, id, slug):
+def detalhe_produto(request, produto_id, slug):
     produto = get_object_or_404(
         Produto.objects.prefetch_related('grupos_opcoes__opcoes', 'categoria'),
-        id=id,
+        id=produto_id,
         slug=slug
     )
     return render(request, 'produtos/detalhe_produto.html', {'produto': produto})

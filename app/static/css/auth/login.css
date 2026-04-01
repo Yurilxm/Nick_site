@@ -5,7 +5,7 @@
     font-family: 'Montserrat', sans-serif;
 }
 
-/* ===== WRAPPER GERAL ===== */
+/* ===== WRAPPER ===== */
 .auth-wrapper {
     min-height: 80vh;
     display: flex;
@@ -74,6 +74,48 @@
 }
 
 .auth-container input:focus {
+    border-color: #b39ddb;
+    background-color: #fff;
+}
+
+/* ===== INPUT GROUPS COM ÍCONES ===== */
+.input-group {
+    position: relative;
+    width: 100%;
+    margin: 8px 0;
+}
+
+.input-group i {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    cursor: pointer;
+    color: #6b5ca5;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    z-index: 2;
+}
+
+.input-group i:hover {
+    opacity: 1;
+}
+
+.input-group input {
+    width: 100%;
+    background-color: #f1eef9;
+    border: 1px solid #e0daf2;
+    padding: 12px 40px 12px 14px;
+    font-size: 14px;
+    border-radius: 10px;
+    outline: none;
+    display: block;
+    margin: 0;
+    transition: all 0.2s ease;
+}
+
+.input-group input:focus {
     border-color: #b39ddb;
     background-color: #fff;
 }
@@ -195,17 +237,17 @@
     right: 0;
 }
 
-/* ===== ERRO ===== */
-.auth-error {
-    color: #c62828;
-    font-size: 14px;
-    margin-top: 10px;
-    text-align: center;
-}
-
+/* ===== CAMPOS DE SENHA ===== */
 .password-field {
     position: relative;
     width: 100%;
+    margin: 8px 0;
+}
+
+.password-field input {
+    width: 100%;
+    padding: 12px 40px 12px 14px;
+    margin: 0;
 }
 
 .password-field .toggle-password {
@@ -217,12 +259,30 @@
     cursor: pointer;
     color: #6b5ca5;
     opacity: 0.7;
+    z-index: 2;
+    transition: opacity 0.2s ease;
 }
 
 .password-field .toggle-password:hover {
     opacity: 1;
 }
 
+/* ===== ERROS ===== */
+.auth-error {
+    background-color: #ffe6e6;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.auth-error div {
+    color: #c0392b;
+    font-size: 13px;
+    text-align: center;
+}
+
+/* ===== LEMBRE-ME + ESQUECEU SENHA ===== */
 .remember-wrapper {
     width: 100%;
     margin-top: 14px;
@@ -231,14 +291,13 @@
     justify-content: space-between;
 }
 
-/* Lembre-me */
 .remember {
     display: flex;
     align-items: center;
     gap: 10px;
     font-size: 14px;
     color: #555;
-    line-height: 1;       /* impede o texto de “afundar” */
+    line-height: 1;
 }
 
 .remember input[type="checkbox"] {
@@ -246,6 +305,7 @@
     height: 16px;
     accent-color: #b39ddb;
     cursor: pointer;
+    margin: 0;
 }
 
 .remember label {
@@ -253,7 +313,6 @@
     user-select: none;
 }
 
-/* Esqueceu senha */
 .remember-wrapper a {
     font-size: 14px;
     color: #6b5ca5;
@@ -267,95 +326,7 @@
     text-decoration: underline;
 }
 
-
-
-
-
-/* ===== MODO SINGLE (reset, confirm, done) ===== */
-.auth-container.single {
-  width: 480px;
-  max-width: 90%;
-  min-height: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Remove comportamentos do login animado */
-.auth-container.single .toggle-container {
-  display: none;
-}
-
-/* Garante centralização */
-.auth-container.single .auth-form {
-  position: static;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  padding: 3rem 2.5rem;
-}
-
-.auth-container.single .auth-form:not(:has(form)) {
-  padding: 3.5rem 3rem;
-  text-align: center;
-}
-
-/* Título */
-.auth-container.single h1 {
-  font-size: 26px;
-  line-height: 1.3;
-  margin-bottom: 12px;
-  text-align: center;
-}
-
-/* Texto explicativo */
-.auth-container.single p,
-.auth-container.single .auth-description {
-  font-size: 15px;
-  line-height: 1.5;
-  text-align: center;
-  margin-top: 12px;
-  margin-bottom: 28px;
-  color: #666;
-}
-
-/* Input maior */
-.auth-container.single input {
-  width: 100%;
-  height: 48px;
-  font-size: 15px;
-  padding: 0 14px;
-}
-
-/* Botão maior */
-.auth-container.single button {
-  width: 100%;
-  height: 48px;
-  font-size: 15px;
-  margin-top: 10px;
-}
-
-.auth-container.single .auth-link {
-  display: block;
-  padding: 12px 28px;
-  border-radius: 10px;
-
-  color: #555;
-  font-weight: 500;
-
-  transition: all 0.2s ease;
-}
-
-
-.auth-error {
-  color: #c0392b;
-  font-size: 14px;
-  text-align: center;
-  margin-bottom: 16px;
-}
-
-
-/* Link de login por código */
+/* ===== LOGIN POR CÓDIGO ===== */
 .login-code-link {
     width: 100%;
     margin-top: 12px;
@@ -373,6 +344,73 @@
 .login-code-link a:hover {
     color: #9f8fd3;
     text-decoration: underline;
+}
+
+/* ===== MODO SINGLE (reset, confirm, done) ===== */
+.auth-container.single {
+    width: 480px;
+    max-width: 90%;
+    min-height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-container.single .toggle-container {
+    display: none;
+}
+
+.auth-container.single .auth-form {
+    position: static;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 3rem 2.5rem;
+}
+
+.auth-container.single .auth-form:not(:has(form)) {
+    padding: 3.5rem 3rem;
+    text-align: center;
+}
+
+.auth-container.single h1 {
+    font-size: 26px;
+    line-height: 1.3;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.auth-container.single p,
+.auth-container.single .auth-description {
+    font-size: 15px;
+    line-height: 1.5;
+    text-align: center;
+    margin-top: 12px;
+    margin-bottom: 28px;
+    color: #666;
+}
+
+.auth-container.single input {
+    width: 100%;
+    height: 48px;
+    font-size: 15px;
+    padding: 0 14px;
+}
+
+.auth-container.single button {
+    width: 100%;
+    height: 48px;
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+.auth-container.single .auth-link {
+    display: block;
+    padding: 12px 28px;
+    border-radius: 10px;
+    color: #555;
+    font-weight: 500;
+    transition: all 0.2s ease;
 }
 
 .auth-container.single .auth-links-extra {

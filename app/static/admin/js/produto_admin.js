@@ -19,12 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
         selects.forEach(select => {
             const optionHover = select.querySelector("option[value='hover']");
             if (!optionHover) return;
-
-            if (hoverSelecionado && select.value !== "hover") {
-                optionHover.disabled = true;
-            } else {
-                optionHover.disabled = false;
-            }
+            optionHover.disabled = hoverSelecionado && select.value !== "hover";
         });
     }
 
@@ -33,38 +28,34 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!file) return;
 
         const reader = new FileReader();
-
         reader.onload = function (e) {
             const inline = input.closest(".inline-related");
             const previewField = inline.querySelector(".field-preview");
-
             if (!previewField) return;
 
-            previewField.innerHTML = `
-                <img src="${e.target.result}" class="admin-preview-img admin-lightbox-trigger">
-            `;
+            previewField.innerHTML = "";
 
-            // Aplica lightbox na nova imagem
-            aplicarLightboxNaImagem(previewField.querySelector("img"));
+            const img = document.createElement("img");
+            img.src = e.target.result; // data URL local gerada pelo FileReader
+            img.className = "admin-preview-img admin-lightbox-trigger";
+            previewField.appendChild(img);
+
+            aplicarLightboxNaImagem(img);
         };
-
         reader.readAsDataURL(file);
     }
 
     function iniciarPreviewImagemPrincipal() {
-        // Campo de imagem principal fica em .field-imagem
         const fieldImagem = document.querySelector(".field-imagem");
         if (!fieldImagem) return;
 
         const input = fieldImagem.querySelector("input[type='file']");
         if (!input) return;
 
-        // Cria o container de preview se não existir
         let previewContainer = fieldImagem.querySelector(".admin-preview-principal");
         if (!previewContainer) {
             previewContainer = document.createElement("div");
             previewContainer.className = "admin-preview-principal";
-            // Insere depois do widget de arquivo
             const widget = fieldImagem.querySelector(".file-upload");
             if (widget) {
                 widget.after(previewContainer);
@@ -73,26 +64,27 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        // Se já tem imagem salva, envolve ela no lightbox
         const imgExistente = fieldImagem.querySelector("a img, .readonly img");
         if (imgExistente) {
             imgExistente.classList.add("admin-lightbox-trigger");
             aplicarLightboxNaImagem(imgExistente);
         }
 
-        // Preview ao selecionar novo arquivo
         input.addEventListener("change", function () {
             const file = this.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = function (e) {
-                previewContainer.innerHTML = `
-                    <img src="${e.target.result}"
-                         class="admin-preview-img-principal admin-lightbox-trigger"
-                         alt="Preview">
-                `;
-                aplicarLightboxNaImagem(previewContainer.querySelector("img"));
+                previewContainer.innerHTML = "";
+
+                const img = document.createElement("img");
+                img.src = e.target.result; // data URL local gerada pelo FileReader
+                img.className = "admin-preview-img-principal admin-lightbox-trigger";
+                img.alt = "Preview";
+                previewContainer.appendChild(img);
+
+                aplicarLightboxNaImagem(img);
             };
             reader.readAsDataURL(file);
         });
@@ -103,22 +95,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const lb = document.createElement("div");
         lb.id = "admin-lightbox";
-        lb.innerHTML = `
-            <div id="admin-lightbox-overlay">
-                <button id="admin-lightbox-fechar">✕</button>
-                <img id="admin-lightbox-img" src="" alt="">
-            </div>
-        `;
+
+        const overlay = document.createElement("div");
+        overlay.id = "admin-lightbox-overlay";
+
+        const btnFechar = document.createElement("button");
+        btnFechar.id = "admin-lightbox-fechar";
+        btnFechar.textContent = "✕";
+
+        const img = document.createElement("img");
+        img.id = "admin-lightbox-img";
+        img.src = "";
+        img.alt = "";
+
+        overlay.appendChild(btnFechar);
+        overlay.appendChild(img);
+        lb.appendChild(overlay);
         document.body.appendChild(lb);
 
-        // Fecha ao clicar no fundo ou no X
         lb.addEventListener("click", function (e) {
             if (e.target === lb || e.target.id === "admin-lightbox-fechar") {
                 fecharLightbox();
             }
         });
 
-        // Fecha com ESC
         document.addEventListener("keydown", function (e) {
             if (e.key === "Escape") fecharLightbox();
         });
@@ -182,7 +182,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 deleteCheckbox.style.display = "none";
 
                 const btn = document.createElement("button");
-                btn.innerHTML = "🗑️";
+                btn.textContent = "🗑️";
                 btn.className = "inline-delete-btn";
 
                 btn.addEventListener("click", function (e) {
@@ -202,7 +202,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         if (e.target.matches("input[type='file']")) {
-            // Inline images
             if (e.target.closest(".inline-related")) {
                 previewImagem(e.target);
             }
@@ -234,137 +233,137 @@ document.addEventListener("DOMContentLoaded", function () {
 // ==========================================
 document.addEventListener("DOMContentLoaded", function () {
 
-  const STORAGE_KEY = "selo_custom_options";
+    const STORAGE_KEY = "selo_custom_options";
 
-  function getCustomSelosStored() {
-    try {
-      return JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "[]");
-    } catch { return []; }
-  }
-
-  function saveCustomSelo(value) {
-    const list = getCustomSelosStored();
-    if (!list.includes(value)) {
-      list.push(value);
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    function getCustomSelosStored() {
+        try {
+            return JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "[]");
+        } catch { return []; }
     }
-  }
 
-  function removeCustomSelo(value) {
-    const list = getCustomSelosStored().filter(s => s !== value);
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-  }
+    function saveCustomSelo(value) {
+        const list = getCustomSelosStored();
+        if (!list.includes(value)) {
+            list.push(value);
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+        }
+    }
 
-  document.querySelectorAll(".selo-widget-wrapper").forEach(function (wrapper) {
+    function removeCustomSelo(value) {
+        const list = getCustomSelosStored().filter(s => s !== value);
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
 
-    const id          = wrapper.id.replace("selo-wrapper-", "");
-    const hiddenInput = document.getElementById(id);
-    const select      = wrapper.querySelector(".selo-select");
-    const directInput = document.getElementById(`selo-direct-${id}`);
-    const clearBtn    = document.getElementById(`selo-clear-btn-${id}`);
-    const addBtn      = document.getElementById(`selo-add-btn-${id}`);
-    const savedList   = document.getElementById(`selo-saved-list-${id}`);
+    document.querySelectorAll(".selo-widget-wrapper").forEach(function (wrapper) {
 
-    if (!hiddenInput || !select) return;
+        const id = wrapper.id.replace("selo-wrapper-", "");
+        const hiddenInput = document.getElementById(id);
+        const select = wrapper.querySelector(".selo-select");
+        const directInput = document.getElementById(`selo-direct-${id}`);
+        const clearBtn = document.getElementById(`selo-clear-btn-${id}`);
+        const addBtn = document.getElementById(`selo-add-btn-${id}`);
+        const savedList = document.getElementById(`selo-saved-list-${id}`);
 
-    function renderSavedList() {
-      const stored = getCustomSelosStored();
-      savedList.innerHTML = "";
+        if (!hiddenInput || !select) return;
 
-      if (stored.length === 0) return;
+        function renderSavedList() {
+            const stored = getCustomSelosStored();
+            savedList.innerHTML = "";
 
-      const label = document.createElement("span");
-      label.className = "selo-saved-label";
-      label.textContent = "Salvos:";
-      savedList.appendChild(label);
+            if (stored.length === 0) return;
 
-      stored.forEach(function (val) {
-        const tag = document.createElement("span");
-        tag.className = "selo-saved-tag";
-        tag.dataset.value = val;
+            const label = document.createElement("span");
+            label.className = "selo-saved-label";
+            label.textContent = "Salvos:";
+            savedList.appendChild(label);
 
-        const text = document.createElement("span");
-        text.className = "selo-saved-tag-text";
-        text.textContent = val;
+            stored.forEach(function (val) {
+                const tag = document.createElement("span");
+                tag.className = "selo-saved-tag";
+                tag.dataset.value = val;
 
-        const del = document.createElement("button");
-        del.type = "button";
-        del.className = "selo-saved-tag-del";
-        del.title = "Remover";
-        del.textContent = "✖";
+                const text = document.createElement("span");
+                text.className = "selo-saved-tag-text";
+                text.textContent = val;
 
-        text.addEventListener("click", function () {
-          setValue(val);
-          addOptionToSelect(val);
-          select.value = val;
-          directInput.value = "";
+                const del = document.createElement("button");
+                del.type = "button";
+                del.className = "selo-saved-tag-del";
+                del.title = "Remover";
+                del.textContent = "✖";
+
+                text.addEventListener("click", function () {
+                    setValue(val);
+                    addOptionToSelect(val);
+                    select.value = val;
+                    directInput.value = "";
+                });
+
+                del.addEventListener("click", function () {
+                    removeCustomSelo(val);
+                    const opt = select.querySelector(`option[value="${CSS.escape(val)}"]`);
+                    if (opt) opt.remove();
+                    if (hiddenInput.value === val) {
+                        setValue("");
+                        select.value = "";
+                    }
+                    renderSavedList();
+                });
+
+                tag.appendChild(text);
+                tag.appendChild(del);
+                savedList.appendChild(tag);
+            });
+        }
+
+        function setValue(val) {
+            hiddenInput.value = val;
+            savedList.querySelectorAll(".selo-saved-tag").forEach(t => {
+                t.classList.toggle("active", t.dataset.value === val);
+            });
+        }
+
+        function addOptionToSelect(value) {
+            const exists = Array.from(select.options).some(o => o.value === value);
+            if (!exists) {
+                const opt = new Option(value, value, true, true);
+                select.appendChild(opt);
+            }
+            select.value = value;
+        }
+
+        getCustomSelosStored().forEach(val => addOptionToSelect(val));
+        renderSavedList();
+
+        select.addEventListener("change", function () {
+            if (select.value) {
+                setValue(select.value);
+                directInput.value = "";
+            }
         });
 
-        del.addEventListener("click", function () {
-          removeCustomSelo(val);
-          const opt = select.querySelector(`option[value="${val}"]`);
-          if (opt) opt.remove();
-          if (hiddenInput.value === val) {
+        directInput.addEventListener("input", function () {
+            const val = directInput.value.trim();
+            setValue(val);
+            if (val) select.value = "";
+        });
+
+        addBtn.addEventListener("click", function () {
+            const val = directInput.value.trim();
+            if (!val) { directInput.focus(); return; }
+            saveCustomSelo(val);
+            addOptionToSelect(val);
+            setValue(val);
+            renderSavedList();
+        });
+
+        clearBtn.addEventListener("click", function () {
             setValue("");
             select.value = "";
-          }
-          renderSavedList();
+            directInput.value = "";
         });
 
-        tag.appendChild(text);
-        tag.appendChild(del);
-        savedList.appendChild(tag);
-      });
-    }
-
-    function setValue(val) {
-      hiddenInput.value = val;
-      savedList.querySelectorAll(".selo-saved-tag").forEach(t => {
-        t.classList.toggle("active", t.dataset.value === val);
-      });
-    }
-
-    function addOptionToSelect(value) {
-      const exists = Array.from(select.options).some(o => o.value === value);
-      if (!exists) {
-        const opt = new Option(value, value, true, true);
-        select.appendChild(opt);
-      }
-      select.value = value;
-    }
-
-    getCustomSelosStored().forEach(val => addOptionToSelect(val));
-    renderSavedList();
-
-    select.addEventListener("change", function () {
-      if (select.value) {
-        setValue(select.value);
-        directInput.value = "";
-      }
+        const initialValue = hiddenInput.value;
+        if (initialValue) setValue(initialValue);
     });
-
-    directInput.addEventListener("input", function () {
-      const val = directInput.value.trim();
-      setValue(val);
-      if (val) select.value = "";
-    });
-
-    addBtn.addEventListener("click", function () {
-      const val = directInput.value.trim();
-      if (!val) { directInput.focus(); return; }
-      saveCustomSelo(val);
-      addOptionToSelect(val);
-      setValue(val);
-      renderSavedList();
-    });
-
-    clearBtn.addEventListener("click", function () {
-      setValue("");
-      select.value = "";
-      directInput.value = "";
-    });
-
-    const initialValue = hiddenInput.value;
-    if (initialValue) setValue(initialValue);
-  });
 });

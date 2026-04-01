@@ -1,0 +1,10 @@
+Olá {{ user.first_name|default:user.email }}!
+
+Obrigado por se cadastrar na Mimos da Nick Personalizados!
+
+Para confirmar seu e-mail e ativar sua conta, acesse o link abaixo:
+{{ verification_link }}
+
+Este link expira em 7 dias.
+
+Se você não criou uma conta na Mimos da Nick Personalizados, ignore este e-mail.

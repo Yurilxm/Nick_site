@@ -1,10 +1,9 @@
 from django.contrib import admin
 from .models import Pedido, PedidoItem, Pagamento
 from produtos.models import Opcao, Categoria
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
 from django.urls import reverse
 from django.contrib.admin import SimpleListFilter
-from django.utils.safestring import mark_safe
 
 
 class PedidoItemInline(admin.TabularInline):
@@ -30,11 +29,17 @@ class PedidoItemInline(admin.TabularInline):
             try:
                 opcao = Opcao.objects.get(id=valor)
                 valor_final = opcao.nome
-            except:
+            except Opcao.DoesNotExist:
                 valor_final = valor
-            linhas.append(f"<b>{chave.capitalize()}</b>: {valor_final}<br>")
+            linhas.append(format_html(
+                "<b>{}</b>: {}<br>",
+                chave.capitalize(),
+                valor_final
+            ))
 
-        return mark_safe("".join(linhas))
+        return format_html_join("", "{}", ((l,) for l in linhas))
+
+    mostrar_personalizacao.short_description = "Personalização"
 
 
 class CategoriaPedidoFilter(SimpleListFilter):
@@ -126,21 +131,36 @@ class PedidoAdmin(admin.ModelAdmin):
     def ficha_producao(self, obj):
         cliente = obj.usuario.username if obj.usuario else "Cliente anônimo"
 
-        linhas = []
-        linhas.append(f"<h3>PEDIDO #{obj.id}</h3>")
-        linhas.append(f"<b>Cliente:</b> {cliente}<br>")
-        linhas.append(f"<b>CEP:</b> {obj.cep_entrega}<br>")
-        linhas.append(f"<b>Endereço:</b> {obj.rua}, {obj.numero}<br>")
-        linhas.append(f"<b>Bairro:</b> {obj.bairro}<br>")
-        linhas.append(f"<b>Cidade:</b> {obj.cidade}/{obj.estado}<br>")
-        linhas.append(f"<b>Complemento:</b> {obj.complemento}<br>")
-        linhas.append("<hr><h4>Itens do pedido</h4>")
+        cabecalho = format_html(
+            "<h3>PEDIDO #{}</h3>"
+            "<b>Cliente:</b> {}<br>"
+            "<b>CEP:</b> {}<br>"
+            "<b>Endereço:</b> {}, {}<br>"
+            "<b>Bairro:</b> {}<br>"
+            "<b>Cidade:</b> {}/{}<br>"
+            "<b>Complemento:</b> {}<br>"
+            "<hr><h4>Itens do pedido</h4>",
+            obj.id,
+            cliente,
+            obj.cep_entrega,
+            obj.rua, obj.numero,
+            obj.bairro,
+            obj.cidade, obj.estado,
+            obj.complemento,
+        )
 
-        for item in obj.itens.all():
-            linhas.append(f"<b>Produto:</b> {item.produto.nome}<br>")
-            linhas.append(f"<b>Quantidade:</b> {item.quantidade}<br><br>")
+        itens = format_html_join(
+            "",
+            "<b>Produto:</b> {}<br><b>Quantidade:</b> {}<br><br>",
+            (
+                (item.produto.nome, item.quantidade)
+                for item in obj.itens.all()
+            )
+        )
 
-        return mark_safe("".join(linhas))
+        return cabecalho + itens
+
+    ficha_producao.short_description = "Ficha de Produção"
 
     def gerar_pdf(self, obj):
         url = reverse("pedidos:pedido_pdf", args=[obj.id])
@@ -148,8 +168,6 @@ class PedidoAdmin(admin.ModelAdmin):
             '<a class="button" href="{}" target="_blank">Gerar PDF</a>',
             url
         )
-
-    # ✅ ACTIONS SEGURAS (COM SAVE)
 
     def marcar_em_producao(self, request, queryset):
         for pedido in queryset:

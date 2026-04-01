@@ -74,8 +74,7 @@
                         <!-- Campo CPF (obrigatório para cartão e boleto) -->
                         <div class="campo-grupo">
                             <label class="campo-label">CPF do titular *</label>
-                            <input type="text" name="cpf" id="cpf" class="campo-input"
-                                   placeholder="000.000.000-00" maxlength="14" required>
+                            <input type="text" name="cpf" id="cpf" class="campo-input" placeholder="000.000.000-00" maxlength="14" value="{{ cpf|default:'' }}" required>
                         </div>
 
                         <!-- Campos do cartão -->
@@ -139,8 +138,7 @@
                         <input type="hidden" name="metodo" value="boleto">
                         <div class="campo-grupo">
                             <label class="campo-label">CPF do titular *</label>
-                            <input type="text" name="cpf" id="cpf-boleto" class="campo-input"
-                                   placeholder="000.000.000-00" maxlength="14" required>
+                            <input type="text" name="cpf" id="cpf-boleto" class="campo-input" placeholder="000.000.000-00" maxlength="14" value="{{ cpf|default:'' }}" required>
                         </div>
                         <button type="submit" class="btn-pagar btn-boleto" id="btn-boleto" disabled>
                             Gerar boleto
