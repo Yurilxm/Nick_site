@@ -156,6 +156,17 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
 
+# ================================================================
+# SESSÃO
+# ================================================================
+# Por padrão a sessão expira ao fechar o navegador (sem "lembrar").
+# Quando o usuário marca "lembrar-me", o views.py chama
+# request.session.set_expiry(settings.SESSION_COOKIE_AGE),
+# mantendo a sessão por 30 dias independente do navegador fechar.
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True          # padrão: fecha com o navegador
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 30         # "lembrar-me": 30 dias em segundos
+
+
 MERCADO_PAGO_ACCESS_TOKEN = config('MERCADO_PAGO_ACCESS_TOKEN')
 MERCADO_PAGO_PUBLIC_KEY = config('MERCADO_PAGO_PUBLIC_KEY')
 SITE_URL = config('SITE_URL', default='http://localhost:8000')

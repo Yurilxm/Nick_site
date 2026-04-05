@@ -49,16 +49,12 @@ function mascaraCPF(input) {
 function validarCPFInput(input, button) {
     if (!input || !button) return;
 
-    // Função que valida e atualiza o botão
     function atualizarBotao() {
         const cpfLimpo = limparCPF(input.value);
         button.disabled = cpfLimpo.length !== 11;
     }
 
-    // Executa a validação imediatamente (para o valor já existente)
     atualizarBotao();
-
-    // Adiciona o evento para quando o usuário digitar
     input.addEventListener("input", atualizarBotao);
 }
 
@@ -67,12 +63,9 @@ function validarCPFInput(input, button) {
 // =============================================
 const cpfInputs = document.querySelectorAll('#cpf, #cpf-boleto');
 cpfInputs.forEach(input => {
-    // Formata o valor existente
     if (input.value) {
         mascaraCPF(input);
     }
-
-    // Aplica máscara enquanto digita
     input.addEventListener('input', e => mascaraCPF(e.target));
 });
 
@@ -165,16 +158,19 @@ const btnCartao = document.getElementById("btn-pagar-cartao");
 const cpfBoleto = document.getElementById("cpf-boleto");
 const btnBoleto = document.getElementById("btn-boleto");
 
-// Aplica validação com execução imediata
 validarCPFInput(cpfCartao, btnCartao);
 validarCPFInput(cpfBoleto, btnBoleto);
 
 // =============================================
 // MERCADO PAGO — TOKENIZAÇÃO (CARTÃO)
 // =============================================
-let mp;
+let mp = null;
 if (window.MP_PUBLIC_KEY) {
-    mp = new MercadoPago(window.MP_PUBLIC_KEY, { locale: 'pt-BR' });
+    if (typeof window.MercadoPago === 'function') {
+        mp = new window.MercadoPago(window.MP_PUBLIC_KEY, { locale: 'pt-BR' });
+    } else {
+        console.error('SDK do MercadoPago não foi carregado. Verifique o script no template.');
+    }
 }
 
 document.getElementById('form-cartao')?.addEventListener('submit', async function (e) {
@@ -186,7 +182,6 @@ document.getElementById('form-cartao')?.addEventListener('submit', async functio
     btn.disabled = true;
     btn.textContent = 'Processando...';
 
-    // Valida CPF usando a função auxiliar
     const cpf = limparCPF(document.getElementById('cpf').value);
     if (!cpf || cpf.length !== 11) {
         erroEl.textContent = 'CPF inválido. Digite um CPF válido.';
@@ -229,7 +224,6 @@ document.getElementById('form-cartao')?.addEventListener('submit', async functio
             document.getElementById('select-parcelas').value || '1';
         document.getElementById('card-bandeira').value = detectarBandeira(numero);
 
-        // Adiciona o CPF limpo como campo hidden se necessário
         let cpfHidden = document.getElementById('cpf-cartao-hidden');
         if (!cpfHidden) {
             cpfHidden = document.createElement('input');
@@ -264,6 +258,5 @@ document.getElementById('form-boleto')?.addEventListener('submit', function (e) 
         return;
     }
 
-    // Atualiza o valor do input com CPF limpo (sem formatação)
     cpfInput.value = cpf;
 });

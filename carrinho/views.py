@@ -11,12 +11,9 @@ from carrinho.services.melhor_envio_service import calcular_frete_melhor_envio
 from carrinho.services.endereco_service import validar_endereco
 
 
+# ============================================================
 # HELPERS
-
-def limpar_frete_se_carrinho_vazio(request, carrinho):
-    if not carrinho.itens.exists():
-        request.session.pop("frete", None)
-
+# ============================================================
 
 def calcular_total_produtos(carrinho):
     return sum(
@@ -52,6 +49,41 @@ def traduzir_opcoes(itens):
         item.opcoes_formatadas = opcoes_traduzidas
 
 
+def validar_e_limpar_frete(request, carrinho):
+    """
+    Função CENTRAL de validação do frete na sessão.
+    Limpa request.session["frete"] se qualquer condição inválida for detectada:
+      - carrinho vazio
+      - frete sem CEP registrado
+      - CEP do frete diferente do CEP do endereço na sessão
+
+    Deve ser chamada no início de qualquer view que renderize
+    dados de frete (ver_carrinho, finalizar_compra, pagamento).
+    """
+    frete = request.session.get("frete")
+
+    # 1. Carrinho vazio → sem frete
+    if not carrinho.itens.exists():
+        request.session.pop("frete", None)
+        return
+
+    if not frete:
+        return
+
+    # 2. Frete sem CEP → inválido
+    cep_frete = frete.get("cep", "").replace("-", "").strip()
+    if not cep_frete or len(cep_frete) != 8:
+        request.session.pop("frete", None)
+        return
+
+    # 3. CEP do frete diverge do endereço salvo na sessão → frete fantasma
+    endereco_sessao = request.session.get("endereco", {})
+    cep_endereco = endereco_sessao.get("cep", "").replace("-", "").strip() if endereco_sessao else ""
+    if cep_endereco and cep_endereco != cep_frete:
+        request.session.pop("frete", None)
+        return
+    
+
 @require_POST
 def adicionar_ao_carrinho(request, produto_id):
     carrinho = obter_carrinho(request)
@@ -70,17 +102,13 @@ def adicionar_ao_carrinho(request, produto_id):
     for key in request.POST:
         if key.startswith("grupo_"):
             grupo_id = key.replace("grupo_", "")
-
             valores = request.POST.getlist(key)
 
             if len(valores) == 1:
                 valor = valores[0].strip()
-
-                # 👉 verifica se é número (ID de opção)
                 if valor.isdigit():
-                    opcoes_escolhidas[grupo_id] = [valor]  # mantém como lista
+                    opcoes_escolhidas[grupo_id] = [valor]
                 else:
-                    # texto digitado
                     if valor:
                         opcoes_escolhidas[grupo_id] = valor
             else:
@@ -120,7 +148,8 @@ def remover_do_carrinho(request, item_id):
     item = get_object_or_404(ItemCarrinho, id=item_id, carrinho=carrinho)
 
     item.delete()
-    limpar_frete_se_carrinho_vazio(request, carrinho)
+    # Usa a função central para garantir limpeza consistente
+    validar_e_limpar_frete(request, carrinho)
 
     total = calcular_total_produtos(carrinho)
 
@@ -138,14 +167,8 @@ def ver_carrinho(request):
     carrinho = obter_carrinho(request)
     itens = carrinho.itens.select_related("produto")
 
-    if not itens.exists():
-        request.session.pop("frete", None)
-
-    # 🔥 LIMPA FRETE SE NÃO TEM CEP SALVO
-    frete = request.session.get("frete")
-    if frete and not frete.get("cep"):
-        request.session.pop("frete", None)
-        frete = None
+    # 🔥 Validação central: limpa frete inconsistente antes de qualquer cálculo
+    validar_e_limpar_frete(request, carrinho)
 
     traduzir_opcoes(itens)
 
@@ -167,7 +190,6 @@ def ver_carrinho(request):
 def limpar_frete(request):
     request.session.pop("frete", None)
     return JsonResponse({"status": "ok"})
-
 
 
 @require_POST
@@ -203,7 +225,8 @@ def diminuir_quantidade(request, item_id):
         item.delete()
         removido = True
 
-    limpar_frete_se_carrinho_vazio(request, carrinho)
+    # Usa a função central
+    validar_e_limpar_frete(request, carrinho)
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         total = calcular_total_produtos(carrinho)
@@ -226,10 +249,8 @@ def mini_carrinho_json(request):
     traduzir_opcoes(itens)
 
     lista_itens = []
-
     for item in itens:
         opcao_principal = None
-
         if hasattr(item, "opcoes_formatadas") and item.opcoes_formatadas:
             opc = item.opcoes_formatadas[0]
             opcao_principal = f"{opc['grupo']}: {', '.join(opc['valores'])}"
@@ -268,7 +289,6 @@ def calcular_frete(request):
     if not opcoes:
         return JsonResponse({"status": "erro", "mensagem": "Não foi possível calcular o frete para este CEP."})
 
-    # Salva a opção mais barata na sessão por padrão
     melhor = opcoes[0]
     request.session["frete"] = {
         "cep": cep,
@@ -289,7 +309,7 @@ def calcular_frete(request):
 def selecionar_frete(request):
     import json
     data = json.loads(request.body)
-    
+
     request.session["frete"] = {
         "cep": data.get("cep"),
         "valor": str(data.get("valor")),
@@ -297,7 +317,7 @@ def selecionar_frete(request):
         "prazo": data.get("prazo"),
         "transportadora": data.get("transportadora"),
     }
-    
+
     return JsonResponse({"status": "ok"})
 
 
@@ -311,22 +331,24 @@ def finalizar_compra(request):
     itens = carrinho.itens.select_related("produto")
     traduzir_opcoes(itens)
 
+    # 🔥 Validação central aplicada antes de qualquer cálculo
+    validar_e_limpar_frete(request, carrinho)
+
     total_produtos = calcular_total_produtos(carrinho)
-    frete = request.session.get("frete")
-    valor_frete = Decimal(frete["valor"]) if frete else Decimal("0.00")
-    total_geral = total_produtos + valor_frete
 
     if request.method == "POST":
         request.session["endereco"] = {
-            "nome_completo":        request.POST.get("nome_completo", ""),
-            "cep":         request.POST.get("cep_entrega", ""),
-            "rua":         request.POST.get("rua", ""),
-            "numero":      request.POST.get("numero", ""),
-            "complemento": request.POST.get("complemento", ""),
-            "bairro":      request.POST.get("bairro", ""),
-            "cidade":      request.POST.get("cidade", ""),
-            "estado":      request.POST.get("estado", ""),
+            "nome_completo": request.POST.get("nome_completo", ""),
+            "cep":           request.POST.get("cep_entrega", ""),
+            "rua":           request.POST.get("rua", ""),
+            "numero":        request.POST.get("numero", ""),
+            "complemento":   request.POST.get("complemento", ""),
+            "bairro":        request.POST.get("bairro", ""),
+            "cidade":        request.POST.get("cidade", ""),
+            "estado":        request.POST.get("estado", ""),
         }
+        # Novo endereço → invalida frete anterior (pode ser de CEP diferente)
+        validar_e_limpar_frete(request, carrinho)
         return redirect("pedidos:pagamento")
 
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
@@ -335,46 +357,49 @@ def finalizar_compra(request):
 
     endereco_profile = {
         "nome_completo": profile.nome_completo,
-        "cep": profile.cep,
-        "rua": profile.rua,
-        "numero": profile.numero,
-        "complemento": profile.complemento,
-        "bairro": profile.bairro,
-        "cidade": profile.cidade,
-        "estado": profile.estado,
+        "cep":           profile.cep,
+        "rua":           profile.rua,
+        "numero":        profile.numero,
+        "complemento":   profile.complemento,
+        "bairro":        profile.bairro,
+        "cidade":        profile.cidade,
+        "estado":        profile.estado,
     }
 
-    # 👉 Se o profile estiver vazio, limpa sessão
+    # Se o profile estiver completamente vazio, limpa sessão
     if not any(endereco_profile.values()):
         request.session.pop("endereco", None)
         endereco = {}
     else:
-        # 👉 Se tiver sessão, usa sessão (prioridade)
+        # Sessão tem prioridade sobre profile
         if endereco_sessao:
             endereco = {**endereco_profile, **endereco_sessao}
         else:
             endereco = endereco_profile
 
-    # segurança extra
     if not isinstance(endereco, dict):
         endereco = {}
 
-    # 🔥 se não tem CEP válido → limpa frete
+    # Sem CEP válido → sem frete
     if not endereco.get("cep"):
         request.session.pop("frete", None)
 
+    # Tem CEP mas frete ainda não calculado → calcula automaticamente
     if endereco.get("cep") and not request.session.get("frete"):
         opcoes = calcular_frete_melhor_envio(endereco["cep"], itens)
-
         if opcoes:
             melhor = opcoes[0]
             request.session["frete"] = {
-                "cep": endereco["cep"],
-                "valor": str(melhor["preco"]),
-                "tipo": melhor["nome"],
-                "prazo": melhor["prazo"],
+                "cep":            endereco["cep"],
+                "valor":          str(melhor["preco"]),
+                "tipo":           melhor["nome"],
+                "prazo":          melhor["prazo"],
                 "transportadora": melhor["transportadora"],
             }
+
+    frete = request.session.get("frete")
+    valor_frete = Decimal(frete["valor"]) if frete else Decimal("0.00")
+    total_geral = total_produtos + valor_frete
 
     return render(request, "carrinho/checkout.html", {
         "itens":          itens,

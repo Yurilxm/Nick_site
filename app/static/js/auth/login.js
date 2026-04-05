@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setActiveTab('login');
   } else if (container && container.getAttribute('data-active') === 'register') {
     setActiveTab('register');
-  } else if (typeof activeTab !== 'undefined' && activeTab === 'register') {
+  } else if (window.activeTab === 'register') {
     setActiveTab('register');
   } else {
     setActiveTab('login');

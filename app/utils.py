@@ -1,5 +1,7 @@
-import random
+import secrets
 
 
 def login_code():
-    return f"{random.randint(100000, 999999)}"
+    # secrets.randbelow é criptograficamente seguro (usa o CSPRNG do SO),
+    # ao contrário de random.randint, que não é adequado para fins de segurança.
+    return f"{secrets.randbelow(900000) + 100000}"

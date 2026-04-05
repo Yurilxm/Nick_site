@@ -5,6 +5,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from carrinho.services import obter_carrinho
+from carrinho.views import validar_e_limpar_frete   # 🔥 função central de frete
 from .models import Pedido
 from pedidos.services.pedido_service import criar_pedido
 from pedidos.services.pagamento_service import (
@@ -23,7 +24,6 @@ from django.views.decorators.http import require_POST
 from app.models import UserProfile
 
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -37,12 +37,44 @@ def formatar_cpf_para_exibicao(cpf):
     return cpf
 
 
+def _salvar_dados_no_profile(user, endereco, cpf_limpo=None):
+    """
+    Persiste endereço e CPF no UserProfile após a compra.
+    Regras:
+      - Só salva campos válidos (não vazio)
+      - Não sobrescreve campos existentes com vazios
+      - Não apaga dados válidos já salvos
+    """
+    try:
+        profile, _ = UserProfile.objects.get_or_create(user=user)
+
+        campos_endereco = [
+            "nome_completo", "cep", "rua", "numero",
+            "complemento", "bairro", "cidade", "estado",
+        ]
+        for campo in campos_endereco:
+            valor_novo = (endereco.get(campo) or "").strip()
+            if valor_novo:  # só atualiza se o valor novo for válido
+                setattr(profile, campo, valor_novo)
+
+        if cpf_limpo and len(cpf_limpo) == 11:
+            profile.cpf = cpf_limpo
+
+        profile.save()
+    except Exception:
+        # Nunca deixa erro de perfil quebrar o fluxo de pagamento
+        logger.exception(f"Erro ao salvar dados no profile do usuário {user.id}")
+
+
 @login_required
 def pagamento(request):
     carrinho = obter_carrinho(request)
 
     if not carrinho.itens.exists():
         return redirect("ver_carrinho")
+
+    # 🔥 Validação central: limpa frete inconsistente antes de qualquer cálculo
+    validar_e_limpar_frete(request, carrinho)
 
     total_produtos = sum(item.subtotal for item in carrinho.itens.all())
     frete = request.session.get("frete")
@@ -54,7 +86,6 @@ def pagamento(request):
     total_com_desconto = total_geral - desconto_pix
 
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
-    # Formata o CPF para exibição no checkout
     cpf_formatado = formatar_cpf_para_exibicao(profile.cpf)
 
     if request.method == "POST":
@@ -71,8 +102,6 @@ def pagamento(request):
         if not eh_valido:
             return JsonResponse({"status": "erro", "mensagens": erros}, status=400)
 
-        metodo = request.POST.get("metodo")
-
         # Obtém CPF e limpa formatação
         cpf = request.POST.get("cpf") or request.POST.get("cpf-boleto") or ""
         cpf_limpo = ''.join(filter(str.isdigit, cpf))
@@ -88,7 +117,6 @@ def pagamento(request):
             cpf_limpo = None  # PIX não precisa
 
         try:
-            # Cria o pedido UMA ÚNICA VEZ com todos os dados, incluindo CPF
             pedido = criar_pedido(
                 usuario=request.user,
                 carrinho=carrinho,
@@ -113,6 +141,8 @@ def pagamento(request):
             # Processamento conforme método
             if metodo == "pix":
                 pagamento_obj = criar_pagamento_pix(pedido, valor=total_com_desconto)
+                # 🔥 Persiste dados no profile (endereço — CPF não obrigatório no PIX)
+                _salvar_dados_no_profile(request.user, endereco)
                 request.session.pop("resumo_checkout", None)
                 request.session.pop("frete", None)
                 return render(request, "pedidos/pagamentos/pix.html", {
@@ -123,6 +153,8 @@ def pagamento(request):
 
             if metodo == "boleto":
                 pagamento_obj = criar_pagamento_boleto(pedido)
+                # 🔥 Persiste endereço + CPF no profile
+                _salvar_dados_no_profile(request.user, endereco, cpf_limpo)
                 request.session.pop("resumo_checkout", None)
                 request.session.pop("frete", None)
                 return redirect(pagamento_obj.boleto_url)
@@ -138,6 +170,9 @@ def pagamento(request):
                         pedido.status = "pago"
                         pedido.save()
                         enviar_email_pedido_confirmado(pedido)
+
+                    # 🔥 Persiste endereço + CPF no profile
+                    _salvar_dados_no_profile(request.user, endereco, cpf_limpo)
 
                     carrinho.itens.all().delete()
                     request.session.pop("resumo_checkout", None)
@@ -167,7 +202,7 @@ def pagamento(request):
         "mp_public_key": settings.MERCADO_PAGO_PUBLIC_KEY,
         "etapa": 3,
         "btn_confirmar": True,
-        "cpf": cpf_formatado,  # Envia CPF já formatado para o template
+        "cpf": cpf_formatado,
     })
 
 
@@ -222,16 +257,14 @@ def pedido_enviado(request, pedido_id):
 @require_POST
 def salvar_endereco(request):
     data = {
-        "nome": request.POST.get("nome"),
-        "cep": request.POST.get("cep_entrega"),
-        "rua": request.POST.get("rua"),
-        "numero": request.POST.get("numero"),
+        "nome":        request.POST.get("nome"),
+        "cep":         request.POST.get("cep_entrega"),
+        "rua":         request.POST.get("rua"),
+        "numero":      request.POST.get("numero"),
         "complemento": request.POST.get("complemento"),
-        "bairro": request.POST.get("bairro"),
-        "cidade": request.POST.get("cidade"),
-        "estado": request.POST.get("estado"),
+        "bairro":      request.POST.get("bairro"),
+        "cidade":      request.POST.get("cidade"),
+        "estado":      request.POST.get("estado"),
     }
-
     request.session["endereco"] = data
-
     return JsonResponse({"status": "ok"})

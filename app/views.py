@@ -67,7 +67,7 @@ def login_view(request):
                 
                 login(request, user)
 
-                if request.POST.get('remember'):
+                if form_login.cleaned_data.get('remember'):
                     request.session.set_expiry(settings.SESSION_COOKIE_AGE)
                 else:
                     request.session.set_expiry(0)

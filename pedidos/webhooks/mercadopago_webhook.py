@@ -13,8 +13,15 @@ sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
 
 def _validar_assinatura(request):
     """
-    Valida a assinatura do webhook do MercadoPago.
-    Docs: https://www.mercadopago.com.br/developers/pt/docs/your-integrations/notifications/webhooks
+    Valida a assinatura HMAC-SHA256 do webhook do MercadoPago.
+
+    O uso de @csrf_exempt neste endpoint é intencional e seguro:
+    webhooks são chamadas server-to-server — o servidor do MercadoPago
+    não possui nem envia token CSRF. A proteção equivalente é feita aqui
+    via validação de assinatura HMAC, conforme documentação oficial:
+    https://www.mercadopago.com.br/developers/pt/docs/your-integrations/notifications/webhooks
+
+    Qualquer requisição com assinatura inválida ou ausente retorna HTTP 400.
     """
     secret = getattr(settings, "MERCADO_PAGO_WEBHOOK_SECRET", None)
     if not secret:
@@ -44,6 +51,8 @@ def _validar_assinatura(request):
     return hmac.compare_digest(expected, hash_recebido)
 
 
+# @csrf_exempt é necessário: webhooks são chamadas server-to-server sem token CSRF.
+# A segurança é garantida pela validação HMAC em _validar_assinatura().
 @csrf_exempt
 def webhook_mercadopago(request):
     if not _validar_assinatura(request):

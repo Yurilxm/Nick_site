@@ -80,30 +80,30 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Máscara para CPF
+document.addEventListener('DOMContentLoaded', function () {
     const cpfInput = document.querySelector('input[name="cpf"]');
-    if (cpfInput) {
-        function mascaraCPF(input) {
-            let value = input.value.replace(/\D/g, '');
-            if (value.length > 11) value = value.slice(0, 11);
-            if (value.length > 9) {
-                value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
-            } else if (value.length > 6) {
-                value = value.replace(/^(\d{3})(\d{3})(\d{0,3})$/, '$1.$2.$3');
-            } else if (value.length > 3) {
-                value = value.replace(/^(\d{3})(\d{0,3})$/, '$1.$2');
-            }
-            input.value = value;
+
+    function mascaraCPF(input) {
+        let value = input.value.replace(/\D/g, '');
+        if (value.length > 11) value = value.slice(0, 11);
+        if (value.length > 9) {
+            value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+        } else if (value.length > 6) {
+            value = value.replace(/^(\d{3})(\d{3})(\d{0,3})$/, '$1.$2.$3');
+        } else if (value.length > 3) {
+            value = value.replace(/^(\d{3})(\d{0,3})$/, '$1.$2');
         }
-        
+        input.value = value;
+    }
+
+    if (cpfInput) {
         // Formata o CPF existente ao carregar
         if (cpfInput.value) {
             mascaraCPF(cpfInput);
         }
-        
+
         // Aplica a máscara enquanto digita
-        cpfInput.addEventListener('input', function(e) {
+        cpfInput.addEventListener('input', function (e) {
             mascaraCPF(e.target);
         });
     }
