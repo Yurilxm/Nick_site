@@ -77,6 +77,14 @@
     border-bottom: 1.5px solid var(--border);
     background: linear-gradient(135deg, rgba(255,175,204,0.1), rgba(205,180,219,0.1));
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.checkout-card-titulo i {
+    font-size: 18px;
+    color: var(--lilac-mid);
 }
 
 /* ====================================
@@ -376,14 +384,291 @@
     filter: brightness(1.08);
 }
 
+/* ====================================
+   TOGGLE ENTREGA / RETIRADA
+==================================== */
+.entrega-toggle {
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+}
 
+.entrega-opcao {
+    flex: 1;
+    cursor: pointer;
+    border-radius: 14px;
+    transition: all 0.2s ease;
+}
+
+.entrega-opcao input[type="radio"] {
+    display: none;
+}
+
+.entrega-opcao-inner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    background: white;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.entrega-opcao input[type="radio"]:checked + .entrega-opcao-inner {
+    border-color: var(--pink-mid);
+    background: linear-gradient(135deg, rgba(255,175,204,0.08), rgba(205,180,219,0.08));
+    box-shadow: 0 2px 8px rgba(255,133,161,0.15);
+}
+
+.entrega-opcao:hover .entrega-opcao-inner {
+    border-color: var(--baby-lilac);
+    transform: translateY(-2px);
+}
+
+.entrega-opcao-inner i {
+    font-size: 28px;
+    flex-shrink: 0;
+    color: var(--lilac-mid);
+}
+
+.entrega-opcao-inner div {
+    flex: 1;
+}
+
+.entrega-opcao-inner strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+}
+
+.entrega-opcao-inner small {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+/* ====================================
+   BLOCO RETIRADA NA LOJA
+==================================== */
+.retirada-loja-info {
+    padding: 0 20px 20px 20px;
+    border-top: 1px solid var(--border);
+}
+
+.retirada-loja-titulo {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-mid);
+    margin-bottom: 12px;
+    margin-top: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.retirada-loja-titulo i {
+    font-size: 14px;
+    margin-right: 6px;
+    color: var(--pink-mid);
+}
+
+.retirada-endereco-box {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.retirada-endereco-linha {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.retirada-endereco-linha:last-child {
+    margin-bottom: 0;
+}
+
+.retirada-endereco-linha i {
+    font-size: 16px;
+    color: var(--baby-pink);
+    flex-shrink: 0;
+}
+
+.retirada-endereco-linha span {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+    line-height: 1.4;
+    flex: 1;
+}
+
+.retirada-endereco-linha.referencia {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+}
+
+.retirada-endereco-linha.referencia i {
+    color: var(--text-light);
+}
+
+.retirada-endereco-linha.referencia span {
+    font-size: 12px;
+    color: var(--text-mid);
+    font-style: italic;
+}
+
+.retirada-whatsapp-group {
+    padding: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.retirada-whatsapp-group label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-mid);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.retirada-whatsapp-group label i {
+    font-size: 14px;
+    color: #25D366;
+}
+
+.retirada-whatsapp-group small {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-bottom: 12px;
+}
+
+.retirada-whatsapp-group input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: rgba(255,255,255,0.8);
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.retirada-whatsapp-group input:focus {
+    border-color: var(--baby-pink);
+    box-shadow: 0 0 0 3px rgba(255, 175, 204, 0.18);
+}
+
+.retirada-whatsapp-group input::placeholder {
+    color: var(--text-light);
+    font-weight: 400;
+}
+
+.retirada-aviso {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: rgba(205, 180, 219, 0.08);
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-mid);
+}
+
+.retirada-aviso i {
+    font-size: 18px;
+    color: var(--baby-pink);
+    flex-shrink: 0;
+}
+
+.retirada-aviso span {
+    line-height: 1.4;
+}
+
+/* ====================================
+   TRANSIÇÕES ENTRE BLOCOS
+==================================== */
+#bloco-entrega,
+#bloco-retirada {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* ====================================
+   RESPONSIVIDADE
+==================================== */
 @media (max-width: 768px) {
     .checkout-layout { flex-direction: column; }
     .checkout-resumo { position: static; width: 100%; min-width: unset; }
     .checkout-wrapper { padding: 24px 16px 40px; }
+
+    .entrega-toggle {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .entrega-opcao-inner {
+        padding: 14px;
+    }
+    
+    .entrega-opcao-inner i {
+        font-size: 24px;
+    }
+    
+    .retirada-endereco-box {
+        padding: 12px;
+    }
+    
+    .retirada-endereco-linha {
+        gap: 8px;
+    }
+    
+    .retirada-endereco-linha i {
+        font-size: 14px;
+    }
+    
+    .retirada-endereco-linha span {
+        font-size: 13px;
+    }
 }
 
 @media (max-width: 480px) {
     .checkout-item { flex-wrap: wrap; gap: 12px; }
     .checkout-img { width: 56px; height: 56px; }
+
+    .entrega-toggle {
+        padding: 16px;
+    }
+    
+    .entrega-opcao-inner strong {
+        font-size: 13px;
+    }
+    
+    .retirada-loja-info,
+    .retirada-whatsapp-group {
+        padding: 16px;
+    }
+    
+    .retirada-aviso {
+        padding: 12px 16px;
+        gap: 8px;
+    }
+    
+    .retirada-aviso i {
+        font-size: 16px;
+    }
 }

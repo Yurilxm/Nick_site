@@ -8,14 +8,14 @@ from django.db.models.signals import pre_delete
 import uuid
 
 
-
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
 
     # Dados pessoais
     nome_completo = models.CharField(max_length=200, blank=True)
     cpf = models.CharField(max_length=14, blank=True)
-    
+    telefone = models.CharField(max_length=20, blank=True, verbose_name="WhatsApp / Telefone")
+
     # Verificação de e-mail
     email_verified = models.BooleanField(default=False)
     email_verified_at = models.DateTimeField(null=True, blank=True)
@@ -31,22 +31,23 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"Perfil de {self.user.email}"
-    
+
     def get_cpf_formatado(self):
         """Retorna o CPF formatado (XXX.XXX.XXX-XX)"""
         if not self.cpf:
             return ''
-        # Remove todos os caracteres não numéricos
         cpf_limpo = ''.join(filter(str.isdigit, self.cpf))
         if len(cpf_limpo) == 11:
             return f"{cpf_limpo[:3]}.{cpf_limpo[3:6]}.{cpf_limpo[6:9]}-{cpf_limpo[9:]}"
         return self.cpf
-    
+
     def save(self, *args, **kwargs):
         """Salva o CPF sem formatação no banco"""
         if self.cpf:
-            # Remove formatação antes de salvar
             self.cpf = ''.join(filter(str.isdigit, self.cpf))
+        # Salva telefone só com dígitos também
+        if self.telefone:
+            self.telefone = ''.join(filter(str.isdigit, self.telefone))
         super().save(*args, **kwargs)
 
 
@@ -83,7 +84,7 @@ class EmailVerificationToken(models.Model):
     def create_token(cls, user):
         return cls.objects.create(
             user=user,
-            expires_at=timezone.now() + timedelta(days=7)  # Token válido por 7 dias
+            expires_at=timezone.now() + timedelta(days=7)
         )
 
 
@@ -93,10 +94,8 @@ def criar_profile(sender, instance, created, **kwargs):
         UserProfile.objects.create(user=instance)
 
 
-
 @receiver(pre_delete, sender=User)
 def deletar_relacionados(sender, instance, **kwargs):
     from app.models import EmailVerificationToken, UserProfile
-
     EmailVerificationToken.objects.filter(user=instance).delete()
     UserProfile.objects.filter(user=instance).delete()

@@ -5,17 +5,9 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
-# Caminho base do projeto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool, default=False)
 
 ALLOWED_HOSTS = config(
@@ -28,8 +20,6 @@ CSRF_TRUSTED_ORIGINS = config(
     default='',
     cast=lambda v: [s.strip() for s in v.split(',')] if v else []
 )
-
-# Application definition
 
 INSTALLED_APPS = [
     'adminsortable2',
@@ -81,10 +71,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'site_nick.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
 ENVIRONMENT = config('ENVIRONMENT', default='development')
 
 if ENVIRONMENT == 'production':
@@ -106,66 +92,46 @@ else:
         }
     }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
-
-
-# Internationalization
-# https://docs.djangoproject.com/en/6.0/topics/i18n/
 
 LANGUAGE_CODE = 'pt-BR'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
-
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / "app" / "static",
-]
-
+STATICFILES_DIRS = [BASE_DIR / "app" / "static"]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = config('MEDIA_ROOT', default=os.path.join(BASE_DIR, 'media'))
 STATIC_ROOT = config('STATIC_ROOT', default=os.path.join(BASE_DIR, 'staticfiles'))
-
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
-
 # ================================================================
 # SESSÃO
 # ================================================================
-# Por padrão a sessão expira ao fechar o navegador (sem "lembrar").
-# Quando o usuário marca "lembrar-me", o views.py chama
-# request.session.set_expiry(settings.SESSION_COOKIE_AGE),
-# mantendo a sessão por 30 dias independente do navegador fechar.
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True          # padrão: fecha com o navegador
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 30         # "lembrar-me": 30 dias em segundos
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 30  # 30 dias para "lembrar-me"
 
+
+# ENDEREÇO DA LOJA (usado na opção de retirada)
+LOJA_ENDERECO = {
+    "rua":         config('LOJA_RUA',        default=''),
+    "numero":      config('LOJA_NUMERO',     default=''),
+    "complemento": config('LOJA_COMPLEMENTO', default=''),
+    "bairro":      config('LOJA_BAIRRO',     default=''),
+    "cidade":      config('LOJA_CIDADE',     default=''),
+    "estado":      config('LOJA_ESTADO',     default='RJ'),
+    "cep":         config('LOJA_CEP',        default=''),
+    "referencia":  config('LOJA_REFERENCIA', default=''),
+}
 
 MERCADO_PAGO_ACCESS_TOKEN = config('MERCADO_PAGO_ACCESS_TOKEN')
 MERCADO_PAGO_PUBLIC_KEY = config('MERCADO_PAGO_PUBLIC_KEY')
@@ -174,26 +140,21 @@ SITE_URL = config('SITE_URL', default='http://localhost:8000')
 MELHOR_ENVIO_TOKEN = config('MELHOR_ENVIO_TOKEN', default='')
 CEP_LOJA = config('CEP_LOJA', default='')
 
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
 EMAIL_PORT = config('EMAIL_PORT', cast=int, default=587)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool, default=True)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-
 DEFAULT_FROM_EMAIL = 'Mimos da Nick Personalizados <mimosdanickpersonalizados@gmail.com>'
 
-
 SOCIAL_LINKS = {
-    "facebook": "https://www.facebook.com/people/Mimos-da-Nick-Personalizados/61557583673989/?rdid=czuOSwCRiSq5nO7C&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F14YgUSQvCeY%2F",
+    "facebook":  "https://www.facebook.com/people/Mimos-da-Nick-Personalizados/61557583673989/?rdid=czuOSwCRiSq5nO7C&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F14YgUSQvCeY%2F",
     "instagram": "https://instagram.com/mimosdanickpersonalizados",
-    "whatsapp": "https://wa.me/5521992536502?text=Olá%2C%20vim%20pelo%20site%20e%20gostaria%20de%20mais%20informações",
-    "email": "mimosdanickpersonalizados@gmail.com",
+    "whatsapp":  "https://wa.me/5521992536502?text=Olá%2C%20vim%20pelo%20site%20e%20gostaria%20de%20mais%20informações",
+    "email":     "mimosdanickpersonalizados@gmail.com",
 }
 
-
-# Cloudinary
 cloudinary.config(
     cloud_name=config('CLOUDINARY_CLOUD_NAME'),
     api_key=config('CLOUDINARY_API_KEY'),
@@ -209,7 +170,6 @@ STORAGES = {
     },
 }
 
-
 CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_HTTPONLY = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -218,16 +178,11 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-
     X_FRAME_OPTIONS = 'DENY'
-
     SECURE_SSL_REDIRECT = True
-
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-
-    SECURE_HSTS_SECONDS = 3600  # 1 hora
+    SECURE_HSTS_SECONDS = 3600 # 1 hora para testes, aumente para 31536000 (1 ano) em produção
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-
     SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"

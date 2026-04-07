@@ -39,8 +39,6 @@ from .utils import login_code
 from django.utils.http import url_has_allowed_host_and_scheme
 
 
-
-
 # =========================
 # LOGIN + CADASTRO
 # =========================
@@ -57,22 +55,21 @@ def login_view(request):
             form_login = LoginForm(request, data=request.POST)
             if form_login.is_valid():
                 user = form_login.get_user()
-                
-                # Verificar se e-mail foi confirmado
+
                 profile = user.profile
                 if not profile.email_verified:
                     request.session['user_id'] = user.id
                     messages.warning(request, 'Por favor, verifique seu e-mail antes de fazer login.', extra_tags='warning')
                     return redirect('verification_email')
-                
+
                 login(request, user)
 
+                # ✅ CORRIGIDO: usar cleaned_data após form.is_valid()
                 if form_login.cleaned_data.get('remember'):
                     request.session.set_expiry(settings.SESSION_COOKIE_AGE)
                 else:
                     request.session.set_expiry(0)
 
-                # Transferir carrinho
                 carrinho_sessao = request.session.get('carrinho', {})
                 for produto_id, quantidade in carrinho_sessao.items():
                     item, created = ItemCarrinho.objects.get_or_create(
@@ -96,8 +93,7 @@ def login_view(request):
             form_register = RegisterForm(request.POST)
             if form_register.is_valid():
                 data = form_register.cleaned_data
-                
-                # Criar usuário
+
                 user = User.objects.create_user(
                     username=data['email'],
                     email=data['email'],
@@ -106,23 +102,18 @@ def login_view(request):
                 )
 
                 request.session['user_id'] = user.id
-                
-                # Atualizar perfil
+
                 profile = user.profile
                 profile.nome_completo = data['nome']
                 profile.save()
-                
-                # Enviar e-mail de verificação
+
                 send_verification_email(request, user)
-                
-                # Mensagem de sucesso
+
                 messages.success(
-                    request, 
+                    request,
                     'Conta criada com sucesso! Verifique seu e-mail para confirmar o cadastro.',
                     extra_tags='success'
                 )
-                
-                # Não logar automaticamente, redirecionar para página de confirmação
                 return redirect('verification_email')
             else:
                 active_tab = 'register'
@@ -135,27 +126,20 @@ def login_view(request):
         'active_tab': active_tab,
     })
 
+
 def send_verification_email(request, user):
-    """Envia e-mail de verificação para o usuário"""
-    # Cria token de verificação
     token = EmailVerificationToken.create_token(user)
-    
-    # Gera link de verificação
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     verification_link = request.build_absolute_uri(
         reverse('verify_email', kwargs={'uidb64': uid, 'token': token.token})
     )
-    
-    # Template do e-mail
     context = {
         'user': user,
         'verification_link': verification_link,
         'site_name': 'Mimos da Nick',
     }
-    
     html_content = render_to_string('emails/verify_email.html', context)
     text_content = render_to_string('emails/verify_email.txt', context)
-    
     email = EmailMultiAlternatives(
         subject='Confirme seu e-mail | Mimos da Nick',
         body=text_content,
@@ -167,33 +151,23 @@ def send_verification_email(request, user):
 
 
 def verify_email_view(request, uidb64, token):
-    """Verifica o e-mail do usuário e loga automaticamente"""
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
-        verification_token = EmailVerificationToken.objects.get(
-            user=user,
-            token=token,
-            used=False
-        )
+        verification_token = EmailVerificationToken.objects.get(user=user, token=token, used=False)
 
         if verification_token.is_valid():
-            # Marcar e-mail como verificado
             profile = user.profile
             profile.email_verified = True
             profile.email_verified_at = timezone.now()
             profile.save()
 
-            # Marcar token como usado
             verification_token.used = True
             verification_token.save()
 
-            # 🔥 LOGIN AUTOMÁTICO
             login(request, user)
-
             request.session.pop('user_id', None)
 
-            # 🔥 Transferir carrinho da sessão
             carrinho_sessao = request.session.get('carrinho', {})
             for produto_id, quantidade in carrinho_sessao.items():
                 item, created = ItemCarrinho.objects.get_or_create(
@@ -206,19 +180,12 @@ def verify_email_view(request, uidb64, token):
                     item.save()
             request.session['carrinho'] = {}
 
-            # 🔥 REDIRECIONAMENTO INTELIGENTE
             next_url = request.session.pop('next_url', 'home')
-
             if not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
                 next_url = 'home'
 
-            messages.success(
-                request,
-                'E-mail verificado com sucesso! Você já está logado 🎉'
-            )
-
+            messages.success(request, 'E-mail verificado com sucesso! Você já está logado 🎉')
             return redirect(next_url)
-
         else:
             messages.error(request, 'Este link de verificação expirou. Solicite um novo.')
             return redirect('resend_verification', user_id=user.id)
@@ -227,26 +194,22 @@ def verify_email_view(request, uidb64, token):
         messages.error(request, 'Link de verificação inválido.')
         return redirect('login')
 
+
 def verification_sent_view(request):
     user_id = request.session.get('user_id')
+    return render(request, 'auth/verification_email.html', {'user_id': user_id})
 
-    return render(request, 'auth/verification_email.html', {
-        'user_id': user_id
-    })
 
 def resend_verification_view(request, user_id):
-    """Reenvia e-mail de verificação"""
     try:
         user = User.objects.get(pk=user_id)
-        # Invalidar tokens antigos
         EmailVerificationToken.objects.filter(user=user, used=False).update(used=True)
-        # Enviar novo
         send_verification_email(request, user)
         messages.success(request, 'Novo link de verificação enviado!')
     except User.DoesNotExist:
         messages.error(request, 'Usuário não encontrado.')
-    
     return redirect('verification_email')
+
 
 # =========================
 # LOGOUT
@@ -256,6 +219,7 @@ def logout_view(request):
     messages.info(request, 'Logout realizado com sucesso!', extra_tags='logout')
     return redirect('home')
 
+
 # =========================
 # HOME
 # =========================
@@ -263,12 +227,12 @@ def home_view(request):
     canecas = Produto.objects.filter(categoria__slug='canecas').order_by('-id').prefetch_related("categoria")[:8]
     agendas = Produto.objects.filter(categoria__slug='agendas').order_by('-id').prefetch_related("categoria")[:8]
     sublimacao = Produto.objects.filter(categoria__slug='sublimacao').order_by('-id').prefetch_related("categoria")[:8]
-
     return render(request, 'pages/home.html', {
         'canecas': canecas,
         'agendas': agendas,
         'sublimacao': sublimacao,
     })
+
 
 # =========================
 # OUTRAS VIEWS
@@ -281,6 +245,7 @@ def contato_view(request):
 
 def carrinho_view(request):
     return render(request, 'pages/carrinho.html')
+
 
 # =========================
 # CÓDIGO POR E-MAIL
@@ -342,7 +307,6 @@ def login_code_confirm_view(request):
         )
         login_code_obj.used = True
         login_code_obj.save()
-
         login(request, user)
 
         carrinho_sessao = request.session.get('carrinho', {})
@@ -358,8 +322,6 @@ def login_code_confirm_view(request):
         request.session['carrinho'] = {}
 
         profile, _ = UserProfile.objects.get_or_create(user=user)
-
-        # 🔥 marcar e-mail como verificado automaticamente
         if not profile.email_verified:
             profile.email_verified = True
             profile.email_verified_at = timezone.now()
@@ -373,6 +335,7 @@ def login_code_confirm_view(request):
         return redirect(next_url)
     return render(request, 'auth/login_code.html')
 
+
 # =========================
 # RESET DE SENHA
 # =========================
@@ -383,11 +346,7 @@ class PasswordResetCustomView(PasswordResetView):
     success_url = reverse_lazy('password_reset_done')
 
     def form_valid(self, form):
-        messages.success(
-            self.request,
-            'Se existir uma conta com esse e-mail, você receberá instruções para redefinir sua senha.',
-            extra_tags='success'
-        )
+        messages.success(self.request, 'Se existir uma conta com esse e-mail, você receberá instruções para redefinir sua senha.', extra_tags='success')
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -408,15 +367,12 @@ class PasswordResetConfirmCustomView(PasswordResetConfirmView):
         return super().form_invalid(form)
 
     def form_valid(self, form):
-        messages.success(
-            self.request,
-            'Senha redefinida com sucesso! Faça login com sua nova senha.',
-            extra_tags='success'
-        )
+        messages.success(self.request, 'Senha redefinida com sucesso! Faça login com sua nova senha.', extra_tags='success')
         return super().form_valid(form)
 
 class PasswordResetCompleteCustomView(PasswordResetCompleteView):
     template_name = 'auth/password_reset_complete.html'
+
 
 # =========================
 # BUSCA
@@ -440,6 +396,7 @@ def search_products_view(request):
     ]
     return JsonResponse({'results': results})
 
+
 # =========================
 # PERFIL
 # =========================
@@ -449,6 +406,7 @@ def perfil_view(request):
     if request.method == "POST":
         profile.nome_completo = request.POST.get("nome_completo", "")
         profile.cpf = request.POST.get("cpf", "")
+        profile.telefone = request.POST.get("telefone", "")  # ✅ NOVO: salva telefone/WhatsApp
         profile.cep = request.POST.get("cep", "")
         profile.rua = request.POST.get("rua", "")
         profile.numero = request.POST.get("numero", "")
@@ -460,6 +418,7 @@ def perfil_view(request):
         messages.success(request, "Perfil atualizado com sucesso!")
         return redirect("perfil")
     return render(request, "auth/perfil.html", {"profile": profile})
+
 
 # =========================
 # BUSCAR CEP
@@ -478,6 +437,7 @@ def buscar_cep(request):
         'localidade': data.get('localidade', ''),
         'uf': data.get('uf', '')
     })
+
 
 # =========================
 # UTILITÁRIO

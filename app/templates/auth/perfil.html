@@ -20,8 +20,8 @@
                         <i class="ri-user-line"></i>
                         <span>Nome completo</span>
                     </label>
-                    <input type="text" name="nome_completo" 
-                           placeholder="Digite seu nome completo" 
+                    <input type="text" name="nome_completo"
+                           placeholder="Digite seu nome completo"
                            value="{{ profile.nome_completo|default:'' }}">
                 </div>
 
@@ -30,9 +30,24 @@
                         <i class="ri-id-card-line"></i>
                         <span>CPF</span>
                     </label>
-                    <input type="text" name="cpf" 
-                           placeholder="000.000.000-00" 
+                    <input type="text" name="cpf"
+                           placeholder="000.000.000-00"
                            value="{{ profile.cpf|default:'' }}">
+                </div>
+
+                <!-- ✅ NOVO: campo de telefone/WhatsApp -->
+                <div class="perfil-form-group">
+                    <label>
+                        <i class="ri-whatsapp-line"></i>
+                        <span>WhatsApp / Telefone</span>
+                    </label>
+                    <input type="tel" name="telefone" id="perfil-telefone"
+                           placeholder="(21) 99999-9999"
+                           value="{{ profile.telefone|default:'' }}">
+                    <div class="perfil-cep-hint">
+                        <i class="ri-information-line"></i>
+                        <span>Usado para combinar retirada na loja, se necessário</span>
+                    </div>
                 </div>
             </div>
 
@@ -48,8 +63,8 @@
                         <i class="ri-mail-line"></i>
                         <span>CEP</span>
                     </label>
-                    <input type="text" id="cep" name="cep" 
-                           placeholder="00000-000" 
+                    <input type="text" id="cep" name="cep"
+                           placeholder="00000-000"
                            value="{{ profile.cep|default:'' }}">
                     <div class="perfil-cep-hint">
                         <i class="ri-information-line"></i>
@@ -62,8 +77,8 @@
                         <i class="ri-road-map-line"></i>
                         <span>Rua</span>
                     </label>
-                    <input type="text" id="rua" name="rua" 
-                           placeholder="Digite sua rua" 
+                    <input type="text" id="rua" name="rua"
+                           placeholder="Digite sua rua"
                            value="{{ profile.rua|default:'' }}">
                 </div>
 
@@ -73,8 +88,8 @@
                             <i class="ri-hashtag"></i>
                             <span>Número</span>
                         </label>
-                        <input type="text" id="numero" name="numero" 
-                               placeholder="Número" 
+                        <input type="text" id="numero" name="numero"
+                               placeholder="Número"
                                value="{{ profile.numero|default:'' }}">
                     </div>
 
@@ -83,8 +98,8 @@
                             <i class="ri-home-office-line"></i>
                             <span>Complemento</span>
                         </label>
-                        <input type="text" id="complemento" name="complemento" 
-                               placeholder="Apto, Bloco, etc" 
+                        <input type="text" id="complemento" name="complemento"
+                               placeholder="Apto, Bloco, etc"
                                value="{{ profile.complemento|default:'' }}">
                     </div>
                 </div>
@@ -94,8 +109,8 @@
                         <i class="ri-community-line"></i>
                         <span>Bairro</span>
                     </label>
-                    <input type="text" id="bairro" name="bairro" 
-                           placeholder="Digite seu bairro" 
+                    <input type="text" id="bairro" name="bairro"
+                           placeholder="Digite seu bairro"
                            value="{{ profile.bairro|default:'' }}">
                 </div>
 
@@ -105,8 +120,8 @@
                             <i class="ri-building-line"></i>
                             <span>Cidade</span>
                         </label>
-                        <input type="text" id="cidade" name="cidade" 
-                               placeholder="Cidade" 
+                        <input type="text" id="cidade" name="cidade"
+                               placeholder="Cidade"
                                value="{{ profile.cidade|default:'' }}">
                     </div>
 
@@ -115,8 +130,8 @@
                             <i class="ri-map-2-line"></i>
                             <span>Estado</span>
                         </label>
-                        <input type="text" id="estado" name="estado" 
-                               placeholder="UF" 
+                        <input type="text" id="estado" name="estado"
+                               placeholder="UF"
                                value="{{ profile.estado|default:'' }}">
                     </div>
                 </div>

@@ -13,16 +13,18 @@
 
     <h2 class="checkout-titulo">Confirmar Pedido</h2>
 
-    <!-- ✅ FORM GLOBAL (ESSENCIAL) -->
-    <form method="post">
+    <form method="post" id="form-checkout">
         {% csrf_token %}
+
+        <!-- Passa o tipo de entrega salvo na sessão (para o JS restaurar o estado) -->
+        <input type="hidden" id="tipo-entrega-inicial" value="{{ tipo_entrega_sessao|default:'entrega' }}">
 
         <div class="checkout-layout">
 
             <!-- COLUNA ESQUERDA -->
             <div class="checkout-itens">
 
-                <!-- ITENS -->
+                <!-- ITENS DO PEDIDO -->
                 <div class="checkout-card" style="margin-bottom: 20px;">
                     <h3 class="checkout-card-titulo">Itens do pedido</h3>
                     <ul class="checkout-lista">
@@ -35,7 +37,6 @@
                             {% endif %}
                             <div class="checkout-item-info">
                                 <strong class="checkout-item-nome">{{ item.produto.nome }}</strong>
-
                                 {% if item.opcoes_formatadas %}
                                 <div class="checkout-opcoes">
                                     {% for opcao in item.opcoes_formatadas %}
@@ -45,30 +46,55 @@
                                     {% endfor %}
                                 </div>
                                 {% endif %}
-
-                                <div class="checkout-item-qty">
-                                    Qtd: <strong>{{ item.quantidade }}</strong>
-                                </div>
+                                <div class="checkout-item-qty">Qtd: <strong>{{ item.quantidade }}</strong></div>
                             </div>
-
-                            <div class="checkout-item-preco">
-                                R$ {{ item.subtotal }}
-                            </div>
+                            <div class="checkout-item-preco">R$ {{ item.subtotal }}</div>
                         </li>
                         {% endfor %}
                     </ul>
                 </div>
 
-                <!-- ENDEREÇO -->
-                <div class="checkout-card">
-                    <h3 class="checkout-card-titulo">📦 Endereço de Entrega</h3>
+                <!-- ✅ TOGGLE: COMO QUER RECEBER? -->
+                <div class="checkout-card" style="margin-bottom: 20px;">
+                    <h3 class="checkout-card-titulo">Como quer receber?</h3>
+
+                    <div class="entrega-toggle">
+                        <label class="entrega-opcao" id="label-entrega">
+                            <input type="radio" name="tipo_entrega" value="entrega" id="radio-entrega">
+                            <div class="entrega-opcao-inner">
+                                <i class="ri-home-4-line"></i>
+                                <div>
+                                    <strong>Receber em casa</strong>
+                                    <small>Calculamos o frete para você</small>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="entrega-opcao" id="label-retirada">
+                            <input type="radio" name="tipo_entrega" value="retirada" id="radio-retirada">
+                            <div class="entrega-opcao-inner">
+                                <i class="ri-store-3-line"></i>
+                                <div>
+                                    <strong>Retirar na loja</strong>
+                                    <small>Grátis — combinamos por WhatsApp</small>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- ✅ BLOCO ENTREGA (endereço + frete) -->
+                <div id="bloco-entrega" class="checkout-card">
+                    <h3 class="checkout-card-titulo">
+                        <i class="ri-home-4-line"></i> Endereço de Entrega
+                    </h3>
 
                     <div class="endereco-form">
-
                         <div class="endereco-linha">
                             <div class="endereco-campo flex-3">
                                 <label>Nome completo *</label>
-                                <input type="text" name="nome_completo" id="endereco-nome" value="{{ endereco.nome_completo|default:'' }}" required>
+                                <input type="text" name="nome_completo" id="endereco-nome"
+                                       value="{{ endereco.nome_completo|default:'' }}">
                             </div>
                         </div>
 
@@ -76,7 +102,9 @@
                             <div class="endereco-campo">
                                 <label>CEP *</label>
                                 <div class="cep-grupo">
-                                    <input type="text" name="cep_entrega" id="endereco-cep" placeholder="00000-000" maxlength="9" value="{{ endereco.cep|default:'' }}">
+                                    <input type="text" name="cep_entrega" id="endereco-cep"
+                                           placeholder="00000-000" maxlength="9"
+                                           value="{{ endereco.cep|default:'' }}">
                                     <button type="button" id="btn-buscar-cep">Buscar</button>
                                 </div>
                             </div>
@@ -86,13 +114,12 @@
                             <div class="endereco-campo flex-3">
                                 <label>Rua *</label>
                                 <input type="text" name="rua" id="endereco-rua"
-                                    value="{{ endereco.rua|default:'' }}">
+                                       value="{{ endereco.rua|default:'' }}">
                             </div>
-
                             <div class="endereco-campo flex-1">
                                 <label>Número *</label>
                                 <input type="text" name="numero" id="endereco-numero"
-                                    value="{{ endereco.numero|default:'' }}">
+                                       value="{{ endereco.numero|default:'' }}">
                             </div>
                         </div>
 
@@ -100,13 +127,12 @@
                             <div class="endereco-campo">
                                 <label>Complemento</label>
                                 <input type="text" name="complemento" id="endereco-complemento"
-                                    value="{{ endereco.complemento|default:'' }}">
+                                       value="{{ endereco.complemento|default:'' }}">
                             </div>
-
                             <div class="endereco-campo">
                                 <label>Bairro *</label>
                                 <input type="text" name="bairro" id="endereco-bairro"
-                                    value="{{ endereco.bairro|default:'' }}">
+                                       value="{{ endereco.bairro|default:'' }}">
                             </div>
                         </div>
 
@@ -114,16 +140,82 @@
                             <div class="endereco-campo flex-3">
                                 <label>Cidade *</label>
                                 <input type="text" name="cidade" id="endereco-cidade"
-                                    value="{{ endereco.cidade|default:'' }}">
+                                       value="{{ endereco.cidade|default:'' }}">
                             </div>
-
                             <div class="endereco-campo flex-1">
                                 <label>Estado *</label>
                                 <input type="text" name="estado" maxlength="2" id="endereco-estado"
-                                    value="{{ endereco.estado|default:'' }}">
+                                       value="{{ endereco.estado|default:'' }}">
                             </div>
                         </div>
+                    </div>
+                </div>
 
+                <!-- ✅ BLOCO RETIRADA (endereço da loja + WhatsApp) -->
+                <div id="bloco-retirada" class="checkout-card" style="display:none;">
+                    <h3 class="checkout-card-titulo">
+                        <i class="ri-store-3-line"></i> Retirada na Loja
+                    </h3>
+
+                    <!-- Nome do cliente -->
+                    <div class="endereco-form">
+                        <div class="endereco-linha">
+                            <div class="endereco-campo flex-3">
+                                <label>Seu nome completo *</label>
+                                <input type="text" name="nome_completo_retirada" id="retirada-nome"
+                                       value="{{ endereco.nome_completo|default:'' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Endereço da loja -->
+                    <div class="retirada-loja-info">
+                        <p class="retirada-loja-titulo">
+                            <i class="ri-map-pin-line"></i> Endereço para retirada:
+                        </p>
+                        <div class="retirada-endereco-box">
+                            {% if loja_endereco.rua %}
+                                <div class="retirada-endereco-linha">
+                                    <i class="ri-road-map-line"></i>
+                                    <span>{{ loja_endereco.rua }}{% if loja_endereco.numero %}, {{ loja_endereco.numero }}{% endif %}{% if loja_endereco.complemento %} — {{ loja_endereco.complemento }}{% endif %}</span>
+                                </div>
+                                <div class="retirada-endereco-linha">
+                                    <i class="ri-map-pin-user-line"></i>
+                                    <span>{{ loja_endereco.bairro }}{% if loja_endereco.cidade %} — {{ loja_endereco.cidade }}/{{ loja_endereco.estado }}{% endif %}</span>
+                                </div>
+                                {% if loja_endereco.cep %}
+                                <div class="retirada-endereco-linha">
+                                    <i class="ri-mail-line"></i>
+                                    <span>CEP: {{ loja_endereco.cep }}</span>
+                                </div>
+                                {% endif %}
+                                {% if loja_endereco.referencia %}
+                                <div class="retirada-endereco-linha referencia">
+                                    <i class="ri-information-line"></i>
+                                    <span>{{ loja_endereco.referencia }}</span>
+                                </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="retirada-endereco-linha">
+                                    <i class="ri-error-warning-line"></i>
+                                    <span>Endereço ainda não configurado. O contato será feito por WhatsApp.</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- WhatsApp do cliente -->
+                    <div class="retirada-whatsapp-group">
+                        <label><i class="ri-whatsapp-line"></i> Seu WhatsApp *</label>
+                        <small>Entraremos em contato para combinar a retirada</small>
+                        <input type="tel" name="whatsapp_retirada" id="retirada-whatsapp"
+                               placeholder="(21) 99999-9999"
+                               value="{{ whatsapp_salvo|default:'' }}">
+                    </div>
+
+                    <div class="retirada-aviso">
+                        <i class="ri-information-line"></i>
+                        <span>Após a confirmação do pagamento, entraremos em contato pelo WhatsApp informado para combinar a retirada.</span>
                     </div>
                 </div>
 
