@@ -205,6 +205,8 @@ def resend_verification_view(request, user_id):
         user = User.objects.get(pk=user_id)
         EmailVerificationToken.objects.filter(user=user, used=False).update(used=True)
         send_verification_email(request, user)
+        # Garante que a página de verificação tenha o ID do usuário
+        request.session['user_id'] = user.id
         messages.success(request, 'Novo link de verificação enviado!')
     except User.DoesNotExist:
         messages.error(request, 'Usuário não encontrado.')

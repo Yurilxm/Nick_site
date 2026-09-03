@@ -130,7 +130,7 @@ def adicionar_ao_carrinho(request, produto_id):
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         return JsonResponse({"status": "ok"})
-    return redirect("ver_carrinho")
+    return redirect("carrinho:ver_carrinho")
 
 
 @require_POST
@@ -147,7 +147,7 @@ def remover_do_carrinho(request, item_id):
             "total": float(total),
             "carrinho_vazio": not carrinho.itens.exists(),
         })
-    return redirect("ver_carrinho")
+    return redirect("carrinho:ver_carrinho")
 
 
 def ver_carrinho(request):
@@ -191,7 +191,7 @@ def aumentar_quantidade(request, item_id):
             "quantidade_total": sum(i.quantidade for i in carrinho.itens.all()),
             "total": float(total),
         })
-    return redirect("ver_carrinho")
+    return redirect("carrinho:ver_carrinho")
 
 
 @require_POST
@@ -219,7 +219,7 @@ def diminuir_quantidade(request, item_id):
             "quantidade_total": sum(i.quantidade for i in carrinho.itens.all()),
             "total": float(total),
         })
-    return redirect("ver_carrinho")
+    return redirect("carrinho:ver_carrinho")
 
 
 def mini_carrinho_json(request):
@@ -295,7 +295,7 @@ def finalizar_compra(request):
     carrinho = obter_carrinho(request)
 
     if not carrinho.itens.exists():
-        return redirect("ver_carrinho")
+        return redirect("carrinho:ver_carrinho")
 
     itens = carrinho.itens.select_related("produto")
     traduzir_opcoes(itens)

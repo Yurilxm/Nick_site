@@ -6,6 +6,9 @@ from .services import obter_carrinho
 
 @receiver(user_logged_in)
 def associar_carrinho_ao_usuario(sender, request, user, **kwargs):
+    # Garante que request.user esteja disponível para obter_carrinho
+    request.user = user
+
     carrinho_sessao = obter_carrinho(request)
 
     # procura carrinho ativo do usuário

@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
+from django.core.validators import FileExtensionValidator
 
 
 class Produto(models.Model):
@@ -47,7 +48,11 @@ class Produto(models.Model):
         help_text="Comprimento em cm"
     )
 
-    imagem = models.ImageField(upload_to="produtos/", max_length=500)
+    imagem = models.ImageField(
+        upload_to="produtos/",
+        max_length=500,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])]
+    )
 
     permite_personalizacao = models.BooleanField(default=False)
 
@@ -104,7 +109,7 @@ class Produto(models.Model):
 
     def get_absolute_url(self):
         return reverse("detalhe_produto", kwargs={"produto_id": self.id, "slug": self.slug})
-    
+
 
 class GrupoOpcao(models.Model):
 
@@ -179,7 +184,11 @@ class ProdutoImagem(models.Model):
         Produto, on_delete=models.CASCADE, related_name="imagens"
     )
 
-    imagem = models.ImageField(upload_to="produtos/galeria/", max_length=500)
+    imagem = models.ImageField(
+        upload_to="produtos/galeria/",
+        max_length=500,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])]
+    )
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, default="detalhe")
     ordem = models.PositiveIntegerField(default=0)
 
@@ -199,13 +208,13 @@ class ProdutoImagem(models.Model):
         return f"{self.get_tipo_display()} - {self.produto.nome}"
 
 
-
 class ConfiguracaoSobre(models.Model):
     foto_equipe = models.ImageField(
         upload_to="sobre/",
         blank=True,
         null=True,
         max_length=500,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])],
         help_text="Foto da equipe/loja exibida na seção 'Nossa história'"
     )
 
@@ -227,13 +236,18 @@ class ConfiguracaoSobre(models.Model):
         return obj
 
 
-
 class Avaliacao(models.Model):
     nome = models.CharField(max_length=100)
     comentario = models.TextField()
     estrelas = models.PositiveIntegerField(default=5)
 
-    foto = models.ImageField(upload_to="avaliacoes/", blank=True, null=True, max_length=500)
+    foto = models.ImageField(
+        upload_to="avaliacoes/",
+        blank=True,
+        null=True,
+        max_length=500,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])]
+    )
 
     aprovado = models.BooleanField(default=False)
     criado_em = models.DateTimeField(auto_now_add=True)
@@ -244,19 +258,23 @@ class Avaliacao(models.Model):
         verbose_name_plural = "Avaliações"
 
     def __str__(self):
-        return f"{self.nome} ({self.estrelas}⭐)"
+        return f"{self.nome} ({self.estrelas}★)"
 
 
 class ImagemSobre(models.Model):
-    imagem = models.ImageField(upload_to="sobre/", max_length=500)
+    imagem = models.ImageField(
+        upload_to="sobre/",
+        max_length=500,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])]
+    )
     ordem = models.PositiveIntegerField(default=0)
     ativo = models.BooleanField(default=True)
     criado_em = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-criado_em"]
-        verbose_name = "Imagem dos prdutos na mão dos clientes na página Sobre"
-        verbose_name_plural = "Imagem dos prdutos na mão dos clientes na página Sobre"
+        verbose_name = "Imagem dos produtos na mão dos clientes na página Sobre"
+        verbose_name_plural = "Imagens dos produtos na mão dos clientes na página Sobre"
 
     def __str__(self):
         return f"Imagem Sobre #{self.id}"

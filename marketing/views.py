@@ -2,6 +2,8 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from .models import EmailMarketing
 
 
@@ -14,9 +16,15 @@ def _referer_seguro(request):
 
 @require_POST
 def cadastrar_email_marketing(request):
-    email = request.POST.get("email")
+    email = request.POST.get("email", "").strip()
 
     if not email:
+        return redirect(_referer_seguro(request))
+
+    try:
+        validate_email(email)
+    except ValidationError:
+        messages.error(request, "E-mail inválido. Verifique e tente novamente.")
         return redirect(_referer_seguro(request))
 
     obj, created = EmailMarketing.objects.get_or_create(

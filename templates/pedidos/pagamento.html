@@ -162,9 +162,9 @@
 
 {# Passa a public key do MercadoPago pro JS sem expor no HTML #}
 <script>
-    window.MP_PUBLIC_KEY = "{{ mp_public_key }}";
+    window.MP_PUBLIC_KEY = "{{ mp_public_key|escapejs }}";
     window.PARCELAS_URL = "{% url 'pedidos:parcelas_cartao' %}";
-    window.TOTAL_GERAL = "{{ total_geral }}";
+    window.TOTAL_GERAL = "{{ total_geral|escapejs }}";
 </script>
 <script src="https://sdk.mercadopago.com/js/v2"></script>
 <script src="{% static 'pedidos/js/pagamento.js' %}"></script>

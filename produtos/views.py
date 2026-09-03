@@ -20,7 +20,7 @@ def lista_produtos(request):
 
 def detalhe_produto(request, produto_id, slug):
     produto = get_object_or_404(
-        Produto.objects.prefetch_related('grupos_opcoes__opcoes', 'categoria'),
+        Produto.objects.prefetch_related('grupos_opcoes__opcoes', 'categoria').filter(ativo=True),
         id=produto_id,
         slug=slug
     )

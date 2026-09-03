@@ -139,7 +139,7 @@ def pagamento(request):
                 request.session.pop("resumo_checkout", None)
                 return JsonResponse({
                     "status": "erro",
-                    "mensagem": f"Pedido não passou na validação de antifraude. Motivo: {motivo}"
+                    "mensagem": "Pedido não passou na validação de segurança."
                 }, status=400)
 
             if metodo == "pix":
@@ -185,10 +185,10 @@ def pagamento(request):
                 return redirect("pedidos:pagamento")
 
         except ValidationError as e:
-            return JsonResponse({"status": "erro", "mensagem": str(e)}, status=400)
-        except Exception as e:
-            logger.exception(f"Erro inesperado ao processar pedido do usuário {request.user.id}")
-            return JsonResponse({"status": "erro", "mensagem": f"Erro ao processar pedido: {str(e)}"}, status=500)
+            return JsonResponse({"status": "erro", "mensagem": "Dados inválidos. Verifique as informações."}, status=400)
+        except Exception:
+            logger.exception("Erro inesperado ao processar pedido")
+            return JsonResponse({"status": "erro", "mensagem": "Erro interno. Tente novamente mais tarde."}, status=500)
 
     # GET
     return render(request, "pedidos/pagamento.html", {

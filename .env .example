@@ -4,6 +4,7 @@ SECRET_KEY=xxxxxxxx
 
 ALLOWED_HOSTS=seudominio.com,.onrender.com
 CSRF_TRUSTED_ORIGINS=https://seudominio.com,https://*.onrender.com
+MERCADO_PAGO_WEBHOOK_SECRET=SEU_WEBHOOK_SECRET
 
 # Banco
 DB_NAME=xxxx
