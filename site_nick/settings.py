@@ -105,7 +105,6 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "app" / "static"]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = config('MEDIA_ROOT', default=os.path.join(BASE_DIR, 'media'))
 STATIC_ROOT = config('STATIC_ROOT', default=os.path.join(BASE_DIR, 'staticfiles'))
