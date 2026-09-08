@@ -151,7 +151,7 @@
 
         <!-- RESUMO -->
         <div class="pagamento-resumo">
-            {% include "components/resumo_pedido.html" %}
+            {% include "components/resumo_pedido.html" with is_retirada=is_retirada %}
             <a href="{% url 'carrinho:finalizar_compra' %}" class="btn-voltar-pagamento">
                 ← Voltar ao pedido
             </a>

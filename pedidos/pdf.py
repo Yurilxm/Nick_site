@@ -116,27 +116,34 @@ def gerar_ficha_pdf(request, pedido_id):
     y -= 1 * cm
 
     # ==========================================
-    # SEÇÃO: ENDEREÇO DE ENTREGA
+    # SEÇÃO: ENTREGA / RETIRADA
     # ==========================================
     y -= 0.3 * cm
-    y = secao_titulo("Endereco de Entrega", y)
-    y -= 0.3 * cm
-
-    if pedido.cep_entrega:
-        campo("CEP", pedido.cep_entrega, 1.5 * cm, y)
-        campo("Cidade/Estado", f"{pedido.cidade}/{pedido.estado}" if pedido.cidade else "—", 7 * cm, y)
+    if pedido.tipo_entrega == "retirada":
+        y = secao_titulo("Retirada na Loja", y)
+        y -= 0.3 * cm
+        campo("Tipo de entrega", "Retirada na loja", 1.5 * cm, y)
+        campo("WhatsApp", pedido.whatsapp_retirada or "Não informado", 10 * cm, y)
         y -= 1 * cm
-        campo("Rua", f"{pedido.rua}, {pedido.numero}" if pedido.rua else "—", 1.5 * cm, y)
-        campo("Bairro", pedido.bairro or "—", 12 * cm, y)
-        y -= 1 * cm
-        if pedido.complemento:
-            campo("Complemento", pedido.complemento, 1.5 * cm, y)
-            y -= 1 * cm
     else:
-        c.setFillColor(TEXT_LIGHT)
-        c.setFont("Helvetica", 10)
-        c.drawString(1.5 * cm, y, "Endereco nao informado")
-        y -= 1 * cm
+        y = secao_titulo("Endereco de Entrega", y)
+        y -= 0.3 * cm
+
+        if pedido.cep_entrega:
+            campo("CEP", pedido.cep_entrega, 1.5 * cm, y)
+            campo("Cidade/Estado", f"{pedido.cidade}/{pedido.estado}" if pedido.cidade else "—", 7 * cm, y)
+            y -= 1 * cm
+            campo("Rua", f"{pedido.rua}, {pedido.numero}" if pedido.rua else "—", 1.5 * cm, y)
+            campo("Bairro", pedido.bairro or "—", 12 * cm, y)
+            y -= 1 * cm
+            if pedido.complemento:
+                campo("Complemento", pedido.complemento, 1.5 * cm, y)
+                y -= 1 * cm
+        else:
+            c.setFillColor(TEXT_LIGHT)
+            c.setFont("Helvetica", 10)
+            c.drawString(1.5 * cm, y, "Endereco nao informado")
+            y -= 1 * cm
 
     # ==========================================
     # SEÇÃO: ITENS DO PEDIDO
@@ -253,7 +260,10 @@ def gerar_ficha_pdf(request, pedido_id):
     c.drawString(width - 8.5 * cm, ty, "Frete:")
     c.setFillColor(TEXT_DARK)
     c.setFont("Helvetica-Bold", 10)
-    c.drawRightString(width - 2 * cm, ty, f"R$ {valor_frete:.2f}" if valor_frete > 0 else "A calcular")
+    if pedido.is_retirada:
+        c.drawRightString(width - 2 * cm, ty, "Grátis")
+    else:
+        c.drawRightString(width - 2 * cm, ty, f"R$ {valor_frete:.2f}" if valor_frete > 0 else "A calcular")
 
     ty -= 0.4 * cm
     c.setStrokeColor(BORDER)

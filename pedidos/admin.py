@@ -131,23 +131,35 @@ class PedidoAdmin(admin.ModelAdmin):
     def ficha_producao(self, obj):
         cliente = obj.usuario.username if obj.usuario else "Cliente anônimo"
 
-        cabecalho = format_html(
-            "<h3>PEDIDO #{}</h3>"
-            "<b>Cliente:</b> {}<br>"
-            "<b>CEP:</b> {}<br>"
-            "<b>Endereço:</b> {}, {}<br>"
-            "<b>Bairro:</b> {}<br>"
-            "<b>Cidade:</b> {}/{}<br>"
-            "<b>Complemento:</b> {}<br>"
-            "<hr><h4>Itens do pedido</h4>",
-            obj.id,
-            cliente,
-            obj.cep_entrega,
-            obj.rua, obj.numero,
-            obj.bairro,
-            obj.cidade, obj.estado,
-            obj.complemento,
-        )
+        if obj.tipo_entrega == "retirada":
+            cabecalho = format_html(
+                "<h3>PEDIDO #{}</h3>"
+                "<b>Cliente:</b> {}<br>"
+                "<b>Tipo de entrega:</b> Retirada na loja<br>"
+                "<b>WhatsApp para contato:</b> {}<br>"
+                "<hr><h4>Itens do pedido</h4>",
+                obj.id,
+                cliente,
+                obj.whatsapp_retirada or "Não informado",
+            )
+        else:
+            cabecalho = format_html(
+                "<h3>PEDIDO #{}</h3>"
+                "<b>Cliente:</b> {}<br>"
+                "<b>CEP:</b> {}<br>"
+                "<b>Endereço:</b> {}, {}<br>"
+                "<b>Bairro:</b> {}<br>"
+                "<b>Cidade:</b> {}/{}<br>"
+                "<b>Complemento:</b> {}<br>"
+                "<hr><h4>Itens do pedido</h4>",
+                obj.id,
+                cliente,
+                obj.cep_entrega,
+                obj.rua, obj.numero,
+                obj.bairro,
+                obj.cidade, obj.estado,
+                obj.complemento,
+            )
 
         itens = format_html_join(
             "",

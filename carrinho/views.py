@@ -52,7 +52,6 @@ def validar_e_limpar_frete(request, carrinho):
       - frete sem CEP
       - CEP do frete diverge do endereço salvo
     """
-    # Retirada nunca tem frete
     if request.session.get("tipo_entrega") == "retirada":
         request.session.pop("frete", None)
         return
@@ -307,7 +306,6 @@ def finalizar_compra(request):
         request.session["tipo_entrega"] = tipo_entrega
 
         if tipo_entrega == "retirada":
-            # ✅ Retirada: sem endereço, sem frete
             nome = request.POST.get("nome_completo") or request.POST.get("nome_completo_retirada", "")
             whatsapp = ''.join(filter(str.isdigit, request.POST.get("whatsapp_retirada", "")))
             request.session.pop("frete", None)
@@ -318,7 +316,6 @@ def finalizar_compra(request):
             }
             request.session["whatsapp_retirada"] = whatsapp
         else:
-            # ✅ Entrega normal
             request.session["whatsapp_retirada"] = ""
             request.session["endereco"] = {
                 "nome_completo": request.POST.get("nome_completo", ""),
@@ -348,21 +345,32 @@ def finalizar_compra(request):
         "estado":        profile.estado,
     }
 
-    if not any(endereco_profile.values()):
-        request.session.pop("endereco", None)
-        endereco = {}
+    # ── CORREÇÃO: antes, se o UserProfile estivesse vazio (comum em
+    # clientes novos), o código apagava request.session["endereco"]
+    # mesmo que ele tivesse acabado de ser preenchido — causando o CEP
+    # "sumir" ao recarregar/voltar na etapa de confirmação. Agora a
+    # sessão nunca é descartada por causa do estado do perfil; o perfil
+    # só serve de fallback quando a sessão está realmente vazia.
+    if endereco_sessao:
+        endereco = {**endereco_profile, **endereco_sessao}
+    elif any(endereco_profile.values()):
+        endereco = endereco_profile
     else:
-        endereco = {**endereco_profile, **endereco_sessao} if endereco_sessao else endereco_profile
+        endereco = {}
 
     if not isinstance(endereco, dict):
         endereco = {}
 
     tipo_entrega_sessao = request.session.get("tipo_entrega", "entrega")
+    is_retirada = tipo_entrega_sessao == "retirada"
 
-    if tipo_entrega_sessao == "entrega":
-        if not endereco.get("cep"):
-            request.session.pop("frete", None)
-        elif not request.session.get("frete"):
+    if is_retirada:
+        request.session.pop("frete", None)
+        frete = None
+    else:
+        frete = request.session.get("frete")
+
+        if not frete and endereco.get("cep"):
             opcoes = calcular_frete_melhor_envio(endereco["cep"], itens)
             if opcoes:
                 melhor = opcoes[0]
@@ -373,8 +381,11 @@ def finalizar_compra(request):
                     "prazo":          melhor["prazo"],
                     "transportadora": melhor["transportadora"],
                 }
+                frete = request.session["frete"]
 
-    frete = request.session.get("frete")
+        if frete and not endereco.get("cep"):
+            endereco = {**endereco, "cep": frete.get("cep", "")}
+
     valor_frete = Decimal(frete["valor"]) if frete else Decimal("0.00")
     total_geral = total_produtos + valor_frete
 
@@ -388,6 +399,7 @@ def finalizar_compra(request):
         "endereco":            endereco,
         "etapa":               2,
         "tipo_entrega_sessao": tipo_entrega_sessao,
+        "is_retirada":         is_retirada,
         "whatsapp_salvo":      whatsapp_salvo,
         "loja_endereco":       settings.LOJA_ENDERECO,
     })

@@ -9,50 +9,54 @@
 
         <div class="checkout-linha">
             <span>Subtotal</span>
-            <span>R$ {{ total_produtos|moeda }}</span>
+            <span id="subtotal-checkout">R$ {{ total_produtos|moeda }}</span>
         </div>
 
-        {% if frete %}
-        <!-- Frete já calculado -->
-        <div class="checkout-linha" id="linha-frete-atual">
-            <span>Frete ({{ frete.tipo }})</span>
-            <span>R$ {{ frete.valor|moeda }}</span>
-        </div>
+        {% if is_retirada %}
+            <div class="checkout-linha retirada-linha">
+                <span>Entrega</span>
+                <span>Retirada na loja</span>
+            </div>
+        {% elif frete %}
+            <!-- Frete já calculado -->
+            <div class="checkout-linha" id="linha-frete-atual">
+                <span>Frete ({{ frete.tipo }})</span>
+                <span>R$ {{ frete.valor|moeda }}</span>
+            </div>
 
-        <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
-            <button type="button" class="btn-alterar-frete" id="btn-alterar-frete">
-                Alterar frete
-            </button>
+            <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
+                <button type="button" class="btn-alterar-frete" id="btn-alterar-frete">
+                    Alterar frete
+                </button>
 
-            <div id="frete-box-checkout" class="frete-box-checkout" style="display:none">
+                <div id="frete-box-checkout" class="frete-box-checkout" style="display:none">
+                    <div class="frete-form-checkout">
+                        <input type="text" id="cep-input-checkout"
+                            placeholder="Digite seu CEP" maxlength="9"
+                            value="{{ frete.cep|default:'' }}">
+                        <button type="button" id="btn-calcular-frete-checkout">Calcular</button>
+                    </div>
+                    <div id="frete-resultado-checkout" style="display:none"></div>
+                </div>
+            </div>
+        {% else %}
+            <!-- Frete não calculado -->
+            <div class="checkout-linha frete-pendente" id="linha-frete-pendente">
+                <span>Frete</span>
+                <span>A calcular</span>
+            </div>
+
+            {% if btn_confirmar %}
+            <div class="frete-box-checkout" id="frete-box-checkout">
+                <p class="frete-label">Calcule o frete para continuar</p>
                 <div class="frete-form-checkout">
                     <input type="text" id="cep-input-checkout"
-                        placeholder="Digite seu CEP" maxlength="9"
-                        value="{{ frete.cep|default:'' }}">
+                           placeholder="Digite seu CEP" maxlength="9">
                     <button type="button" id="btn-calcular-frete-checkout">Calcular</button>
                 </div>
                 <div id="frete-resultado-checkout" style="display:none"></div>
             </div>
-        </div>
-
-        {% else %}
-        <!-- Frete não calculado -->
-        <div class="checkout-linha frete-pendente" id="linha-frete-pendente">
-            <span>Frete</span>
-            <span>A calcular</span>
-        </div>
-
-        {% if btn_confirmar %}
-        <div class="frete-box-checkout" id="frete-box-checkout">
-            <p class="frete-label">Calcule o frete para continuar</p>
-            <div class="frete-form-checkout">
-                <input type="text" id="cep-input-checkout"
-                       placeholder="Digite seu CEP" maxlength="9">
-                <button type="button" id="btn-calcular-frete-checkout">Calcular</button>
-            </div>
-            <div id="frete-resultado-checkout" style="display:none"></div>
-        </div>
-        {% endif %}
+            {% endif %}
         {% endif %}
 
         <div class="checkout-divider"></div>
@@ -64,7 +68,7 @@
 
         {% if btn_confirmar %}
         <button type="submit" id="btn-confirmar" class="btn-confirmar"
-            {% if not frete %}disabled style="opacity:0.5;cursor:not-allowed;"{% endif %}>
+            {% if not frete and not is_retirada %}disabled style="opacity:0.5;cursor:not-allowed;"{% endif %}>
             Confirmar pedido
         </button>
 

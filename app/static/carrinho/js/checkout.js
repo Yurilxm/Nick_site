@@ -61,11 +61,76 @@ document.addEventListener("DOMContentLoaded", function () {
     // TOGGLE ENTREGA / RETIRADA
     // ================================================================
 
-    // Campos obrigatórios apenas na entrega
     const camposEntrega = [
         "endereco-nome", "endereco-cep", "endereco-rua", "endereco-numero",
         "endereco-bairro", "endereco-cidade", "endereco-estado"
     ].map(id => document.getElementById(id)).filter(Boolean);
+
+    function obterSubtotal() {
+        const el = document.getElementById("subtotal-checkout");
+        if (!el) return 0;
+        const texto = el.textContent.replace("R$", "").trim();
+        return parseFloat(texto.replace(/\./g, "").replace(",", ".")) || 0;
+    }
+
+    function formatarMoeda(valor) {
+        return valor.toFixed(2).replace(".", ",");
+    }
+
+    function atualizarResumo(isRetirada, freteExistente = null) {
+        const linhaFreteAtual = document.getElementById("linha-frete-atual");
+        const linhaFretePendente = document.getElementById("linha-frete-pendente");
+        const totalEl = document.getElementById("total-geral-checkout");
+        const btnConfirmar = document.getElementById("btn-confirmar");
+
+        const subtotal = obterSubtotal();
+        let frete = 0;
+
+        if (isRetirada) {
+            // Esconde linhas de frete
+            if (linhaFreteAtual) linhaFreteAtual.style.display = "none";
+            if (linhaFretePendente) linhaFretePendente.style.display = "none";
+            frete = 0;
+        } else {
+            // Mostra linha de frete, dependendo se existe frete calculado
+            if (freteExistente) {
+                if (linhaFreteAtual) {
+                    linhaFreteAtual.style.display = "flex"; // ou block, conforme CSS
+                    // Atualiza valores
+                    const spanTexto = linhaFreteAtual.querySelector("span:first-child");
+                    const spanValor = linhaFreteAtual.querySelector("span:last-child");
+                    if (spanTexto) spanTexto.textContent = `Frete (${freteExistente.tipo})`;
+                    if (spanValor) spanValor.textContent = `R$ ${freteExistente.valor}`;
+                    frete = parseFloat(freteExistente.valor.replace(",", ".")) || 0;
+                }
+                if (linhaFretePendente) linhaFretePendente.style.display = "none";
+            } else {
+                // Sem frete calculado, mostra linha pendente
+                if (linhaFreteAtual) linhaFreteAtual.style.display = "none";
+                if (linhaFretePendente) {
+                    linhaFretePendente.style.display = "flex";
+                    const spanValor = linhaFretePendente.querySelector("span:last-child");
+                    if (spanValor) spanValor.textContent = "A calcular";
+                }
+                frete = 0;
+            }
+        }
+
+        const total = subtotal + frete;
+        if (totalEl) totalEl.textContent = `R$ ${formatarMoeda(total)}`;
+
+        // Habilita botão confirmar se retirada, ou se entrega e tem endereço/frete
+        if (btnConfirmar) {
+            if (isRetirada) {
+                btnConfirmar.disabled = false;
+                btnConfirmar.style.opacity = "1";
+                btnConfirmar.style.cursor = "pointer";
+            } else {
+                // A validação existente atualizará o botão
+                atualizarBotaoConfirmar();
+            }
+        }
+    }
 
     function ativarEntrega() {
         if (blocoEntrega) blocoEntrega.style.display = "block";
@@ -80,6 +145,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const nomeRet = document.getElementById("retirada-nome");
         if (nomeRet) nomeRet.required = false;
 
+        // Atualiza resumo para entrega (preserva frete existente se houver)
+        const freteAtual = window.freteAtual || null;
+        atualizarResumo(false, freteAtual);
         atualizarBotaoConfirmar();
     }
 
@@ -96,24 +164,19 @@ document.addEventListener("DOMContentLoaded", function () {
         const nomeRet = document.getElementById("retirada-nome");
         if (nomeRet) nomeRet.required = true;
 
+        // Atualiza resumo para retirada (sem frete)
+        atualizarResumo(true, null);
         atualizarBotaoConfirmar();
     }
 
-    // Restaura estado da sessão ao carregar
-    if (tipoInicial === "retirada") {
-        if (radioRetirada) radioRetirada.checked = true;
-        ativarRetirada();
-    } else {
-        if (radioEntrega) radioEntrega.checked = true;
-        ativarEntrega();
-    }
-
-    if (radioEntrega) {
-        radioEntrega.addEventListener("change", () => { if (radioEntrega.checked) ativarEntrega(); });
-    }
-    if (radioRetirada) {
-        radioRetirada.addEventListener("change", () => { if (radioRetirada.checked) ativarRetirada(); });
-    }
+    // ================================================================
+    // TOGGLE LISTENERS  ← ÚNICA CORREÇÃO NESTE ARQUIVO
+    // Sem isso, clicar nos rádios não disparava ativarEntrega/ativarRetirada,
+    // e o resumo só se atualizava depois do POST/redirect (por isso o
+    // frete "antigo" ficava visível até a página de pagamento).
+    // ================================================================
+    if (radioEntrega) radioEntrega.addEventListener("change", ativarEntrega);
+    if (radioRetirada) radioRetirada.addEventListener("change", ativarRetirada);
 
     // ================================================================
     // MÁSCARA WHATSAPP (retirada)
@@ -547,7 +610,35 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // ================================================================
-    // ESTADO INICIAL
+    // INICIALIZAÇÃO
     // ================================================================
+
+    // Armazena frete atual vindo do servidor (se existir) em variável global
+    window.freteAtual = null;
+    const freteAtualElement = document.getElementById("linha-frete-atual");
+    if (freteAtualElement) {
+        const spanTexto = freteAtualElement.querySelector("span:first-child");
+        const spanValor = freteAtualElement.querySelector("span:last-child");
+        if (spanTexto && spanValor) {
+            const tipoMatch = spanTexto.textContent.match(/Frete \((.*?)\)/);
+            const valorMatch = spanValor.textContent.replace("R$", "").trim();
+            if (tipoMatch && valorMatch) {
+                window.freteAtual = {
+                    tipo: tipoMatch[1],
+                    valor: valorMatch
+                };
+            }
+        }
+    }
+
+    if (tipoInicial === "retirada") {
+        if (radioRetirada) radioRetirada.checked = true;
+        ativarRetirada();
+    } else {
+        if (radioEntrega) radioEntrega.checked = true;
+        ativarEntrega();
+    }
+
+    // Atualiza botão após inicialização
     atualizarBotaoConfirmar();
 });

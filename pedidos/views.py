@@ -5,6 +5,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from carrinho.services import obter_carrinho
+from carrinho.services.melhor_envio_service import calcular_frete_melhor_envio
 from carrinho.views import validar_e_limpar_frete
 from .models import Pedido
 from pedidos.services.pedido_service import criar_pedido
@@ -81,8 +82,28 @@ def pagamento(request):
     tipo_entrega = request.session.get("tipo_entrega", "entrega")
     is_retirada = tipo_entrega == "retirada"
 
-    total_produtos = sum(item.subtotal for item in carrinho.itens.all())
-    frete = request.session.get("frete")
+    itens = carrinho.itens.select_related("produto")
+    total_produtos = sum(item.subtotal for item in itens)
+
+    endereco = request.session.get("endereco") or {}
+    
+    if is_retirada:
+        request.session.pop("frete", None)
+        frete = None
+    else:
+        if endereco.get("cep") and not request.session.get("frete"):
+            opcoes = calcular_frete_melhor_envio(endereco["cep"], itens)
+            if opcoes:
+                melhor = opcoes[0]
+                request.session["frete"] = {
+                    "cep":            endereco["cep"],
+                    "valor":          str(melhor["preco"]),
+                    "tipo":           melhor["nome"],
+                    "prazo":          melhor["prazo"],
+                    "transportadora": melhor["transportadora"],
+                }
+        frete = request.session.get("frete")
+
     valor_frete = Decimal(frete["valor"]) if frete and not is_retirada else Decimal("0.00")
     total_geral = total_produtos + valor_frete
 
