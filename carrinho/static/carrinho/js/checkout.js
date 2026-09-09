@@ -82,6 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const linhaFretePendente = document.getElementById("linha-frete-pendente");
         const totalEl = document.getElementById("total-geral-checkout");
         const btnConfirmar = document.getElementById("btn-confirmar");
+        const freteBox = document.getElementById("frete-box-checkout");
 
         const subtotal = obterSubtotal();
         let frete = 0;
@@ -90,13 +91,13 @@ document.addEventListener("DOMContentLoaded", function () {
             // Esconde linhas de frete
             if (linhaFreteAtual) linhaFreteAtual.style.display = "none";
             if (linhaFretePendente) linhaFretePendente.style.display = "none";
+            if (freteBox) freteBox.style.display = "none";
             frete = 0;
         } else {
             // Mostra linha de frete, dependendo se existe frete calculado
             if (freteExistente) {
                 if (linhaFreteAtual) {
-                    linhaFreteAtual.style.display = "flex"; // ou block, conforme CSS
-                    // Atualiza valores
+                    linhaFreteAtual.style.display = "flex";
                     const spanTexto = linhaFreteAtual.querySelector("span:first-child");
                     const spanValor = linhaFreteAtual.querySelector("span:last-child");
                     if (spanTexto) spanTexto.textContent = `Frete (${freteExistente.tipo})`;
@@ -104,14 +105,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     frete = parseFloat(freteExistente.valor.replace(",", ".")) || 0;
                 }
                 if (linhaFretePendente) linhaFretePendente.style.display = "none";
+                if (freteBox) freteBox.style.display = "none"; // já existe frete; campo CEP não é necessário
             } else {
-                // Sem frete calculado, mostra linha pendente
+                // Sem frete calculado: mostra linha pendente e o campo de CEP
                 if (linhaFreteAtual) linhaFreteAtual.style.display = "none";
                 if (linhaFretePendente) {
                     linhaFretePendente.style.display = "flex";
                     const spanValor = linhaFretePendente.querySelector("span:last-child");
                     if (spanValor) spanValor.textContent = "A calcular";
                 }
+                if (freteBox) freteBox.style.display = "block"; // mostra o input de CEP
                 frete = 0;
             }
         }
@@ -119,14 +122,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const total = subtotal + frete;
         if (totalEl) totalEl.textContent = `R$ ${formatarMoeda(total)}`;
 
-        // Habilita botão confirmar se retirada, ou se entrega e tem endereço/frete
         if (btnConfirmar) {
             if (isRetirada) {
                 btnConfirmar.disabled = false;
                 btnConfirmar.style.opacity = "1";
                 btnConfirmar.style.cursor = "pointer";
             } else {
-                // A validação existente atualizará o botão
                 atualizarBotaoConfirmar();
             }
         }
