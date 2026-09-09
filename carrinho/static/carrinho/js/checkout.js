@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnCalcularFrete = document.getElementById("btn-calcular-frete-checkout");
     const freteResultado = document.getElementById("frete-resultado-checkout");
     const nomeCompletoInput = document.getElementById("endereco-nome");
+    const nomeRetirada = document.getElementById("retirada-nome");
 
     function getCSRFToken() {
         return document.querySelector("[name=csrfmiddlewaretoken]")?.value || "";
@@ -83,6 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const totalEl = document.getElementById("total-geral-checkout");
         const btnConfirmar = document.getElementById("btn-confirmar");
         const freteBox = document.getElementById("frete-box-checkout");
+        const btnAlterar = document.getElementById("btn-alterar-frete");
 
         const subtotal = obterSubtotal();
         let frete = 0;
@@ -92,6 +94,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (linhaFreteAtual) linhaFreteAtual.style.display = "none";
             if (linhaFretePendente) linhaFretePendente.style.display = "none";
             if (freteBox) freteBox.style.display = "none";
+            if (btnAlterar) btnAlterar.style.display = "none";
             frete = 0;
         } else {
             // Mostra linha de frete, dependendo se existe frete calculado
@@ -106,6 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
                 if (linhaFretePendente) linhaFretePendente.style.display = "none";
                 if (freteBox) freteBox.style.display = "none"; // já existe frete; campo CEP não é necessário
+                if (btnAlterar) btnAlterar.style.display = "inline-block"; // botão de alterar disponível
             } else {
                 // Sem frete calculado: mostra linha pendente e o campo de CEP
                 if (linhaFreteAtual) linhaFreteAtual.style.display = "none";
@@ -115,6 +119,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (spanValor) spanValor.textContent = "A calcular";
                 }
                 if (freteBox) freteBox.style.display = "block"; // mostra o input de CEP
+                if (btnAlterar) btnAlterar.style.display = "none"; // sem frete, botão não faz sentido
                 frete = 0;
             }
         }
@@ -143,8 +148,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const wpp = document.getElementById("retirada-whatsapp");
         if (wpp) wpp.required = false;
-        const nomeRet = document.getElementById("retirada-nome");
-        if (nomeRet) nomeRet.required = false;
+        if (nomeRetirada) nomeRetirada.required = false;
+
+        // Copia nome do campo de retirada para o de entrega (se entrega estiver vazio)
+        if (nomeRetirada && nomeCompletoInput) {
+            if (!nomeCompletoInput.value.trim() && nomeRetirada.value.trim()) {
+                nomeCompletoInput.value = nomeRetirada.value;
+            }
+        }
 
         // Atualiza resumo para entrega (preserva frete existente se houver)
         const freteAtual = window.freteAtual || null;
@@ -162,8 +173,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const wpp = document.getElementById("retirada-whatsapp");
         if (wpp) wpp.required = true;
-        const nomeRet = document.getElementById("retirada-nome");
-        if (nomeRet) nomeRet.required = true;
+        if (nomeRetirada) nomeRetirada.required = true;
+
+        // Copia nome do campo de entrega para o de retirada (se retirada estiver vazio)
+        if (nomeCompletoInput && nomeRetirada) {
+            if (!nomeRetirada.value.trim() && nomeCompletoInput.value.trim()) {
+                nomeRetirada.value = nomeCompletoInput.value;
+            }
+        }
 
         // Atualiza resumo para retirada (sem frete)
         atualizarResumo(true, null);
@@ -197,7 +214,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // ================================================================
     // SINCRONIZAR NOME (entrega ↔ retirada)
     // ================================================================
-    const nomeRetirada = document.getElementById("retirada-nome");
     if (nomeCompletoInput && nomeRetirada) {
         nomeCompletoInput.addEventListener("input", () => {
             if (!nomeRetirada.value) nomeRetirada.value = nomeCompletoInput.value;
@@ -630,6 +646,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 };
             }
         }
+    }
+
+    // Se não há frete vindo do servidor, remove CEP salvo no sessionStorage
+    if (!window.freteAtual) {
+        sessionStorage.removeItem("cep_digitado");
     }
 
     if (tipoInicial === "retirada") {
